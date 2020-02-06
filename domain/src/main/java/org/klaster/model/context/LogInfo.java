@@ -1,11 +1,11 @@
 package org.klaster.model.context;
 
 import java.time.LocalDateTime;
-import org.klaster.model.state.AccountState;
-import org.klaster.model.state.UnverifiedAccountState;
+import org.klaster.model.state.UnverifiedUserState;
+import org.klaster.model.state.UserState;
 
 /**
- * Account
+ * LogInfo
  *
  * workrest
  *
@@ -14,16 +14,16 @@ import org.klaster.model.state.UnverifiedAccountState;
  * @author Nikita Lepesevich
  */
 
-public class Account extends AbstractContext<AccountState> {
+public class LogInfo extends AbstractContext<UserState> {
 
   private final String login;
   private final String passwordHash;
   private LocalDateTime lastAuthorizedAt;
 
-  public Account(String login, String passwordHash) {
+  public LogInfo(String login, String passwordHash) {
     this.login = login;
     this.passwordHash = passwordHash;
-    this.setCurrentState(new UnverifiedAccountState(this));
+    this.setCurrentState(new UnverifiedUserState(this));
   }
 
   public String getLogin() {

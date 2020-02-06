@@ -1,6 +1,7 @@
 package org.klaster.model.entity;
 
 import java.util.Set;
+import org.klaster.model.context.User;
 
 /**
  * FreelancerProfile

@@ -1,8 +1,7 @@
 package org.klaster.model.entity;
 
 import java.util.logging.Logger;
-import org.klaster.model.context.Account;
-import org.klaster.model.controller.AccountController;
+import org.klaster.model.context.LogInfo;
 
 /**
  * Administrator
@@ -14,21 +13,16 @@ import org.klaster.model.controller.AccountController;
  * @author Nikita Lepesevich
  */
 
-public class Administrator implements AccountController {
+public class Administrator {
 
-  private final Account account;
+  private final LogInfo logInfo;
   private final Logger logger = Logger.getLogger(getClass().getName());
 
-  public Administrator(Account account) {
-    this.account = account;
+  public Administrator(LogInfo logInfo) {
+    this.logInfo = logInfo;
   }
 
-  @Override
-  public void authorizeAccount(Account account) {
-    logger.warning(String.format("Failed attempt to authorize Account#%s by Administrator#%s", account, this));
-  }
-
-  public Account getAccount() {
-    return account;
+  public LogInfo getLogInfo() {
+    return logInfo;
   }
 }

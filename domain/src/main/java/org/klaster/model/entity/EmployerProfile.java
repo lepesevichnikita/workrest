@@ -2,6 +2,7 @@ package org.klaster.model.entity;
 
 import java.util.Set;
 import org.klaster.model.context.Job;
+import org.klaster.model.context.User;
 import org.klaster.model.controller.JobController;
 
 /**

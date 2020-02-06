@@ -1,5 +1,7 @@
 package org.klaster.model.entity;
 
+import org.klaster.model.context.User;
+
 /**
  * VerificationMessage
  *

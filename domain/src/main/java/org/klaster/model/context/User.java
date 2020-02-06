@@ -1,7 +1,11 @@
-package org.klaster.model.entity;
+package org.klaster.model.context;
 
 import java.util.Set;
-import org.klaster.model.context.Account;
+import org.klaster.model.entity.EmployerProfile;
+import org.klaster.model.entity.FileInfo;
+import org.klaster.model.entity.FreelancerProfile;
+import org.klaster.model.entity.VerificationMessage;
+import org.klaster.model.state.UserState;
 
 /**
  * User
@@ -9,15 +13,15 @@ import org.klaster.model.context.Account;
  * @author Nikita Lepesevich
  */
 
-public class User {
+public class User extends AbstractContext<UserState> {
 
-  private final Account account;
+  private final LogInfo logInfo;
   private FreelancerProfile freelancerProfile;
   private EmployerProfile employerProfile;
   private Set<VerificationMessage> verificationMessages;
 
-  public User(Account account) {
-    this.account = account;
+  public User(LogInfo logInfo) {
+    this.logInfo = logInfo;
   }
 
   public EmployerProfile getEmployerProfile() {
@@ -28,8 +32,8 @@ public class User {
     this.employerProfile = employerProfile;
   }
 
-  public Account getAccount() {
-    return account;
+  public LogInfo getLogInfo() {
+    return logInfo;
   }
 
   public FreelancerProfile getFreelancerProfile() {
