@@ -1,28 +1,23 @@
 package org.klaster.model.entity;
 
 import java.util.logging.Logger;
-import org.klaster.model.context.LogInfo;
 
 /**
  * Administrator
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */
 
 public class Administrator {
 
-  private final LogInfo logInfo;
+  private final LoginInfo loginInfo;
   private final Logger logger = Logger.getLogger(getClass().getName());
 
-  public Administrator(LogInfo logInfo) {
-    this.logInfo = logInfo;
+  public Administrator(LoginInfo loginInfo) {
+    this.loginInfo = loginInfo;
   }
 
-  public LogInfo getLogInfo() {
-    return logInfo;
+  public LoginInfo getLoginInfo() {
+    return loginInfo;
   }
 }

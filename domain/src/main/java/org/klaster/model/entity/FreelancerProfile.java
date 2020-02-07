@@ -13,7 +13,7 @@ public class FreelancerProfile extends AbstractProfile {
 
   private Set<FreelancerSkill> freelancerSkills;
 
-  protected FreelancerProfile(User owner) {
+  public FreelancerProfile(User owner) {
     super(owner);
   }
 

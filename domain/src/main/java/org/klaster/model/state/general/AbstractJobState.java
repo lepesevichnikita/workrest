@@ -1,18 +1,17 @@
-package org.klaster.model.state;
+package org.klaster.model.state.general;
 
 import org.klaster.model.context.Job;
+import org.klaster.model.state.job.DeletedJobState;
+import org.klaster.model.state.job.FinishedJobState;
+import org.klaster.model.state.job.JobState;
 
 /**
  * AbstractJobState
  *
- * workrest
- *
- * 03.02.2020
- *
  * @author Nikita Lepesevich
  */
 
-abstract class AbstractJobState extends AbstractState<Job> implements JobState {
+public abstract class AbstractJobState extends AbstractState<Job> implements JobState {
 
   public AbstractJobState(Job context) {
     super(context);

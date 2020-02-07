@@ -1,13 +1,9 @@
-package org.klaster.model.state;
+package org.klaster.model.state.general;
 
 import org.klaster.model.context.Context;
 
 /**
  * State
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */

@@ -3,14 +3,10 @@ package org.klaster.model.context;
 import java.util.Set;
 import org.klaster.model.entity.EmployerProfile;
 import org.klaster.model.entity.JobSkill;
-import org.klaster.model.state.JobState;
+import org.klaster.model.state.job.JobState;
 
 /**
  * Job
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */

@@ -1,29 +1,22 @@
-package org.klaster.model.context;
+package org.klaster.model.entity;
 
 import java.time.LocalDateTime;
-import org.klaster.model.state.UnverifiedUserState;
-import org.klaster.model.state.UserState;
 
 /**
- * LogInfo
- *
- * workrest
- *
- * 03.02.2020
+ * LoginInfo
  *
  * @author Nikita Lepesevich
  */
 
-public class LogInfo extends AbstractContext<UserState> {
+public class LoginInfo {
 
   private final String login;
   private final String passwordHash;
   private LocalDateTime lastAuthorizedAt;
 
-  public LogInfo(String login, String passwordHash) {
+  public LoginInfo(String login, String passwordHash) {
     this.login = login;
     this.passwordHash = passwordHash;
-    this.setCurrentState(new UnverifiedUserState(this));
   }
 
   public String getLogin() {

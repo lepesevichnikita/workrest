@@ -3,7 +3,6 @@ package org.klaster.model.entity;
 import java.util.Set;
 import org.klaster.model.context.Job;
 import org.klaster.model.context.User;
-import org.klaster.model.controller.JobController;
 
 /**
  * EmployerProfile
@@ -11,12 +10,16 @@ import org.klaster.model.controller.JobController;
  * @author Nikita Lepesevich
  */
 
-public class EmployerProfile extends AbstractProfile implements JobController {
+public class EmployerProfile extends AbstractProfile {
 
   private Set<Job> jobs;
 
-  protected EmployerProfile(User owner) {
+  public EmployerProfile(User owner) {
     super(owner);
+  }
+
+  public Job createJob(String description, Set<Skill> requiredSkills) {
+    return null;
   }
 
   public Set<Job> getJobs() {

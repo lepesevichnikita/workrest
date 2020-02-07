@@ -12,7 +12,7 @@ public abstract class AbstractProfile {
 
   private final User owner;
 
-  protected AbstractProfile(User owner) {
+  public AbstractProfile(User owner) {
     this.owner = owner;
   }
 

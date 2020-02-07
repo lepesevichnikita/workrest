@@ -4,8 +4,10 @@ import java.util.Set;
 import org.klaster.model.entity.EmployerProfile;
 import org.klaster.model.entity.FileInfo;
 import org.klaster.model.entity.FreelancerProfile;
+import org.klaster.model.entity.LoginInfo;
 import org.klaster.model.entity.VerificationMessage;
-import org.klaster.model.state.UserState;
+import org.klaster.model.state.user.UnverifiedUserState;
+import org.klaster.model.state.user.UserState;
 
 /**
  * User
@@ -15,13 +17,14 @@ import org.klaster.model.state.UserState;
 
 public class User extends AbstractContext<UserState> {
 
-  private final LogInfo logInfo;
+  private final LoginInfo loginInfo;
   private FreelancerProfile freelancerProfile;
   private EmployerProfile employerProfile;
   private Set<VerificationMessage> verificationMessages;
 
-  public User(LogInfo logInfo) {
-    this.logInfo = logInfo;
+  public User(LoginInfo loginInfo) {
+    this.loginInfo = loginInfo;
+    this.setCurrentState(new UnverifiedUserState(this));
   }
 
   public EmployerProfile getEmployerProfile() {
@@ -32,8 +35,8 @@ public class User extends AbstractContext<UserState> {
     this.employerProfile = employerProfile;
   }
 
-  public LogInfo getLogInfo() {
-    return logInfo;
+  public LoginInfo getLoginInfo() {
+    return loginInfo;
   }
 
   public FreelancerProfile getFreelancerProfile() {

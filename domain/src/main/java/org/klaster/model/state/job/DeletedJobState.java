@@ -1,13 +1,10 @@
-package org.klaster.model.state;
+package org.klaster.model.state.job;
 
 import org.klaster.model.context.Job;
+import org.klaster.model.state.general.AbstractJobState;
 
 /**
  * DeletedJobState
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */

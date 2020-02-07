@@ -1,14 +1,10 @@
-package org.klaster.model.state;
+package org.klaster.model.state.general;
 
 import java.util.logging.Logger;
 import org.klaster.model.context.Context;
 
 /**
  * AbstractState
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */

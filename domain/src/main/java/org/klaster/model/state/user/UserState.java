@@ -1,13 +1,10 @@
-package org.klaster.model.state;
+package org.klaster.model.state.user;
 
 import org.klaster.model.context.User;
+import org.klaster.model.state.general.State;
 
 /**
  * UserState
- *
- * workrest
- *
- * 03.02.2020
  *
  * @author Nikita Lepesevich
  */
@@ -23,4 +20,8 @@ public interface UserState extends State<User> {
   void verifyUser();
 
   void authorizeUser();
+
+  void createEmployerProfile();
+
+  void createFreelancerProfile();
 }
