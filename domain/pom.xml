@@ -5,6 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.klastter</groupId>
+  <name>Domain model for workrest</name>
   <artifactId>domain</artifactId>
   <version>1.0-SNAPSHOT</version>
 
