@@ -13,7 +13,11 @@
   <url>https://github.com/lepesevichnikita/{project.artifactId}</url>
 
   <properties>
+    <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
+    <sonar.organization>lepesevichnikita</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.login>{env.SONAR_TOKEN}</sonar.login>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -80,5 +84,49 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.6.0.1398</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>sonar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.6-SNAPSHOT</version>
+        <configuration>
+          <append>true</append>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>prepare-agent-integration</id>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
