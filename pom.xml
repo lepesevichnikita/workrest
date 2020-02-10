@@ -15,10 +15,14 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
+    <sonar.organization>lepesevichnikita</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>
 
   <modules>
     <module>domain</module>
+    <module>web-application</module>
   </modules>
 
 
