@@ -1,5 +1,6 @@
 package org.klaster.model.state.user;
 
+import java.time.LocalDateTime;
 import org.klaster.model.context.User;
 import org.klaster.model.state.general.State;
 
@@ -19,7 +20,7 @@ public interface UserState extends State<User> {
 
   void verifyUser();
 
-  void authorizeUser();
+  void authorizeUser(LocalDateTime authorizedAt);
 
   void createEmployerProfile();
 

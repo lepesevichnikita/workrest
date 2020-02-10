@@ -38,10 +38,10 @@ public class UnverifiedUserState extends AbstractUserState {
   }
 
   @Override
-  public void authorizeUser() {
+  public void authorizeUser(LocalDateTime authorizedAt) {
     getContext().getLoginInfo()
-                .setLastAuthorizedAt(LocalDateTime.now());
-    final String message = String.format("User#%s was authorized", getContext());
+                .setLastAuthorizedAt(authorizedAt);
+    final String message = String.format("User#%s was authorized at %s", getContext(), authorizedAt);
     logger.info(message);
   }
 }

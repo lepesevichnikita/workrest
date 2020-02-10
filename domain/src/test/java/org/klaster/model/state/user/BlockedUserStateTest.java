@@ -3,8 +3,9 @@ package org.klaster.model.state.user;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.not;
 
+import java.time.LocalDateTime;
 import org.klaster.builder.DefaultLoginInfoBuilder;
 import org.klaster.builder.DefaultUserBuilder;
 import org.klaster.builder.LoginInfoBuilder;
@@ -42,10 +43,11 @@ public class BlockedUserStateTest {
 
   @Test
   public void blockedUserCantAuthorize() {
+    LocalDateTime authorizedAt = LocalDateTime.now();
     user.getCurrentState()
-        .authorizeUser();
+        .authorizeUser(authorizedAt);
     assertThat(user.getLoginInfo()
-                   .getLastAuthorizedAt(), nullValue());
+                   .getLastAuthorizedAt(), not(equalTo(authorizedAt)));
   }
 
   @Test

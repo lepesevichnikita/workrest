@@ -1,5 +1,6 @@
 package org.klaster.model.state.general;
 
+import java.time.LocalDateTime;
 import org.klaster.model.context.User;
 import org.klaster.model.state.user.UserState;
 
@@ -34,8 +35,8 @@ public abstract class AbstractUserState extends AbstractState<User> implements U
   }
 
   @Override
-  public void authorizeUser() {
-    final String message = String.format("Failed attempt to authorize user #%s", getContext());
+  public void authorizeUser(LocalDateTime authorizedAt) {
+    final String message = String.format("Failed attempt to authorize user #%s at%s", getContext(), authorizedAt);
     logger.warning(message);
   }
 
