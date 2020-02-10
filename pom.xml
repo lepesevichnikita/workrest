@@ -13,11 +13,6 @@
   <url>https://github.com/lepesevichnikita/{project.artifactId}</url>
 
   <properties>
-    <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
-    <sonar.organization>lepesevichnikita</sonar.organization>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.login>1abe1f88b92a18fd97a1e459336e9fb8b203421c</sonar.login>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -86,6 +81,14 @@
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
           <version>3.6.1.1688</version>
+          <executions>
+            <execution>
+              <phase>verify</phase>
+              <goals>
+                <goal>sonar</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
