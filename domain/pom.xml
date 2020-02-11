@@ -4,16 +4,24 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.klastter</groupId>
-  <name>Domain model for workrest</name>
+  <parent>
+    <groupId>org.klaster</groupId>
+    <artifactId>workrest</artifactId>
+    <version>0.0.1</version>
+  </parent>
+
+  <name>Domain model</name>
   <artifactId>domain</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <version>0.0.1</version>
 
   <properties>
-    <sonar.projectKey>lepesevichnikita_workrest_domain</sonar.projectKey>
-    <sonar.organization>lepesevichnikita</sonar.organization>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.projectKey>lepesevichnikita_${parent.artifactId}_${project.artifactId}</sonar.projectKey>
   </properties>
+
+  <dependencies>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -24,12 +32,14 @@
           <target>8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
-
-  <parent>
-    <groupId>org.klaster</groupId>
-    <artifactId>workrest</artifactId>
-    <version>0.0.1</version>
-  </parent>
 </project>

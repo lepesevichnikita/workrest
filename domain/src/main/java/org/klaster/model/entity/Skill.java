@@ -8,6 +8,8 @@ package org.klaster.model.entity;
 
 public class Skill {
 
+  long id;
+
   private final String name;
 
   public Skill(String name) {
