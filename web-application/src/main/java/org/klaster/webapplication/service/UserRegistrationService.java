@@ -7,11 +7,10 @@ package org.klaster.webapplication.service;
  *
  */
 
-import org.klaster.model.context.User;
+import org.klaster.domain.model.context.User;
 import org.klaster.webapplication.repository.LoginInfoRepository;
 import org.klaster.webapplication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,15 +19,13 @@ import org.springframework.stereotype.Service;
  * @author Nikita Lepesevich
  */
 
-@Service("userRegistrationService")
+@Service
 public class UserRegistrationService {
 
   @Autowired
-  @Qualifier("loginInfoRepository")
   private LoginInfoRepository loginInfoRepository;
 
   @Autowired
-  @Qualifier("userRepository")
   private UserRepository userRepository;
 
   public boolean hasUniqueLogin(User user) {
@@ -36,7 +33,7 @@ public class UserRegistrationService {
                                                   .getLogin());
   }
 
-  public User register(User user) {
+  public User createUser(User user) {
     User registeredUser = null;
     if (hasUniqueLogin(user)) {
       registeredUser = userRepository.save(user);

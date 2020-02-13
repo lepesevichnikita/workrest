@@ -1,15 +1,15 @@
 package org.klaster.webapplication.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
-import org.klaster.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.domain.Example;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 
 /*
  * workrest
@@ -25,21 +25,28 @@ import org.testng.annotations.Test;
  */
 
 @SpringBootTest
-@EnableJpaRepositories
 public class LoginInfoRepositoryTest extends AbstractTestNGSpringContextTests {
 
-  private static final String NEW_LOGIN = "NEW LOGIN";
-  private static final String NEW_PASSWORD_HASH = "NEW PASSWORD";
+  private static final int THREAD_POOL_SIZE = 4;
+  private static final int INVOCATION_COUNT = 8;
+
+  private static final String DEFAULT_NEW_LOGIN = "NEW LOGIN";
+  private static final int DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN.hashCode();
 
   @Autowired
   private LoginInfoRepository loginInfoRepository;
 
-  @Test
-  public void createsLoginInfo() {
+  @BeforeMethod
+  private void initialize() {
+    loginInfoRepository.deleteAll();
+  }
+
+  @Test()
+  public void createsUniqueLoginInfo() {
     LoginInfo newLoginInfo = new LoginInfo();
-    newLoginInfo.setLogin(NEW_LOGIN);
-    newLoginInfo.setPasswordHash(NEW_PASSWORD_HASH);
-    loginInfoRepository.save(newLoginInfo);
-    assertThat(loginInfoRepository.findById(newLoginInfo.getId()), equalTo(newLoginInfo));
+    newLoginInfo.setLogin(DEFAULT_NEW_LOGIN);
+    newLoginInfo.setPasswordHash(DEFAULT_NEW_PASSWORD_HASH);
+    loginInfoRepository.saveAndFlush(newLoginInfo);
+    assertThat(loginInfoRepository.exists(Example.of(newLoginInfo)), is(true));
   }
 }

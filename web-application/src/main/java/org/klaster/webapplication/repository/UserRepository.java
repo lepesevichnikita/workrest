@@ -7,9 +7,8 @@ package org.klaster.webapplication.repository;
  *
  */
 
-import org.klaster.model.context.User;
+import org.klaster.domain.model.context.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Component;
 
 /**
  * UserRepository
@@ -17,7 +16,5 @@ import org.springframework.stereotype.Component;
  * @author Nikita Lepesevich
  */
 
-@Component("userRepository")
 public interface UserRepository extends JpaRepository<User, Long> {
-
 }

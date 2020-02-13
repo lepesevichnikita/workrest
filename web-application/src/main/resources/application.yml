@@ -1,0 +1,6 @@
+spring:
+    config:
+        name: 'Web application for WorkRest'
+    jpa:
+        generate-ddl: true
+        show-sql: true
