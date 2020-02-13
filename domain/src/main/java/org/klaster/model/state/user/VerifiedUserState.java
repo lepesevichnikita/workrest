@@ -1,10 +1,8 @@
 package org.klaster.model.state.user;
 
 import java.time.LocalDateTime;
-import org.klaster.model.context.User;
-import org.klaster.model.entity.EmployerProfile;
+import org.klaster.model.controller.EmployerProfile;
 import org.klaster.model.entity.FreelancerProfile;
-import org.klaster.model.state.general.AbstractUserState;
 
 /**
  * VerifiedUserState
@@ -14,22 +12,14 @@ import org.klaster.model.state.general.AbstractUserState;
 
 public class VerifiedUserState extends AbstractUserState {
 
-  public VerifiedUserState(User context) {
-    super(context);
+  @Override
+  public FreelancerProfile getAccessToFreelancerProfile() {
+    return getContext().getFreelancerProfile();
   }
 
   @Override
-  public void blockUser() {
-    final String message = String.format("User #%s was blocked", getContext());
-    logger.info(message);
-    getContext().setCurrentState(new org.klaster.model.state.user.BlockedUserState(getContext()));
-  }
-
-  @Override
-  public void deleteUser() {
-    final String message = String.format("User #%s was deleted", getContext());
-    logger.info(message);
-    getContext().setCurrentState(new org.klaster.model.state.user.DeletedUserState(getContext()));
+  public EmployerProfile getAccessToEmployerProfile() {
+    return getContext().getEmployerProfile();
   }
 
   @Override

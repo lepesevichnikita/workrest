@@ -1,26 +1,36 @@
 package org.klaster.model.entity;
 
-import org.klaster.model.context.User;
+import org.klaster.model.controller.Administrator;
 
 /**
- * VerificationMessage
+ * PersonalData
  *
  * @author Nikita Lepesevich
  */
 
-public class VerificationMessage {
+public class PersonalData {
 
-  private final User author;
-  private final String documentNumber;
-  private final String documentName;
-  private final FileInfo documentScan;
+  private String documentNumber;
+  private String documentName;
+  private String firstName;
+  private String lastName;
+  private FileInfo documentScan;
   private Administrator consideredBy;
 
-  public VerificationMessage(User author, String documentName, String documentNumber, FileInfo documentScan) {
-    this.author = author;
+  public PersonalData(String documentName, String documentNumber, String firstName, String lastName, FileInfo documentScan) {
     this.documentName = documentName;
     this.documentNumber = documentNumber;
+    this.firstName = firstName;
+    this.lastName = lastName;
     this.documentScan = documentScan;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
   }
 
   public String getDocumentNumber() {
@@ -29,10 +39,6 @@ public class VerificationMessage {
 
   public FileInfo getDocumentScan() {
     return documentScan;
-  }
-
-  public User getAuthor() {
-    return author;
   }
 
   public Administrator getConsideredBy() {

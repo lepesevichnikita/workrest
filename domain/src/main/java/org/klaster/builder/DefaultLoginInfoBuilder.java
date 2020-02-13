@@ -6,6 +6,7 @@ package org.klaster.builder;/*
  */
 
 import org.klaster.model.entity.LoginInfo;
+import org.springframework.stereotype.Component;
 
 /**
  * DefaultLoginInfoBuilder
@@ -13,6 +14,7 @@ import org.klaster.model.entity.LoginInfo;
  * @author Nikita Lepesevich
  */
 
+@Component("defaultLoginInfoBuilder")
 public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
 
   private String login;
@@ -42,6 +44,9 @@ public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
 
   @Override
   public LoginInfo build() {
-    return new LoginInfo(login, passwordHash);
+    LoginInfo newLoginInfo = new LoginInfo();
+    newLoginInfo.setLogin(login);
+    newLoginInfo.setPasswordHash(passwordHash);
+    return newLoginInfo;
   }
 }

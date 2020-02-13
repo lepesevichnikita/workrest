@@ -1,7 +1,10 @@
 package org.klaster.model.entity;
 
+import java.util.List;
 import java.util.Set;
+import org.klaster.model.context.Job;
 import org.klaster.model.context.User;
+import org.klaster.webapplication.service.JobsRecommendationService;
 
 /**
  * FreelancerProfile
@@ -11,17 +14,22 @@ import org.klaster.model.context.User;
 
 public class FreelancerProfile extends AbstractProfile {
 
-  private Set<FreelancerSkill> freelancerSkills;
+  private Set<Skill> skills;
 
   public FreelancerProfile(User owner) {
     super(owner);
   }
 
-  public Set<FreelancerSkill> getFreelancerSkills() {
-    return freelancerSkills;
+  public Set<Skill> getSkills() {
+    return skills;
   }
 
-  public void setFreelancerSkills(Set<FreelancerSkill> freelancerSkills) {
-    this.freelancerSkills = freelancerSkills;
+  public void setSkills(Set<Skill> skills) {
+    this.skills = skills;
+  }
+
+  public List<Job> getRecommendedJobs(long limit) {
+    return JobsRecommendationService.getInstance()
+                                    .getRecommended(this, limit);
   }
 }

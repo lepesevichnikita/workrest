@@ -1,13 +1,17 @@
 package org.klaster.model.context;
 
-import java.util.Set;
-import org.klaster.model.entity.EmployerProfile;
-import org.klaster.model.entity.FileInfo;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Transient;
+import org.klaster.model.controller.EmployerProfile;
 import org.klaster.model.entity.FreelancerProfile;
 import org.klaster.model.entity.LoginInfo;
-import org.klaster.model.entity.VerificationMessage;
+import org.klaster.model.entity.PersonalData;
+import org.klaster.model.state.user.AbstractUserState;
 import org.klaster.model.state.user.UnverifiedUserState;
-import org.klaster.model.state.user.UserState;
 
 /**
  * User
@@ -15,17 +19,20 @@ import org.klaster.model.state.user.UserState;
  * @author Nikita Lepesevich
  */
 
-public class User extends AbstractContext<UserState> {
+@Entity
+public class User extends AbstractContext<AbstractUserState> {
 
-  private final LoginInfo loginInfo;
+  @Id
+  private long id;
+
+  @OneToOne(optional = false, fetch = FetchType.EAGER)
+  private LoginInfo loginInfo;
+  @Transient
   private FreelancerProfile freelancerProfile;
+  @Transient
   private EmployerProfile employerProfile;
-  private Set<VerificationMessage> verificationMessages;
-
-  public User(LoginInfo loginInfo) {
-    this.loginInfo = loginInfo;
-    this.setCurrentState(new UnverifiedUserState(this));
-  }
+  @Transient
+  private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {
     return employerProfile;
@@ -55,15 +62,32 @@ public class User extends AbstractContext<UserState> {
     return employerProfile != null;
   }
 
-  public Set<VerificationMessage> getVerificationMessages() {
-    return verificationMessages;
+  public PersonalData getPersonalData() {
+    return personalData;
   }
 
-  public void setVerificationMessages(Set<VerificationMessage> verificationMessages) {
-    this.verificationMessages = verificationMessages;
+  public void setPersonalData(PersonalData personalData) {
+    this.personalData = personalData;
   }
 
-  public void createVerificationRequest(String documentName, String documentNumber, FileInfo fileInfo) {
-    verificationMessages.add(new VerificationMessage(this, documentName, documentNumber, fileInfo));
+  public boolean hasPersonalData() {
+    return personalData != null;
+  }
+
+  @PrePersist
+  private void setDefaultState() {
+    if (getCurrentState() == null) {
+      setCurrentState(getDefaultState());
+    }
+  }
+
+  private AbstractUserState getDefaultState() {
+    AbstractUserState defaultState = new UnverifiedUserState();
+    defaultState.setContext(this);
+    return defaultState;
+  }
+
+  public void setLoginInfo(LoginInfo loginInfo) {
+    this.loginInfo = loginInfo;
   }
 }

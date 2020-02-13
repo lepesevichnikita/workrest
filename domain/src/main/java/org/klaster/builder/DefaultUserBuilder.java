@@ -1,4 +1,5 @@
-package org.klaster.builder;/*
+package org.klaster.builder;
+/*
  * workrest
  *
  * 07.02.2020
@@ -7,6 +8,7 @@ package org.klaster.builder;/*
 
 import org.klaster.model.context.User;
 import org.klaster.model.entity.LoginInfo;
+import org.springframework.stereotype.Component;
 
 /**
  * DefaultUserBuilder
@@ -14,6 +16,7 @@ import org.klaster.model.entity.LoginInfo;
  * @author Nikita Lepesevich
  */
 
+@Component("defaultUserBuilder")
 public class DefaultUserBuilder implements UserBuilder {
 
   private LoginInfo loginInfo;
@@ -35,6 +38,8 @@ public class DefaultUserBuilder implements UserBuilder {
 
   @Override
   public User build() {
-    return new User(loginInfo);
+    User user = new User();
+    user.setLoginInfo(loginInfo);
+    return user;
   }
 }
