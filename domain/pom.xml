@@ -16,7 +16,7 @@
   <version>0.0.1</version>
 
   <properties>
-    <sonar.projectKey>lepesevichnikita_${parent.artifactId}_${project.artifactId}</sonar.projectKey>
+    <sonar.projectKey>lepesevichnikita_${project.parent.artifactId}_${project.artifactId}</sonar.projectKey>
   </properties>
 
   <dependencies>

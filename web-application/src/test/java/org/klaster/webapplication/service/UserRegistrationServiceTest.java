@@ -1,7 +1,7 @@
 package org.klaster.webapplication.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 
 import org.klaster.domain.builder.LoginInfoBuilder;
@@ -12,6 +12,7 @@ import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.klaster.webapplication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Example;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,6 +37,9 @@ public class UserRegistrationServiceTest extends AbstractTestNGSpringContextTest
   private static String DEFAULT_NEW_LOGIN = "new login";
   private static int DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN.hashCode();
 
+  private LoginInfo loginInfo;
+  private User user;
+
   @Autowired
   private UserBuilder defaultUserBuilder;
 
@@ -53,25 +57,21 @@ public class UserRegistrationServiceTest extends AbstractTestNGSpringContextTest
     defaultUserBuilder.reset();
     defaultLoginInfoBuilder.reset();
     userRepository.deleteAll();
+    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
+                                                 .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
+                                                 .build();
+    User user = defaultUserBuilder.setLoginInfo(loginInfo)
+                                  .build();
   }
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
-                                                 .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
-                                                 .build();
-    User user = defaultUserBuilder.setLoginInfo(loginInfo)
-                                  .build();
-    assertThat(registrationService.createUser(user), equalTo(user));
+    registrationService.createUser(user);
+    assertThat(userRepository.exists(Example.of(user)), is(true));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
-                                                 .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
-                                                 .build();
-    User user = defaultUserBuilder.setLoginInfo(loginInfo)
-                                  .build();
     registrationService.createUser(user);
     assertThat(user.getCurrentState(), isA(UnverifiedUserState.class));
   }

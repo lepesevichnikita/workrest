@@ -6,59 +6,9 @@
     <groupId>org.klaster</groupId>
     <artifactId>workrest</artifactId>
     <version>0.0.1</version>
-    <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <artifactId>web-application</artifactId>
   <version>0.0.1</version>
-  <name>web-application</name>
-  <description>General web application for WorkRest</description>
-
-  <properties>
-    <java.version>1.8</java.version>
-    <sonar.projectKey>lepesevichnikita_${parent.artifactId}_${project.artifactId}</sonar.projectKey>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.junit.vintage</groupId>
-          <artifactId>junit-vintage-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.klaster</groupId>
-      <artifactId>domain</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-  </dependencies>
-
   <build>
     <pluginManagement>
       <plugins>
@@ -111,7 +61,62 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+      </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
 
+    <dependency>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit-vintage-engine</artifactId>
+          <groupId>org.junit.vintage</groupId>
+        </exclusion>
+      </exclusions>
+      <groupId>org.springframework.boot</groupId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <artifactId>domain</artifactId>
+      <groupId>org.klaster</groupId>
+      <version>0.0.1</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+  </dependencies>
+
+  <description>General web application for WorkRest</description>
+
+  <name>Web application for WorkRest</name>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <sonar.projectKey>lepesevichnikita_${parent.artifactId}_${project.artifactId}</sonar.projectKey>
+  </properties>
 </project>
