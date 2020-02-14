@@ -1,4 +1,10 @@
+server:
+    port: 9091
 spring:
+    mvc:
+        view:
+            prefix: /WEB-INF/jsp/
+            suffix: .jsp
     config:
         name: 'Web application for WorkRest'
     jpa:

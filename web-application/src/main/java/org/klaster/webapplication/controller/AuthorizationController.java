@@ -1,19 +1,21 @@
 package org.klaster.webapplication.controller;
+
 /*
- * org.klaster.webapplication.controller
- *
  * workrest
  *
- * 2/14/20
+ * 14.02.2020
  *
- * Copyright(c) Nikita Lepesevich
  */
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * AuthorizationController
+ *
+ * @author Nikita Lepesevich
+ */
 
 @Controller
-@RequestMapping("/login")
 public class AuthorizationController {
 
 }

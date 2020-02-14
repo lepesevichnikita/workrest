@@ -30,9 +30,9 @@ public class RegistrationController {
   @Autowired
   private UserRegistrationService userRegistrationService;
 
-  @GetMapping
+  @GetMapping("/kek")
   public ModelAndView getForm() {
-    return new ModelAndView("registration/form");
+    return new ModelAndView("register_form", "loginInfoDTO", new LoginInfoDTO());
   }
 
   @PostMapping
@@ -40,7 +40,8 @@ public class RegistrationController {
     User newUser = new User();
     newUser.setLoginInfo(loginInfoDTO.toLoginInfo());
     userRegistrationService.createUser(newUser);
-    return new ModelAndView("registration/form");
+    loginInfoDTO.setPassword("");
+    return new ModelAndView("registration/form", "loginInfoDTO", loginInfoDTO);
   }
 
 }
