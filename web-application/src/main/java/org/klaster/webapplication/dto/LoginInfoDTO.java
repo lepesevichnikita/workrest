@@ -23,7 +23,7 @@ public class LoginInfoDTO {
 
   public LoginInfo toLoginInfo() {
     return defaultLoginInfoBuilder.setLogin(login)
-                                  .setPasswordHash(password.hashCode())
+                                  .setPasswordHash(password)
                                   .build();
   }
 

@@ -9,7 +9,7 @@ package org.klaster.domain.builder;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
 
@@ -22,7 +22,7 @@ import org.klaster.domain.model.entity.Skill;
 public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder {
 
   private Set<Skill> skills;
-  private User owner;
+  private ApplicationUser owner;
 
   public DefaultFreelancerProfileBuilder() {
     reset();
@@ -35,7 +35,7 @@ public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder
   }
 
   @Override
-  public FreelancerProfileBuilder setOwner(User owner) {
+  public FreelancerProfileBuilder setOwner(ApplicationUser owner) {
     this.owner = owner;
     return this;
   }
@@ -43,7 +43,7 @@ public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder
   @Override
   public void reset() {
     skills = new LinkedHashSet<>();
-    owner = new DefaultUserBuilder().build();
+    owner = new DefaultApplicationUserBuilder().build();
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.klaster.webapplication.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import org.klaster.domain.model.entity.LoginInfo;
@@ -27,11 +28,8 @@ import org.testng.annotations.Test;
 @SpringBootTest
 public class LoginInfoRepositoryTest extends AbstractTestNGSpringContextTests {
 
-  private static final int THREAD_POOL_SIZE = 4;
-  private static final int INVOCATION_COUNT = 8;
-
   private static final String DEFAULT_NEW_LOGIN = "NEW LOGIN";
-  private static final int DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN.hashCode();
+  private static final String DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN;
 
   @Autowired
   private LoginInfoRepository loginInfoRepository;
@@ -41,12 +39,17 @@ public class LoginInfoRepositoryTest extends AbstractTestNGSpringContextTests {
     loginInfoRepository.deleteAll();
   }
 
-  @Test()
+  @Test
   public void createsUniqueLoginInfo() {
     LoginInfo newLoginInfo = new LoginInfo();
     newLoginInfo.setLogin(DEFAULT_NEW_LOGIN);
     newLoginInfo.setPasswordHash(DEFAULT_NEW_PASSWORD_HASH);
     loginInfoRepository.saveAndFlush(newLoginInfo);
     assertThat(loginInfoRepository.exists(Example.of(newLoginInfo)), is(true));
+  }
+
+  @Test
+  public void isEmptyAtStart() {
+    assertThat(loginInfoRepository.count(), equalTo(0));
   }
 }

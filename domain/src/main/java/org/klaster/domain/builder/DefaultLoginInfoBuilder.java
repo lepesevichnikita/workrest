@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
 
   private String login;
-  private int passwordHash;
+  private String passwordHash;
 
   public DefaultLoginInfoBuilder() {
     reset();
@@ -31,7 +31,7 @@ public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
   }
 
   @Override
-  public LoginInfoBuilder setPasswordHash(int passwordHash) {
+  public LoginInfoBuilder setPasswordHash(String passwordHash) {
     this.passwordHash = passwordHash;
     return this;
   }
@@ -39,7 +39,7 @@ public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
   @Override
   public void reset() {
     login = "";
-    passwordHash = login.hashCode();
+    passwordHash = "";
   }
 
   @Override

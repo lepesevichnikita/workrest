@@ -8,7 +8,7 @@ package org.klaster.domain.builder;
  */
 
 import java.util.Set;
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
 
@@ -22,5 +22,5 @@ public interface FreelancerProfileBuilder extends Builder<FreelancerProfile> {
 
   FreelancerProfileBuilder setSkills(Set<Skill> skills);
 
-  FreelancerProfileBuilder setOwner(User owner);
+  FreelancerProfileBuilder setOwner(ApplicationUser owner);
 }

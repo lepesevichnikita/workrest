@@ -17,5 +17,5 @@ public interface LoginInfoBuilder extends Builder<LoginInfo> {
 
   LoginInfoBuilder setLogin(String login);
 
-  LoginInfoBuilder setPasswordHash(int passwordHash);
+  LoginInfoBuilder setPasswordHash(String passwordHash);
 }

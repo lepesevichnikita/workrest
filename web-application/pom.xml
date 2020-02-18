@@ -65,9 +65,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-        </configuration>
         <groupId>org.apache.maven.plugins</groupId>
       </plugin>
     </plugins>

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.klaster.webapplication.WebApplication;
 import org.klaster.webapplication.dto.LoginInfoDTO;
+import org.klaster.webapplication.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
@@ -36,11 +38,12 @@ import org.testng.annotations.Test;
 public class RegistrationControllerTest extends AbstractTestNGSpringContextTests {
 
   private static final String CONTROLLER_PATH = "/register";
-  private static final int THREAD_POOL_SIZE = 4;
-  private static final int INVOCATION_COUNT = 8;
 
   @Autowired
   private WebApplicationContext webApplicationContext;
+
+  @Autowired
+  private ApplicationUserRepository applicationUserRepository;
 
   private MockMvc mockMvc;
 
@@ -50,9 +53,14 @@ public class RegistrationControllerTest extends AbstractTestNGSpringContextTests
                              .build();
   }
 
+  @BeforeMethod
+  public void reset() {
+    applicationUserRepository.deleteAll();
+  }
+
   @Test
   public void returnsRegistrationFormWithLoginInfoDTO() throws Exception {
-    final String viewName = "registration/form";
+    final String viewName = "register_form";
     mockMvc.perform(get(CONTROLLER_PATH))
            .andExpect(status().isOk())
            .andExpect(view().name(viewName))
@@ -61,8 +69,8 @@ public class RegistrationControllerTest extends AbstractTestNGSpringContextTests
 
 
   @Test
-  public void registersUser() throws Exception {
-    final String viewName = "registration/form";
+  public void registersUniqueUser() throws Exception {
+    final String viewName = "register_form";
     final String login = "login";
     final String password = "password";
     LoginInfoDTO loginInfoDTO = new LoginInfoDTO();

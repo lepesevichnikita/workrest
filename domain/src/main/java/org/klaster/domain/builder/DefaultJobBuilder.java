@@ -8,8 +8,8 @@ package org.klaster.domain.builder;/*
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.controller.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.user.AbstractUserState;
@@ -58,13 +58,13 @@ public class DefaultJobBuilder implements JobBuilder {
 
   @Override
   public void reset() {
-    User user = new DefaultUserBuilder().build();
+    ApplicationUser applicationUser = new DefaultApplicationUserBuilder().build();
     AbstractUserState verifiedUserState = new VerifiedUserState();
-    verifiedUserState.setContext(user);
-    user.setCurrentState(verifiedUserState);
-    user.getCurrentState()
-        .createEmployerProfile();
-    employerProfile = user.getEmployerProfile();
+    verifiedUserState.setContext(applicationUser);
+    applicationUser.setCurrentState(verifiedUserState);
+    applicationUser.getCurrentState()
+                   .createEmployerProfile();
+    employerProfile = applicationUser.getEmployerProfile();
     description = "";
     endDateTime = LocalDateTime.now();
     skills = new LinkedHashSet<>();

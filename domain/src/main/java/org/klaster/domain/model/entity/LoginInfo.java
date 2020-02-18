@@ -23,7 +23,7 @@ public class LoginInfo {
   private String login;
 
   @Column(nullable = false)
-  private int passwordHash;
+  private String passwordHash;
 
   public long getId() {
     return id;
@@ -41,11 +41,11 @@ public class LoginInfo {
     this.login = login;
   }
 
-  public int getPasswordHash() {
+  public String getPasswordHash() {
     return passwordHash;
   }
 
-  public void setPasswordHash(int passwordHash) {
+  public void setPasswordHash(String passwordHash) {
     this.passwordHash = passwordHash;
   }
 

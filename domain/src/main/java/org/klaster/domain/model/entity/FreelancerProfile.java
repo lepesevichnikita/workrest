@@ -2,8 +2,8 @@ package org.klaster.domain.model.entity;
 
 import java.util.List;
 import java.util.Set;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
 import org.klaster.domain.service.JobsRecommendationService;
 
 /**
@@ -16,7 +16,7 @@ public class FreelancerProfile extends AbstractProfile {
 
   private Set<Skill> skills;
 
-  public FreelancerProfile(User owner) {
+  public FreelancerProfile(ApplicationUser owner) {
     super(owner);
   }
 

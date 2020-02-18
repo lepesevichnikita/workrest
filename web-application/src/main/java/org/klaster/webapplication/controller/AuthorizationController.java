@@ -7,11 +7,10 @@ package org.klaster.webapplication.controller;
  *
  */
 
-import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * AuthorizationController
@@ -24,8 +23,16 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthorizationController {
 
   @GetMapping
-  public ModelAndView getForm() {
-    return new ModelAndView("login_form", "loginInfoDTO", new LoginInfoDTO());
+  public String getForm(Model model, String error, String logout) {
+    if (error != null) {
+      model.addAttribute("error", "Your username and password is invalid.");
+    }
+
+    if (logout != null) {
+      model.addAttribute("message", "You have been logged out successfully.");
+    }
+
+    return "login";
   }
 
 }

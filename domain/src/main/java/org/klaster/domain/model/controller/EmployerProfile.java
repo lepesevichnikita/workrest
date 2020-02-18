@@ -5,8 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.klaster.domain.builder.DefaultJobBuilder;
 import org.klaster.domain.builder.JobBuilder;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.AbstractProfile;
 
 /**
@@ -19,7 +19,7 @@ public class EmployerProfile extends AbstractProfile implements JobController {
 
   private Set<Job> jobs;
 
-  public EmployerProfile(User owner) {
+  public EmployerProfile(ApplicationUser owner) {
     super(owner);
     jobs = new LinkedHashSet<>();
   }

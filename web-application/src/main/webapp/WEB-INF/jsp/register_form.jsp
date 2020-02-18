@@ -13,6 +13,7 @@
     <form:input path="login"></form:input>
     <form:label path="password">Password</form:label>
     <form:input path="password"></form:input>
+    <input type="submit">
 </form:form>
 <script src="webjars/Semantic-UI/2.4.1/semantic.js"></script>
 </body>

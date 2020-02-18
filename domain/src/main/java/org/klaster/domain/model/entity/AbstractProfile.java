@@ -1,6 +1,6 @@
 package org.klaster.domain.model.entity;
 
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 
 /**
  * Profile
@@ -10,13 +10,13 @@ import org.klaster.domain.model.context.User;
 
 public abstract class AbstractProfile {
 
-  private final User owner;
+  private final ApplicationUser owner;
 
-  public AbstractProfile(User owner) {
+  public AbstractProfile(ApplicationUser owner) {
     this.owner = owner;
   }
 
-  public User getOwner() {
+  public ApplicationUser getOwner() {
     return owner;
   }
 }

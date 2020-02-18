@@ -7,9 +7,9 @@ package org.klaster.webapplication.controller;
  *
  */
 
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.webapplication.dto.LoginInfoDTO;
-import org.klaster.webapplication.service.UserRegistrationService;
+import org.klaster.webapplication.service.ApplicationUserRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class RegistrationController {
 
   @Autowired
-  private UserRegistrationService userRegistrationService;
+  private ApplicationUserRegistrationService applicationUserRegistrationService;
 
   @GetMapping
   public ModelAndView getForm() {
@@ -37,9 +37,9 @@ public class RegistrationController {
 
   @PostMapping
   public ModelAndView registerUserWithLoginInfo(LoginInfoDTO loginInfoDTO) {
-    User newUser = new User();
-    newUser.setLoginInfo(loginInfoDTO.toLoginInfo());
-    userRegistrationService.createUser(newUser);
+    ApplicationUser newApplicationUser = new ApplicationUser();
+    newApplicationUser.setLoginInfo(loginInfoDTO.toLoginInfo());
+    applicationUserRegistrationService.registerUser(newApplicationUser);
     loginInfoDTO.setPassword("");
     return new ModelAndView("register_form", "loginInfoDTO", loginInfoDTO);
   }

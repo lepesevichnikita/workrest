@@ -5,7 +5,7 @@ package org.klaster.domain.model.controller;/*
  *
  */
 
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 
 /**
  * UserController
@@ -13,18 +13,18 @@ import org.klaster.domain.model.context.User;
  * @author Nikita Lepesevich
  */
 
-public interface UserController extends ContextController<User> {
+public interface UserController extends ContextController<ApplicationUser> {
 
-  default void deleteUser(User user) {
+  default void deleteUser(ApplicationUser applicationUser) {
   }
 
-  default void blockUser(User user) {
+  default void blockUser(ApplicationUser applicationUser) {
   }
 
-  default void unblockUser(User user) {
+  default void unblockUser(ApplicationUser applicationUser) {
   }
 
-  default void verifyUser(User user) {
+  default void verifyUser(ApplicationUser applicationUser) {
   }
 
 }

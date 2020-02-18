@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
-import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.controller.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.state.general.AbstractState;
@@ -18,7 +18,7 @@ import org.klaster.domain.model.state.general.AbstractState;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractUserState extends AbstractState<User> {
+public abstract class AbstractUserState extends AbstractState<ApplicationUser> {
 
   @Transient
   public FreelancerProfile getAccessToFreelancerProfile() {

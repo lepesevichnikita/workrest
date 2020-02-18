@@ -1,8 +1,10 @@
 package org.klaster.domain.model.context;
 
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
@@ -10,20 +12,24 @@ import org.klaster.domain.model.controller.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.model.entity.Role;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
 
 /**
- * User
+ * ApplicationUser
  *
  * @author Nikita Lepesevich
  */
 
 @Entity
-public class User extends AbstractContext<AbstractUserState> {
+public class ApplicationUser extends AbstractContext<AbstractUserState> {
 
   @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private LoginInfo loginInfo;
+
+  @ManyToMany
+  private Set<Role> roles;
 
   @Transient
   private FreelancerProfile freelancerProfile;
@@ -89,5 +95,13 @@ public class User extends AbstractContext<AbstractUserState> {
     AbstractUserState defaultState = new UnverifiedUserState();
     defaultState.setContext(this);
     return defaultState;
+  }
+
+  public Set<Role> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
   }
 }
