@@ -1,13 +1,20 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: nikital
+  Date: 2/18/20
+  Time: 8:12 AM
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registration page</title>
+    <title>Login</title>
 </head>
 <body>
-<h2>Registration form</h2>
+<h2>Login form</h2>
 <form:form action="/register" method="post" modelAttribute="loginInfoDTO">
     <form:label path="login">Login</form:label>
     <form:input path="login"></form:input>

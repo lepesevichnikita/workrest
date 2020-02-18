@@ -7,7 +7,11 @@ package org.klaster.webapplication.controller;
  *
  */
 
+import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * AuthorizationController
@@ -16,6 +20,12 @@ import org.springframework.stereotype.Controller;
  */
 
 @Controller
+@RequestMapping("/login")
 public class AuthorizationController {
+
+  @GetMapping
+  public ModelAndView getForm() {
+    return new ModelAndView("login_form", "loginInfoDTO", new LoginInfoDTO());
+  }
 
 }

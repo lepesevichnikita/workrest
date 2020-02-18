@@ -10,3 +10,7 @@ spring:
     jpa:
         generate-ddl: true
         show-sql: true
+    couchbase:
+        env:
+            timeouts:
+                view:

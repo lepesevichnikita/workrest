@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EntityScan("org.klaster.domain")
-@ComponentScan({"org.klaster.domain", "org.klaster.webapplication.*"})
+@ComponentScan({"org.klaster.domain", "org.klaster.webapplication"})
 public class WebApplication {
 
   public static void main(String[] args) {
