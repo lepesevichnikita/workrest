@@ -1,5 +1,6 @@
 package org.klaster.domain.model.state.general;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 import javax.persistence.Entity;
@@ -31,6 +32,7 @@ public abstract class AbstractState<C extends AbstractContext> {
   private LocalDateTime createdAt;
 
   @ManyToOne(targetEntity = AbstractContext.class)
+  @JsonBackReference
   private C context;
 
   public long getId() {

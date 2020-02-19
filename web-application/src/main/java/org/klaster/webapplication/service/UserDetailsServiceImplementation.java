@@ -17,6 +17,7 @@ import org.klaster.webapplication.repository.LoginInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,6 +51,6 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
                    .map(Role::getName)
                    .map(SimpleGrantedAuthority::new)
                    .forEach(grantedAuthorities::add);
-    return new org.springframework.security.core.userdetails.User(loginInfo.getLogin(), loginInfo.getPasswordHash(), grantedAuthorities);
+    return new User(loginInfo.getLogin(), loginInfo.getPassword(), grantedAuthorities);
   }
 }

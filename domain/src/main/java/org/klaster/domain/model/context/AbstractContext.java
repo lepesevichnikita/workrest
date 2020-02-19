@@ -1,5 +1,6 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -24,9 +25,11 @@ public abstract class AbstractContext<S extends AbstractState> {
   private long id;
 
   @OneToOne(optional = false, targetEntity = AbstractState.class, cascade = CascadeType.ALL)
+  @JsonManagedReference
   private S currentState;
 
   @OneToMany(targetEntity = AbstractState.class, cascade = CascadeType.ALL)
+  @JsonManagedReference
   private Set<S> states;
 
   public S getCurrentState() {

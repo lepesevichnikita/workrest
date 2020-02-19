@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  */
 
 @SpringBootTest
-public class ApplicationUserRegistrationServiceTest extends AbstractTestNGSpringContextTests {
+public class ApplicationUserServiceTest extends AbstractTestNGSpringContextTests {
 
   private static String DEFAULT_NEW_LOGIN = "new login";
   private static String DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN;
@@ -47,7 +47,7 @@ public class ApplicationUserRegistrationServiceTest extends AbstractTestNGSpring
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserRegistrationService registrationService;
+  private ApplicationUserService registrationService;
 
   @Autowired
   private ApplicationUserRepository applicationUserRepository;
@@ -57,23 +57,20 @@ public class ApplicationUserRegistrationServiceTest extends AbstractTestNGSpring
     defaultApplicationUserBuilder.reset();
     defaultLoginInfoBuilder.reset();
     applicationUserRepository.deleteAll();
-    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
-                                                 .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
-                                                 .build();
-    applicationUser = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                   .build();
-    applicationUserRepository.deleteAll();
+    loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
+                                       .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
+                                       .build();
   }
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    registrationService.registerUser(applicationUser);
+    registrationService.registerUserByLoginInfo(loginInfo);
     assertThat(applicationUserRepository.exists(Example.of(applicationUser)), is(true));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    registrationService.registerUser(applicationUser);
+    registrationService.registerUserByLoginInfo(loginInfo);
     assertThat(applicationUser.getCurrentState(), isA(UnverifiedUserState.class));
   }
 }

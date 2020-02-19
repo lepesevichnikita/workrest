@@ -7,6 +7,7 @@ package org.klaster.domain.model.entity;
  *
  */
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -26,6 +27,7 @@ public class Role {
   private long id;
 
   @ManyToMany(mappedBy = "roles")
+  @JsonBackReference
   private Set<ApplicationUser> users;
 
   private String name;
@@ -38,7 +40,7 @@ public class Role {
     this.name = name;
   }
 
-  public Set<ApplicationUser> getUsers() {
+  public Set<ApplicationUser> getApplicationUsers() {
     return users;
   }
 

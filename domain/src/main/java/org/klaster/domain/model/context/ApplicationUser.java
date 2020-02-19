@@ -1,5 +1,6 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -29,6 +30,7 @@ public class ApplicationUser extends AbstractContext<AbstractUserState> {
   private LoginInfo loginInfo;
 
   @ManyToMany
+  @JsonManagedReference
   private Set<Role> roles;
 
   @Transient

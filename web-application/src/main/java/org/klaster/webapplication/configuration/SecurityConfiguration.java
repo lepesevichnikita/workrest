@@ -30,10 +30,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired
   private UserDetailsService userDetailsServiceImplementation;
 
-  @Value("${spring.security.user.name}")
+  @Value("${spring.security.user.name:admin}")
   private String systemAdministratorLogin;
 
-  @Value("${spring.security.user.password}")
+  @Value("${spring.security.user.password:admin}")
   private String systemAdministratorPassword;
 
 
@@ -46,18 +46,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   }
 
   @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.inMemoryAuthentication()
-        .withUser(systemAdministratorLogin)
-        .password(bCryptPasswordEncoder().encode(systemAdministratorPassword))
-        .roles(roles);
+  protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+    authenticationManagerBuilder.inMemoryAuthentication()
+                                .withUser(systemAdministratorLogin)
+                                .password(bCryptPasswordEncoder().encode(systemAdministratorPassword))
+                                .roles(roles);
+    super.configure(authenticationManagerBuilder);
   }
 
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .authorizeRequests()
-        .antMatchers("/system_administrator")
+        .antMatchers("/administrators")
         .hasRole("SYSTEM_ADMINISTRATOR")
         .antMatchers("/*")
         .permitAll()

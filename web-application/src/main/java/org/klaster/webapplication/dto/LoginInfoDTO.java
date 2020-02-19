@@ -9,22 +9,34 @@ package org.klaster.webapplication.dto;
  * Copyright(c) Nikita Lepesevich
  */
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.klaster.domain.builder.DefaultLoginInfoBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoginInfoDTO {
 
-  @Autowired
-  private static LoginInfoBuilder defaultLoginInfoBuilder;
+  @JsonIgnore
+  private LoginInfoBuilder defaultLoginInfoBuilder;
 
   private String password;
   private String login;
+
+  public LoginInfoDTO() {
+    defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();
+  }
 
   public LoginInfo toLoginInfo() {
     return defaultLoginInfoBuilder.setLogin(login)
                                   .setPasswordHash(password)
                                   .build();
+  }
+
+  public static LoginInfoDTO fromLoginInfo(LoginInfo loginInfo) {
+    LoginInfoDTO loginInfoDTO = new LoginInfoDTO();
+    loginInfoDTO.setLogin(loginInfo.getLogin());
+    loginInfoDTO.setPassword(loginInfo.getPassword());
+    return loginInfoDTO;
   }
 
   public String getPassword() {

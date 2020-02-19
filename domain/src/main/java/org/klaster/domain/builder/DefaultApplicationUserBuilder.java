@@ -6,8 +6,10 @@ package org.klaster.domain.builder;
  *
  */
 
+import java.util.Set;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Role;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Component;
 public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
 
   private LoginInfo loginInfo;
+  private Set<Role> roles;
+  private long id;
 
   public DefaultApplicationUserBuilder() {
     reset();
@@ -32,8 +36,22 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
   }
 
   @Override
+  public ApplicationUserBuilder setRoles(Set<Role> roles) {
+    this.roles = roles;
+    return this;
+  }
+
+  @Override
+  public ApplicationUserBuilder setId(long id) {
+    this.id = id;
+    return this;
+  }
+
+  @Override
   public void reset() {
     loginInfo = null;
+    roles = null;
+    id = 0;
   }
 
   @Override

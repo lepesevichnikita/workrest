@@ -7,14 +7,12 @@ package org.klaster.webapplication.controller;
  *
  */
 
-import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.webapplication.dto.LoginInfoDTO;
-import org.klaster.webapplication.service.ApplicationUserRegistrationService;
+import org.klaster.webapplication.service.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -23,24 +21,16 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Nikita Lepesevich
  */
 
-@Controller
+@RestController
 @RequestMapping("/register")
 public class RegistrationController {
 
   @Autowired
-  private ApplicationUserRegistrationService applicationUserRegistrationService;
-
-  @GetMapping
-  public ModelAndView getForm() {
-    return new ModelAndView("register_form", "loginInfoDTO", new LoginInfoDTO());
-  }
+  private ApplicationUserService applicationUserService;
 
   @PostMapping
-  public ModelAndView registerUserWithLoginInfo(LoginInfoDTO loginInfoDTO) {
-    ApplicationUser newApplicationUser = new ApplicationUser();
-    newApplicationUser.setLoginInfo(loginInfoDTO.toLoginInfo());
-    applicationUserRegistrationService.registerUser(newApplicationUser);
-    loginInfoDTO.setPassword("");
+  public ModelAndView create(LoginInfoDTO loginInfoDTO) {
+    applicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
     return new ModelAndView("register_form", "loginInfoDTO", loginInfoDTO);
   }
 

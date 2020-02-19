@@ -41,12 +41,12 @@ public class LoginInfo {
     this.login = login;
   }
 
-  public String getPasswordHash() {
+  public String getPassword() {
     return passwordHash;
   }
 
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
+  public void setPasswordHash(String password) {
+    this.passwordHash = password;
   }
 
   public LocalDateTime getLastAuthorizedAt() {
