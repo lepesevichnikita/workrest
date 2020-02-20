@@ -20,9 +20,6 @@ public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
 
   LoginInfo findFirstByLogin(String login);
 
-  LoginInfo findFirstByLoginAndPasswordHash(String login, String passwordHash);
-
   boolean existsByLogin(String login);
 
-  boolean existsByLoginAndPasswordHash(String login, String passwordHash);
 }

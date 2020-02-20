@@ -43,7 +43,7 @@ public class LoginInfoRepositoryTest extends AbstractTestNGSpringContextTests {
   public void createsUniqueLoginInfo() {
     LoginInfo newLoginInfo = new LoginInfo();
     newLoginInfo.setLogin(DEFAULT_NEW_LOGIN);
-    newLoginInfo.setPasswordHash(DEFAULT_NEW_PASSWORD_HASH);
+    newLoginInfo.setPassword(DEFAULT_NEW_PASSWORD_HASH);
     loginInfoRepository.saveAndFlush(newLoginInfo);
     assertThat(loginInfoRepository.exists(Example.of(newLoginInfo)), is(true));
   }

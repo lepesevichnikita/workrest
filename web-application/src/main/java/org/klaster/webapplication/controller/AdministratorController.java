@@ -49,13 +49,8 @@ public class AdministratorController {
 
   @GetMapping("/{id}")
   public ResponseEntity<ApplicationUser> findById(@PathVariable long id) {
-    ResponseEntity result = ResponseEntity.notFound()
-                                          .build();
     ApplicationUser foundAdministrator = administratorService.findById(id);
-    if (foundAdministrator != null) {
-      result = ResponseEntity.ok(administratorService.findById(id));
-    }
-    return result;
+    return ResponseEntity.ok(foundAdministrator);
   }
 
   @PostMapping

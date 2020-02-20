@@ -46,7 +46,7 @@ public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
   public LoginInfo build() {
     LoginInfo newLoginInfo = new LoginInfo();
     newLoginInfo.setLogin(login);
-    newLoginInfo.setPasswordHash(passwordHash);
+    newLoginInfo.setPassword(passwordHash);
     return newLoginInfo;
   }
 }

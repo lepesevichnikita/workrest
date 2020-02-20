@@ -1,77 +1,24 @@
-package org.klaster.webapplication.service;
-
-/*
+package org.klaster.webapplication.service;/*
+ * org.klaster.webapplication.service
+ *
  * workrest
  *
- * 18.02.2020
+ * 2/20/20
  *
+ * Copyright(c) Nikita Lepesevich
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
-import org.klaster.webapplication.constant.RoleName;
-import org.klaster.webapplication.repository.ApplicationUserRepository;
-import org.klaster.webapplication.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-/**
- * AdministratorService
- *
- * @author Nikita Lepesevich
- */
+public interface AdministratorService {
 
-@Service
-public class AdministratorService {
+  ApplicationUser registerAdministrator(LoginInfo loginInfo);
 
-  @Autowired
-  private RoleRepository roleRepository;
+  List<ApplicationUser> findAll();
 
-  @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  ApplicationUser findById(long id);
 
-  @Autowired
-  private ApplicationUserService applicationUserService;
-
-  @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
-
-  public ApplicationUser registerAdministrator(LoginInfo loginInfo) {
-    Role administratorRole = roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR);
-    ApplicationUser administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                                 .setRoles(Collections.singleton(administratorRole))
-                                                                 .build();
-    return applicationUserRepository.save(administrator);
-  }
-
-  public List<ApplicationUser> findAll() {
-    return new ArrayList<>(roleRepository.findFirstByName(RoleName.SYSTEM_ADMINISTRATOR)
-                                         .getApplicationUsers());
-  }
-
-  public ApplicationUser findById(long id) {
-    Role role = roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR);
-    return role.getApplicationUsers()
-               .stream()
-               .filter(applicationUser -> applicationUser.getId() == id)
-               .findFirst()
-               .orElse(null);
-  }
-
-  public ApplicationUser deleteById(long id) {
-    ApplicationUser deletedAdministrator = findById(id);
-    if (deletedAdministrator != null) {
-      deletedAdministrator.getRoles()
-                          .removeIf(role -> role.getName()
-                                                .equals(RoleName.SYSTEM_ADMINISTRATOR));
-      applicationUserRepository.save(deletedAdministrator);
-    }
-    return deletedAdministrator;
-  }
-
+  ApplicationUser deleteById(long id);
 }

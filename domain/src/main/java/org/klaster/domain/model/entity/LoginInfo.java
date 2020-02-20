@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 /**
  * LoginInfo
@@ -19,11 +20,13 @@ public class LoginInfo {
 
   private LocalDateTime lastAuthorizedAt;
 
+  @NotBlank(message = "Login is required")
   @Column(unique = true, nullable = false)
   private String login;
 
+  @NotBlank(message = "Password is required")
   @Column(nullable = false)
-  private String passwordHash;
+  private String password;
 
   public long getId() {
     return id;
@@ -42,11 +45,11 @@ public class LoginInfo {
   }
 
   public String getPassword() {
-    return passwordHash;
+    return password;
   }
 
-  public void setPasswordHash(String password) {
-    this.passwordHash = password;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public LocalDateTime getLastAuthorizedAt() {
