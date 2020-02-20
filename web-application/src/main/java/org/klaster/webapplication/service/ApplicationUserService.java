@@ -12,6 +12,7 @@ import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.webapplication.constant.RoleName;
 import org.klaster.webapplication.repository.ApplicationUserRepository;
 import org.klaster.webapplication.repository.LoginInfoRepository;
 import org.klaster.webapplication.repository.RoleRepository;
@@ -26,8 +27,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ApplicationUserService {
-
-  public static String USER_ROLE_NAME = "USER";
 
   @Autowired
   private LoginInfoRepository loginInfoRepository;
@@ -47,7 +46,7 @@ public class ApplicationUserService {
   }
 
   public ApplicationUser registerUserByLoginInfo(LoginInfo loginInfo) {
-    Role role = roleRepository.findFirstOrCreateByName(USER_ROLE_NAME);
+    Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
     ApplicationUser applicationUser = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
                                                                    .setRoles(Collections.singleton(role))
                                                                    .build();

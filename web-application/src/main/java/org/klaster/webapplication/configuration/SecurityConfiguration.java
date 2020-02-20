@@ -7,6 +7,7 @@ package org.klaster.webapplication.configuration;
  *
  */
 
+import org.klaster.webapplication.constant.RoleName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,22 +32,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Autowired
   private UserDetailsService userDetailsServiceImplementation;
 
-  @Value("${spring.security.user.name:admin}")
+  @Value("${spring.security.user.name}")
   private String systemAdministratorLogin;
 
-  @Value("${spring.security.user.password:admin}")
+  @Value("${spring.security.user.password}")
   private String systemAdministratorPassword;
 
 
-  @Value("${spring.security.user.roles}")
-  private String[] roles;
-
   @Override
   protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-    authenticationManagerBuilder.inMemoryAuthentication()
-                                .withUser(systemAdministratorLogin)
-                                .password(bCryptPasswordEncoder().encode(systemAdministratorPassword))
-                                .roles(roles);
+    systemAdministratorInMemoryAuthentication(authenticationManagerBuilder);
   }
 
   @Override
@@ -80,4 +75,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     auth.userDetailsService(userDetailsServiceImplementation)
         .passwordEncoder(bCryptPasswordEncoder());
   }
+
+  private void systemAdministratorInMemoryAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+    authenticationManagerBuilder.inMemoryAuthentication()
+                                .withUser(systemAdministratorLogin)
+                                .password(bCryptPasswordEncoder().encode(systemAdministratorPassword))
+                                .roles(RoleName.SYSTEM_ADMINISTRATOR);
+  }
+
 }

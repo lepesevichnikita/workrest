@@ -18,4 +18,3 @@ spring:
         user:
             name: ${WORKREST_ADMINISTRATOR_LOGIN}
             password: ${WORKREST_ADMINISTRATOR_PASSWORD}
-            roles: SYSTEM_ADMINISTRATOR, USER

@@ -17,6 +17,7 @@ import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.webapplication.constant.RoleName;
 import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.klaster.webapplication.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,9 +55,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
 
   private static final String CONTROLLER_PATH = "/administrators";
 
-  private static final String VALID_SYSTEM_ADMINISTRATOR_NAME = "admin";
+  private static final String SYSTEM_ADMINISTRATOR_NAME = "admin";
 
-  private static final String VALID_SYSTEM_ADMINISTRATOR_PASSWORD = "admin";
+  private static final String SYSTEM_ADMINISTRATOR_PASSWORD = "admin";
 
   @Autowired
   private WebApplicationContext webApplicationContext;
@@ -88,10 +90,11 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     defaultApplicationUserBuilder.reset();
   }
 
+  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void createsAdministrator() throws Exception {
     Role role = new Role();
-    role.setName(AdministratorService.ADMINISTRATOR_ROLE_NAME);
+    role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(0)
                                                                            .setLoginInfo(loginInfo)
@@ -99,10 +102,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     when(administratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
     String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
-    mockMvc.perform(post(CONTROLLER_PATH).with(httpBasic(VALID_SYSTEM_ADMINISTRATOR_NAME, VALID_SYSTEM_ADMINISTRATOR_PASSWORD))
+    mockMvc.perform(post(CONTROLLER_PATH).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                          .contentType(MediaType.APPLICATION_JSON_VALUE)
                                          .accept(MediaType.APPLICATION_JSON_VALUE)
-                                         .characterEncoding("UTF-8")
                                          .content(loginInfoAsJson))
            .andExpect(status().isCreated())
            .andExpect(content().json(registeredAdministratorAsJson));
@@ -111,7 +113,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void getsUnauthenticated() throws Exception {
     Role role = new Role();
-    role.setName(AdministratorService.ADMINISTRATOR_ROLE_NAME);
+    role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(0)
                                                                            .setLoginInfo(loginInfo)

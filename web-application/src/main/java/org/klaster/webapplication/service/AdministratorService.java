@@ -14,8 +14,7 @@ import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
-import org.klaster.domain.model.state.user.AbstractUserState;
-import org.klaster.domain.model.state.user.DeletedUserState;
+import org.klaster.webapplication.constant.RoleName;
 import org.klaster.webapplication.repository.ApplicationUserRepository;
 import org.klaster.webapplication.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdministratorService {
 
-  public static String ADMINISTRATOR_ROLE_NAME = "ADMINISTRATOR";
-
   @Autowired
   private RoleRepository roleRepository;
 
@@ -45,7 +42,7 @@ public class AdministratorService {
   private ApplicationUserBuilder defaultApplicationUserBuilder;
 
   public ApplicationUser registerAdministrator(LoginInfo loginInfo) {
-    Role administratorRole = roleRepository.findFirstOrCreateByName(ADMINISTRATOR_ROLE_NAME);
+    Role administratorRole = roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR);
     ApplicationUser administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
                                                                  .setRoles(Collections.singleton(administratorRole))
                                                                  .build();
@@ -53,12 +50,12 @@ public class AdministratorService {
   }
 
   public List<ApplicationUser> findAll() {
-    return new ArrayList<>(roleRepository.findFirstByName(ADMINISTRATOR_ROLE_NAME)
+    return new ArrayList<>(roleRepository.findFirstByName(RoleName.SYSTEM_ADMINISTRATOR)
                                          .getApplicationUsers());
   }
 
   public ApplicationUser findById(long id) {
-    Role role = roleRepository.findFirstOrCreateByName(ADMINISTRATOR_ROLE_NAME);
+    Role role = roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR);
     return role.getApplicationUsers()
                .stream()
                .filter(applicationUser -> applicationUser.getId() == id)
@@ -67,14 +64,14 @@ public class AdministratorService {
   }
 
   public ApplicationUser deleteById(long id) {
-    ApplicationUser deletedApplicationUser = findById(id);
-    if (deletedApplicationUser != null) {
-      AbstractUserState userState = new DeletedUserState();
-      userState.setContext(deletedApplicationUser);
-      deletedApplicationUser.setCurrentState(userState);
-      applicationUserRepository.save(deletedApplicationUser);
+    ApplicationUser deletedAdministrator = findById(id);
+    if (deletedAdministrator != null) {
+      deletedAdministrator.getRoles()
+                          .removeIf(role -> role.getName()
+                                                .equals(RoleName.SYSTEM_ADMINISTRATOR));
+      applicationUserRepository.save(deletedAdministrator);
     }
-    return deletedApplicationUser;
+    return deletedAdministrator;
   }
 
 }
