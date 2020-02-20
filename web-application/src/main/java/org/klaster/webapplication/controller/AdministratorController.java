@@ -16,7 +16,6 @@ import org.klaster.webapplication.repository.RoleRepository;
 import org.klaster.webapplication.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,8 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/administrators")
-@PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
-public class AdministratorsController {
+public class AdministratorController {
 
   @Autowired
   private RoleRepository roleRepository;
