@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,6 +14,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
@@ -22,8 +27,8 @@ import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.klaster.webapplication.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestExecutionListeners;
@@ -71,7 +76,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockBean
+  @SpyBean
   private AdministratorService administratorService;
 
   private MockMvc mockMvc;
@@ -96,8 +101,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = new Role();
     role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(0)
-                                                                           .setLoginInfo(loginInfo)
+    ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
                                                                            .build();
     when(administratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
     String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
@@ -111,20 +115,63 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   }
 
   @Test
-  public void getsUnauthenticated() throws Exception {
+  public void getsUnauthenticatedIfAnonymous() throws Exception {
+    mockMvc.perform(get(CONTROLLER_PATH).accept(MediaType.APPLICATION_JSON_VALUE))
+           .andExpect(unauthenticated());
+  }
+
+  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
+  @Test
+  public void getsUnauthenticatedWithLoginAndPassword() throws Exception {
+    final String wrongLogin = "wrongLogin";
+    final String wrongPassword = "wrongPassword";
+    mockMvc.perform(get(CONTROLLER_PATH).accept(MediaType.APPLICATION_JSON_VALUE)
+                                        .with(httpBasic(wrongLogin, wrongPassword)))
+           .andExpect(unauthenticated());
+  }
+
+  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
+  @Test
+  public void getsListOfAdministrators() throws Exception {
     Role role = new Role();
     role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(0)
-                                                                           .setLoginInfo(loginInfo)
-                                                                           .build();
-    when(administratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
-    String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
-    String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
-    mockMvc.perform(post(CONTROLLER_PATH).contentType(MediaType.APPLICATION_JSON_VALUE)
-                                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                                         .characterEncoding("UTF-8")
-                                         .content(loginInfoAsJson))
-           .andExpect(unauthenticated());
+    defaultApplicationUserBuilder.setLoginInfo(loginInfo)
+                                 .setRoles(Collections.singleton(role))
+                                 .build();
+    List<ApplicationUser> registeredAdministrators = Arrays.asList(defaultApplicationUserBuilder.setId(0)
+                                                                                                .build(),
+                                                                   defaultApplicationUserBuilder.setId(1)
+                                                                                                .build());
+    when(administratorService.findAll()).thenReturn(registeredAdministrators);
+    String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
+    mockMvc.perform(get(CONTROLLER_PATH).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+                                        .accept(MediaType.APPLICATION_JSON_VALUE))
+           .andExpect(status().isOk())
+           .andExpect(content().json(expectedAdministratorsAsJson));
+  }
+
+  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
+  @Test
+  public void deletesAdministrator() throws Exception {
+    final long id = 0;
+    final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
+    Role role = new Role();
+    role.setName(RoleName.SYSTEM_ADMINISTRATOR);
+    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
+    ApplicationUser sourceAdministrator = defaultApplicationUserBuilder.setId(id)
+                                                                       .setRoles(Collections.singleton(role))
+                                                                       .setLoginInfo(loginInfo)
+                                                                       .build();
+    ApplicationUser expectedAdministrator = defaultApplicationUserBuilder.build();
+    expectedAdministrator.getRoles()
+                         .removeIf(removedRole -> removedRole.getName()
+                                                             .equals(RoleName.SYSTEM_ADMINISTRATOR));
+    when(administratorService.findById(id)).thenReturn(sourceAdministrator);
+    String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
+    mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+                               .accept(MediaType.APPLICATION_JSON_VALUE))
+           .andExpect(status().isAccepted())
+           .andExpect(content().json(expectedAdministratorAsJson));
   }
 }

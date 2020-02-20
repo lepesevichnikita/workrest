@@ -6,6 +6,7 @@ package org.klaster.domain.builder;
  *
  */
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -50,13 +51,15 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
   @Override
   public void reset() {
     loginInfo = null;
-    roles = null;
+    roles = new LinkedHashSet<>();
     id = 0;
   }
 
   @Override
   public ApplicationUser build() {
     ApplicationUser applicationUser = new ApplicationUser();
+    applicationUser.setId(id);
+    applicationUser.setRoles(new LinkedHashSet<>(roles));
     applicationUser.setLoginInfo(loginInfo);
     return applicationUser;
   }
