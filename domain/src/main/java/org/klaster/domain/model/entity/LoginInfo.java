@@ -1,5 +1,6 @@
 package org.klaster.domain.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ public class LoginInfo {
   @Column(unique = true, nullable = false)
   private String login;
 
+  @JsonIgnore
   @NotBlank(message = "Password is required")
   @Column(nullable = false)
   private String password;

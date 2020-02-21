@@ -1,9 +1,13 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -22,6 +26,7 @@ import org.klaster.domain.model.state.general.AbstractState;
 public abstract class AbstractContext<S extends AbstractState> {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @OneToOne(optional = false, targetEntity = AbstractState.class, cascade = CascadeType.ALL)
@@ -29,14 +34,19 @@ public abstract class AbstractContext<S extends AbstractState> {
   private S currentState;
 
   @OneToMany(targetEntity = AbstractState.class, cascade = CascadeType.ALL)
-  @JsonManagedReference
+  @JsonIgnore
   private Set<S> states;
+
+  public AbstractContext() {
+    states = new LinkedHashSet<>();
+  }
 
   public S getCurrentState() {
     return currentState;
   }
 
   public void setCurrentState(S newState) {
+    states.add(newState);
     currentState = newState;
   }
 

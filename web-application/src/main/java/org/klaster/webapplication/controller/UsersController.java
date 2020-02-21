@@ -3,22 +3,18 @@ package org.klaster.webapplication.controller;
 /*
  * workrest
  *
- * 18.02.2020
+ * 13.02.2020
  *
  */
 
 import java.net.URI;
-import java.util.List;
 import org.klaster.domain.model.context.ApplicationUser;
-import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.webapplication.dto.LoginInfoDTO;
-import org.klaster.webapplication.repository.RoleRepository;
-import org.klaster.webapplication.service.AdministratorService;
+import org.klaster.webapplication.service.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,50 +23,35 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
- * SystemAdministratorController
+ * RegistrationController
  *
  * @author Nikita Lepesevich
  */
 
 @RestController
-@RequestMapping("/administrators")
-@PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
-public class AdministratorController {
+@RequestMapping("/users")
+public class UsersController {
 
   @Autowired
-  private RoleRepository roleRepository;
-
-  @Autowired
-  private AdministratorService administratorService;
-
-  @GetMapping
-  public ResponseEntity<List<ApplicationUser>> findAll() {
-    return ResponseEntity.ok(administratorService.findAll());
-  }
-
-
-  @GetMapping("/{id}")
-  public ResponseEntity<ApplicationUser> findById(@PathVariable long id) {
-    ApplicationUser foundAdministrator = administratorService.findById(id);
-    return ResponseEntity.ok(foundAdministrator);
-  }
+  private ApplicationUserService defaultApplicationUserService;
 
   @PostMapping
   public ResponseEntity<ApplicationUser> create(@RequestBody LoginInfoDTO loginInfoDTO) {
-    LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
-    ApplicationUser registeredAdministrator = administratorService.registerAdministrator(loginInfo);
+    ApplicationUser registeredApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                                               .path("/{id}")
-                                              .buildAndExpand(registeredAdministrator.getId())
+                                              .buildAndExpand(registeredApplicationUser.getId())
                                               .toUri();
     return ResponseEntity.created(location)
-                         .body(registeredAdministrator);
+                         .body(registeredApplicationUser);
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMINISTRATOR')")
   public ResponseEntity<ApplicationUser> delete(@PathVariable long id) {
-    ApplicationUser deletedAdministrator = administratorService.deleteById(id);
+    ApplicationUser deletedApplicationUser = defaultApplicationUserService.deleteById(id);
     return ResponseEntity.accepted()
-                         .body(deletedAdministrator);
+                         .body(deletedApplicationUser);
   }
+
 }

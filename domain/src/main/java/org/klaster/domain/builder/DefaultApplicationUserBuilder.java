@@ -11,6 +11,8 @@ import java.util.Set;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.state.user.AbstractUserState;
+import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +26,7 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
 
   private LoginInfo loginInfo;
   private Set<Role> roles;
+  private AbstractUserState currentState;
   private long id;
 
   public DefaultApplicationUserBuilder() {
@@ -49,10 +52,17 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
   }
 
   @Override
+  public ApplicationUserBuilder setCurrentState(AbstractUserState currentState) {
+    this.currentState = currentState;
+    return this;
+  }
+
+  @Override
   public void reset() {
     loginInfo = null;
     roles = new LinkedHashSet<>();
     id = 0;
+    currentState = new UnverifiedUserState();
   }
 
   @Override
@@ -61,6 +71,8 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
     applicationUser.setId(id);
     applicationUser.setRoles(new LinkedHashSet<>(roles));
     applicationUser.setLoginInfo(loginInfo);
+    applicationUser.setCurrentState(currentState);
+    currentState.setContext(applicationUser);
     return applicationUser;
   }
 }

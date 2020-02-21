@@ -31,7 +31,7 @@ public class DefaultLoginInfoBuilder implements LoginInfoBuilder {
   }
 
   @Override
-  public LoginInfoBuilder setPasswordHash(String passwordHash) {
+  public LoginInfoBuilder setPassword(String passwordHash) {
     this.passwordHash = passwordHash;
     return this;
   }

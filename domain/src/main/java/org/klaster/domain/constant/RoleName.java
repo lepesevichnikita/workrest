@@ -1,4 +1,4 @@
-package org.klaster.webapplication.constant;
+package org.klaster.domain.constant;
 
 /*
  * workrest
@@ -15,6 +15,7 @@ package org.klaster.webapplication.constant;
 
 public class RoleName {
 
+  public static final String ADMINISTRATOR = "ADMINISTRATOR";
   public static final String SYSTEM_ADMINISTRATOR = "SYSTEM_ADMINISTRATOR";
   public static final String USER = "USER";
 

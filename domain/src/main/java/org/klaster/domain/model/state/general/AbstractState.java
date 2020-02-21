@@ -1,6 +1,7 @@
 package org.klaster.domain.model.state.general;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 import javax.persistence.Entity;
@@ -23,6 +24,7 @@ import org.springframework.data.annotation.CreatedDate;
 public abstract class AbstractState<C extends AbstractContext> {
 
   @Transient
+  @JsonIgnore
   protected final Logger logger = Logger.getLogger(getClass().getName());
 
   @Id

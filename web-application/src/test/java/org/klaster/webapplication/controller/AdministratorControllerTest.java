@@ -22,10 +22,10 @@ import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.builder.RoleBuilder;
+import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
-import org.klaster.webapplication.constant.RoleName;
 import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.klaster.webapplication.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
@@ -99,7 +98,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     defaultApplicationUserBuilder.reset();
   }
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void createsAdministrator() throws Exception {
     final long id = 0;
@@ -127,9 +125,8 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
            .andExpect(unauthenticated());
   }
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
-  public void getsUnauthenticatedWithLoginAndPassword() throws Exception {
+  public void getsUnauthenticatedWithWrongLoginAndPassword() throws Exception {
     final String wrongLogin = "wrongLogin";
     final String wrongPassword = "wrongPassword";
     mockMvc.perform(get(CONTROLLER_PATH).accept(MediaType.APPLICATION_JSON_VALUE)
@@ -137,7 +134,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
            .andExpect(unauthenticated());
   }
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void getsListOfAdministrators() throws Exception {
     Role role = defaultRoleBuilder.setName(RoleName.SYSTEM_ADMINISTRATOR)
@@ -158,7 +154,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
            .andExpect(content().json(expectedAdministratorsAsJson));
   }
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void deletesAdministrator() throws Exception {
     final long id = 0;
@@ -177,7 +172,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
            .andExpect(content().json(expectedAdministratorAsJson));
   }
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void returnsNotFoundIfDeletedAdministratorDoesntExists() throws Exception {
     final long id = 0;
@@ -189,7 +183,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   }
 
 
-  @WithMockUser(username = SYSTEM_ADMINISTRATOR_NAME, password = SYSTEM_ADMINISTRATOR_PASSWORD, roles = RoleName.SYSTEM_ADMINISTRATOR)
   @Test
   public void returnsNotFoundIfRequiredAdministratorNotFound() throws Exception {
     final long id = 0;

@@ -3,54 +3,28 @@ package org.klaster.webapplication.service;
 /*
  * workrest
  *
- * 13.02.2020
+ * 21.02.2020
  *
  */
 
-import java.util.Collections;
-import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
-import org.klaster.webapplication.constant.RoleName;
-import org.klaster.webapplication.repository.ApplicationUserRepository;
-import org.klaster.webapplication.repository.LoginInfoRepository;
-import org.klaster.webapplication.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
- * RegistrationService
+ * ApplicationUserService
  *
  * @author Nikita Lepesevich
  */
 
-@Service
-public class ApplicationUserService {
+public interface ApplicationUserService {
 
-  @Autowired
-  private LoginInfoRepository loginInfoRepository;
+  boolean hasUniqueLogin(ApplicationUser applicationUser);
 
-  @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  ApplicationUser registerUserByLoginInfo(LoginInfo loginInfo);
 
-  @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
+  ApplicationUser deleteById(long id);
 
-  @Autowired
-  private RoleRepository roleRepository;
+  ApplicationUser findFirst();
 
-  public boolean hasUniqueLogin(ApplicationUser applicationUser) {
-    return !loginInfoRepository.existsByLogin(applicationUser.getLoginInfo()
-                                                             .getLogin());
-  }
-
-  public ApplicationUser registerUserByLoginInfo(LoginInfo loginInfo) {
-    Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
-    ApplicationUser applicationUser = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                                   .setRoles(Collections.singleton(role))
-                                                                   .build();
-    return applicationUserRepository.save(applicationUser);
-  }
-
+  long count();
 }

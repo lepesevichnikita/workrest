@@ -7,15 +7,15 @@ package org.klaster.webapplication.service;
  *
  */
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.ApplicationUserBuilder;
+import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
-import org.klaster.webapplication.constant.RoleName;
 import org.klaster.webapplication.repository.ApplicationUserRepository;
 import org.klaster.webapplication.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,6 @@ public class DefaultAdministratorService implements AdministratorService {
   private ApplicationUserRepository applicationUserRepository;
 
   @Autowired
-  private ApplicationUserService applicationUserService;
-
-  @Autowired
   private ApplicationUserBuilder defaultApplicationUserBuilder;
 
   @Override
@@ -53,8 +50,8 @@ public class DefaultAdministratorService implements AdministratorService {
 
   @Override
   public List<ApplicationUser> findAll() {
-    return new ArrayList<>(roleRepository.findFirstByName(RoleName.SYSTEM_ADMINISTRATOR)
-                                         .getApplicationUsers());
+    return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR)
+                                          .getApplicationUsers());
   }
 
   @Override

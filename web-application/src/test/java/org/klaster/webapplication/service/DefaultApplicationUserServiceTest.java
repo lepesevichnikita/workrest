@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  */
 
 @SpringBootTest
-public class ApplicationUserServiceTest extends AbstractTestNGSpringContextTests {
+public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringContextTests {
 
   private static String DEFAULT_NEW_LOGIN = "new login";
   private static String DEFAULT_NEW_PASSWORD_HASH = DEFAULT_NEW_LOGIN;
@@ -47,7 +47,7 @@ public class ApplicationUserServiceTest extends AbstractTestNGSpringContextTests
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserService registrationService;
+  private ApplicationUserService defaultApplicationUserService;
 
   @Autowired
   private ApplicationUserRepository applicationUserRepository;
@@ -58,19 +58,19 @@ public class ApplicationUserServiceTest extends AbstractTestNGSpringContextTests
     defaultLoginInfoBuilder.reset();
     applicationUserRepository.deleteAll();
     loginInfo = defaultLoginInfoBuilder.setLogin(DEFAULT_NEW_LOGIN)
-                                       .setPasswordHash(DEFAULT_NEW_PASSWORD_HASH)
+                                       .setPassword(DEFAULT_NEW_PASSWORD_HASH)
                                        .build();
   }
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    registrationService.registerUserByLoginInfo(loginInfo);
+    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
     assertThat(applicationUserRepository.exists(Example.of(applicationUser)), is(true));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    registrationService.registerUserByLoginInfo(loginInfo);
+    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
     assertThat(applicationUser.getCurrentState(), isA(UnverifiedUserState.class));
   }
 }

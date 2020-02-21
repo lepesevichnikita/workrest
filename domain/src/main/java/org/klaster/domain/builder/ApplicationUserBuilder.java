@@ -11,6 +11,7 @@ import java.util.Set;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.state.user.AbstractUserState;
 
 /**
  * ApplicationUserBuilder
@@ -25,4 +26,6 @@ public interface ApplicationUserBuilder extends Builder<ApplicationUser> {
   ApplicationUserBuilder setRoles(Set<Role> roles);
 
   ApplicationUserBuilder setId(long id);
+
+  ApplicationUserBuilder setCurrentState(AbstractUserState currentState);
 }

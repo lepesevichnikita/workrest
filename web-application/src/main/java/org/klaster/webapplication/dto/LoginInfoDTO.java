@@ -26,17 +26,18 @@ public class LoginInfoDTO {
     defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();
   }
 
-  public LoginInfo toLoginInfo() {
-    return defaultLoginInfoBuilder.setLogin(login)
-                                  .setPasswordHash(password)
-                                  .build();
-  }
 
   public static LoginInfoDTO fromLoginInfo(LoginInfo loginInfo) {
     LoginInfoDTO loginInfoDTO = new LoginInfoDTO();
-    loginInfoDTO.setLogin(loginInfo.getLogin());
     loginInfoDTO.setPassword(loginInfo.getPassword());
+    loginInfoDTO.setLogin(loginInfo.getLogin());
     return loginInfoDTO;
+  }
+
+  public LoginInfo toLoginInfo() {
+    return defaultLoginInfoBuilder.setLogin(login)
+                                  .setPassword(password)
+                                  .build();
   }
 
   public String getPassword() {
