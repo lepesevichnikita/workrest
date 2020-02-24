@@ -14,6 +14,8 @@ import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.state.user.AbstractUserState;
+import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.webapplication.repository.ApplicationUserRepository;
 import org.klaster.webapplication.repository.LoginInfoRepository;
@@ -62,8 +64,7 @@ public class DefaultApplicationUserService implements ApplicationUserService {
     ApplicationUser deletedApplicationUser = applicationUserRepository.findById(id)
                                                                       .orElseThrow(EntityNotFoundException::new);
     deletedApplicationUser.setCurrentState(new DeletedUserState());
-    deletedApplicationUser = applicationUserRepository.save(deletedApplicationUser);
-    return deletedApplicationUser;
+    return applicationUserRepository.save(deletedApplicationUser);
   }
 
   @Override
@@ -77,6 +78,27 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   @Override
   public long count() {
     return applicationUserRepository.count();
+  }
+
+  @Override
+  public ApplicationUser blockById(long id) {
+    ApplicationUser deletedApplicationUser = applicationUserRepository.findById(id)
+                                                                      .orElseThrow(EntityNotFoundException::new);
+    deletedApplicationUser.setCurrentState(new BlockedUserState());
+    return applicationUserRepository.save(deletedApplicationUser);
+  }
+
+  @Override
+  public ApplicationUser unblockById(long id) {
+    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
+                                                                    .orElseThrow(EntityNotFoundException::new);
+    if (foundApplicationUser.getCurrentState() instanceof BlockedUserState) {
+      AbstractUserState previousState = foundApplicationUser.getPreviousState();
+      if (previousState != null) {
+        foundApplicationUser.setCurrentState(previousState);
+      }
+    }
+    return applicationUserRepository.save(foundApplicationUser);
   }
 
 }

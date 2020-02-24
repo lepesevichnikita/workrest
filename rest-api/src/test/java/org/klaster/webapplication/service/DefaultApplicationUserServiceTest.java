@@ -1,6 +1,7 @@
 package org.klaster.webapplication.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -15,6 +16,9 @@ import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.state.user.AbstractUserState;
+import org.klaster.domain.model.state.user.BlockedUserState;
+import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.klaster.webapplication.configuration.ApplicationContext;
 import org.klaster.webapplication.repository.ApplicationUserRepository;
@@ -47,8 +51,6 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
   private LoginInfo loginInfo;
   private ApplicationUser applicationUser;
   private Faker faker;
-  private String login;
-  private String password;
 
   @Autowired
   private ApplicationUserBuilder defaultApplicationUserBuilder;
@@ -69,10 +71,10 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
 
   @BeforeMethod
   public void initialize() {
-    login = faker.name()
-                 .username();
-    password = faker.internet()
-                    .password();
+    String login = faker.name()
+                        .username();
+    String password = faker.internet()
+                           .password();
     defaultApplicationUserBuilder.reset();
     defaultLoginInfoBuilder.reset();
     loginInfo = defaultLoginInfoBuilder.setLogin(login)
@@ -97,5 +99,31 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
   public void registeredUserHasRoleUser() {
     applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
     assertThat(new ArrayList<>(applicationUser.getRoles()), contains(hasProperty("name", equalTo(RoleName.USER))));
+  }
+
+  @Test
+  public void deletesUsers() {
+    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    applicationUser = defaultApplicationUserService.deleteById(applicationUser.getId());
+    assertThat(applicationUser.getCurrentState(), isA(DeletedUserState.class));
+  }
+
+  @Test
+  public void blocksUser() {
+    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    applicationUser = defaultApplicationUserService.blockById(applicationUser.getId());
+    assertThat(applicationUser.getCurrentState(), isA(BlockedUserState.class));
+  }
+
+  @Test
+  public void unblocksUser() {
+    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    applicationUser = defaultApplicationUserService.blockById(applicationUser.getId());
+    AbstractUserState previousState = applicationUser.getPreviousState();
+    applicationUser = defaultApplicationUserService.unblockById(applicationUser.getId());
+    assertThat(applicationUser.getCurrentState(), allOf(
+        hasProperty("id", equalTo(previousState.getId())),
+        hasProperty("class", equalTo(previousState.getClass()))
+    ));
   }
 }

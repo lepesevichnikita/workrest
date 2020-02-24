@@ -27,4 +27,8 @@ public interface ApplicationUserService {
   ApplicationUser findFirst();
 
   long count();
+
+  ApplicationUser blockById(long id);
+
+  ApplicationUser unblockById(long id);
 }

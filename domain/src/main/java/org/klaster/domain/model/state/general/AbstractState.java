@@ -11,7 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import org.klaster.domain.model.context.AbstractContext;
 import org.springframework.data.annotation.CreatedDate;
@@ -37,7 +37,7 @@ public abstract class AbstractState<C extends AbstractContext> {
   @CreatedDate
   private LocalDateTime createdAt;
 
-  @OneToOne(targetEntity = AbstractContext.class, fetch = FetchType.LAZY)
+  @ManyToOne(targetEntity = AbstractContext.class, fetch = FetchType.LAZY)
   @JsonBackReference
   private C context;
 
@@ -59,5 +59,9 @@ public abstract class AbstractState<C extends AbstractContext> {
 
   public LocalDateTime getCreatedAt() {
     return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
   }
 }

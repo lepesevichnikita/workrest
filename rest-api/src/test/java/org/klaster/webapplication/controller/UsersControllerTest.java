@@ -45,7 +45,7 @@ import org.testng.annotations.Test;
  */
 
 /**
- * RegistrationControllerTest
+ * UsersControllerTest
  *
  * @author Nikita Lepesevich
  */
@@ -56,7 +56,9 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   public static final String VALID_ADMIN_PASSWORD = "admin";
   public static final String VALID_ADMIN_LOGIN = "admin";
-  private static final String CONTROLLER_PATH = "/users";
+  private static final String CONTROLLER_NAME = "users";
+  private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
+  private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
 
   private Faker faker;
   private ObjectMapper objectMapper;
@@ -102,14 +104,14 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void registersUniqueUser() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(login)
                                                  .setPassword(password)
                                                  .build();
-    String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
-
-    mockMvc.perform(post(CONTROLLER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                         .accept(MediaType.APPLICATION_JSON)
-                                         .content(loginInfoDTOAsJson))
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .content(loginInfoDTOAsJson))
            .andExpect(status().isCreated())
            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").isNotEmpty())
@@ -121,7 +123,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void returnsUnauthorizedForAnonymousUserDeletingUser() throws Exception {
     final long id = 0;
-    final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
     mockMvc.perform(delete(uri).with(httpBasic(login, password))
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON))
@@ -134,7 +136,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
                                                  .setPassword(password)
                                                  .build();
     ApplicationUser deletedApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String uri = String.format("%s/%s", CONTROLLER_PATH, deletedApplicationUser.getId());
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedApplicationUser.getId());
     LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(loginInfo);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(loginInfoDTO);
     mockMvc.perform(delete(uri).with(user(VALID_ADMIN_LOGIN).password(VALID_ADMIN_PASSWORD))

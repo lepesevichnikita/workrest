@@ -57,7 +57,9 @@ import org.testng.annotations.Test;
 @ContextConfiguration(classes = {TestContext.class})
 public class AdministratorControllerTest extends AbstractTestNGSpringContextTests {
 
-  private static final String CONTROLLER_PATH = "/administrators";
+  private static final String CONTROLLER_NAME = "administrators";
+  private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
+  private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
   private static final String SYSTEM_ADMINISTRATOR_NAME = "admin";
   private static final String SYSTEM_ADMINISTRATOR_PASSWORD = "admin";
 
@@ -97,6 +99,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void createsAdministrator() throws Exception {
     final long id = 0;
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     Role role = defaultRoleBuilder.setName(RoleName.ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
@@ -105,33 +108,35 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
                                                                            .setRoles(Collections.singleton(role))
                                                                            .build();
     when(defaultAdministratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
-    String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
-    String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
-    mockMvc.perform(post(CONTROLLER_PATH).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
-                                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                                         .content(loginInfoAsJson))
+    final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
+    mockMvc.perform(post(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+                             .contentType(MediaType.APPLICATION_JSON_VALUE)
+                             .accept(MediaType.APPLICATION_JSON_VALUE)
+                             .content(loginInfoAsJson))
            .andExpect(status().isCreated())
            .andExpect(content().json(registeredAdministratorAsJson));
   }
 
   @Test
   public void getsUnauthenticatedIfAnonymous() throws Exception {
-    mockMvc.perform(get(CONTROLLER_PATH).accept(MediaType.APPLICATION_JSON_VALUE))
+    mockMvc.perform(get(CONTROLLER_NAME).accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(unauthenticated());
   }
 
   @Test
   public void getsUnauthenticatedWithWrongLoginAndPassword() throws Exception {
-    final String wrongLogin = "wrongLogin";
-    final String wrongPassword = "wrongPassword";
-    mockMvc.perform(get(CONTROLLER_PATH).accept(MediaType.APPLICATION_JSON_VALUE)
-                                        .with(httpBasic(wrongLogin, wrongPassword)))
+    final String wrongLogin = "wrong login";
+    final String wrongPassword = "wrong password";
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    mockMvc.perform(get(uri).accept(MediaType.APPLICATION_JSON_VALUE)
+                            .with(httpBasic(wrongLogin, wrongPassword)))
            .andExpect(unauthenticated());
   }
 
   @Test
   public void getsListOfAdministrators() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     Role role = defaultRoleBuilder.setName(RoleName.SYSTEM_ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
@@ -143,9 +148,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
                                                                    defaultApplicationUserBuilder.setId(1)
                                                                                                 .build());
     when(defaultAdministratorService.findAll()).thenReturn(registeredAdministrators);
-    String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
-    mockMvc.perform(get(CONTROLLER_PATH).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
-                                        .accept(MediaType.APPLICATION_JSON_VALUE))
+    final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
+    mockMvc.perform(get(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+                            .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isOk())
            .andExpect(content().json(expectedAdministratorsAsJson));
   }
@@ -153,7 +158,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void deletesAdministrator() throws Exception {
     final long id = 0;
-    final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
     Role role = new Role();
     role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
@@ -161,7 +166,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
                                                                          .setLoginInfo(loginInfo)
                                                                          .build();
     when(defaultAdministratorService.deleteById(anyLong())).thenReturn(expectedAdministrator);
-    String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
+    final String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isAccepted())
@@ -171,7 +176,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void returnsNotFoundIfDeletedAdministratorDoesntExists() throws Exception {
     final long id = 0;
-    final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
     when(defaultAdministratorService.deleteById(id)).thenThrow(EntityNotFoundException.class);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -182,7 +187,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void returnsNotFoundIfRequiredAdministratorNotFound() throws Exception {
     final long id = 0;
-    final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
     when(defaultAdministratorService.findById(id)).thenThrow(EntityNotFoundException.class);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))

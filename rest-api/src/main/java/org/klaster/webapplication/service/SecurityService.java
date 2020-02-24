@@ -26,7 +26,7 @@ public class SecurityService {
   private AuthenticationManager authenticationManager;
 
   @Autowired
-  private UserDetailsService userDetailsService;
+  private UserDetailsService defaultUserDetailsService;
 
   public String findLoggedInUsername() {
     String result = "";
@@ -41,8 +41,10 @@ public class SecurityService {
 
 
   public void autoLogin(String login, String password) {
-    UserDetails userDetails = userDetailsService.loadUserByUsername(login);
-    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+    UserDetails userDetails = defaultUserDetailsService.loadUserByUsername(login);
+    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
+                                                                                                                      password,
+                                                                                                                      userDetails.getAuthorities());
 
     authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
