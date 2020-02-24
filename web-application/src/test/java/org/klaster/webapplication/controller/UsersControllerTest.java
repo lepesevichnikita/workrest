@@ -12,26 +12,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.klaster.domain.builder.ApplicationUserBuilder;
+import com.github.javafaker.Faker;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.builder.RoleBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.webapplication.configuration.ApplicationContext;
 import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.klaster.webapplication.service.AdministratorService;
 import org.klaster.webapplication.service.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 
@@ -48,13 +49,19 @@ import org.testng.annotations.Test;
  * @author Nikita Lepesevich
  */
 
-@SpringBootTest
-@TestExecutionListeners(MockitoTestExecutionListener.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = {ApplicationContext.class})
 public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   public static final String VALID_ADMIN_PASSWORD = "admin";
   public static final String VALID_ADMIN_LOGIN = "admin";
   private static final String CONTROLLER_PATH = "/users";
+
+  private Faker faker;
+  private MockMvc mockMvc;
+  private String password;
+  private String login;
+
   @Autowired
   private WebApplicationContext webApplicationContext;
 
@@ -62,36 +69,34 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
-
-  @Autowired
-  private RoleBuilder defaultRoleBuilder;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   @Autowired
   private AdministratorService defaultAdministratorService;
 
-  @SpyBean
+  @Autowired
   private ApplicationUserService defaultApplicationUserService;
 
-  private MockMvc mockMvc;
-
-
   @BeforeClass
-  public void setup() {
+  public void setup() throws NoSuchAlgorithmException {
+    faker = Faker.instance(SecureRandom.getInstanceStrong());
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   }
 
+  @BeforeMethod
+  public void initialize() {
+    login = faker.name()
+                 .username();
+    password = faker.internet()
+                    .password();
+  }
+
 
   @Test
   public void registersUniqueUser() throws Exception {
-    final String login = "login";
-    final String password = "password";
     LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(login)
                                                  .setPassword(password)
                                                  .build();
@@ -111,10 +116,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void returnsUnauthorizedForAnonymousUserDeletingUser() throws Exception {
     final long id = 0;
-    final String incorrectLogin = "login";
-    final String incorrectPassword = "password";
     final String uri = String.format("%s/%s", CONTROLLER_PATH, id);
-    mockMvc.perform(delete(uri).with(httpBasic(incorrectLogin, incorrectPassword))
+    mockMvc.perform(delete(uri).with(httpBasic(login, password))
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON))
            .andExpect(unauthenticated());

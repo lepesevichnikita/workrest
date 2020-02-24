@@ -32,7 +32,6 @@
     <module>web-application</module>
   </modules>
 
-
   <dependencies>
     <dependency>
       <groupId>org.testng</groupId>

@@ -29,11 +29,11 @@ public abstract class AbstractContext<S extends AbstractState> {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
-  @OneToOne(optional = false, targetEntity = AbstractState.class, cascade = CascadeType.ALL)
+  @OneToOne(targetEntity = AbstractState.class, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
   private S currentState;
 
-  @OneToMany(targetEntity = AbstractState.class, cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = AbstractState.class, cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
   private Set<S> states;
 

@@ -10,6 +10,7 @@ package org.klaster.webapplication.repository;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * ApplicationUserRepository
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Nikita Lepesevich
  */
 
+@Repository
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, Long> {
 
   ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo);

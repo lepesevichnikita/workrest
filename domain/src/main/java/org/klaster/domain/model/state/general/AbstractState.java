@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -28,12 +31,13 @@ public abstract class AbstractState<C extends AbstractContext> {
   protected final Logger logger = Logger.getLogger(getClass().getName());
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @CreatedDate
   private LocalDateTime createdAt;
 
-  @ManyToOne(targetEntity = AbstractContext.class)
+  @ManyToOne(targetEntity = AbstractContext.class, fetch = FetchType.LAZY)
   @JsonBackReference
   private C context;
 

@@ -9,6 +9,7 @@ package org.klaster.webapplication.repository;
 
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * LoginInfoRepository
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Nikita Lepesevich
  */
 
+@Repository
 public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
 
   LoginInfo findFirstByLogin(String login);

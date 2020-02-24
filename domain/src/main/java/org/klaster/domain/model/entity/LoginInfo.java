@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
@@ -17,6 +19,7 @@ import javax.validation.constraints.NotBlank;
 public class LoginInfo {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   private LocalDateTime lastAuthorizedAt;

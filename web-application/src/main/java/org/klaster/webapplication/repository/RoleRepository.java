@@ -15,6 +15,7 @@ import org.klaster.domain.builder.DefaultRoleBuilder;
 import org.klaster.domain.builder.RoleBuilder;
 import org.klaster.domain.model.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * RoleRepository
@@ -22,14 +23,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Nikita Lepesevich
  */
 
+@Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
   Optional<Role> findFirstByName(String name);
 
   default Role findFirstOrCreateByName(String name) {
     RoleBuilder defaultRoleBuilder = new DefaultRoleBuilder();
-    return findFirstByName(name).orElse(save(defaultRoleBuilder.setName(name)
-                                                               .build()));
+    Optional<Role> foundRole = findFirstByName(name);
+    return foundRole.orElseGet(() -> save(defaultRoleBuilder.setName(name)
+                                                            .build()));
   }
 
   default Set<Role> findOrCreateAllByNames(String... names) {

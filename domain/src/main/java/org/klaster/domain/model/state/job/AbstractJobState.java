@@ -2,7 +2,9 @@ package org.klaster.domain.model.state.job;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.general.AbstractState;
@@ -13,7 +15,8 @@ import org.klaster.domain.model.state.general.AbstractState;
  * @author Nikita Lepesevich
  */
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractJobState extends AbstractState<Job> {
 
   public boolean isOverDeadlines() {

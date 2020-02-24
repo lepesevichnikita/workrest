@@ -12,8 +12,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,15 +24,14 @@ import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
+import org.klaster.webapplication.configuration.TestContext;
 import org.klaster.webapplication.dto.LoginInfoDTO;
 import org.klaster.webapplication.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -56,8 +53,8 @@ import org.testng.annotations.Test;
  * @author Nikita Lepesevich
  */
 
-@SpringBootTest
-@TestExecutionListeners(MockitoTestExecutionListener.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = {TestContext.class})
 public class AdministratorControllerTest extends AbstractTestNGSpringContextTests {
 
   private static final String CONTROLLER_PATH = "/administrators";
@@ -81,7 +78,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockBean
+  @Autowired
   private AdministratorService defaultAdministratorService;
 
   @BeforeClass
@@ -89,7 +86,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
-    objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
   }
 
   @BeforeMethod
@@ -101,7 +97,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void createsAdministrator() throws Exception {
     final long id = 0;
-    Role role = defaultRoleBuilder.setName(RoleName.SYSTEM_ADMINISTRATOR)
+    Role role = defaultRoleBuilder.setName(RoleName.ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(id)
