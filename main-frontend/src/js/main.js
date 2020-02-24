@@ -1,7 +1,6 @@
 let menuContainerId = '#menu';
 let homePage = 'src/template/page/home.html';
-
-const cachedScript = (url, options) => {
+export const cachedScript = (url, options) => {
   options = $.extend(options || {}, {
     dataType: "script",
     cache: true,
@@ -10,7 +9,7 @@ const cachedScript = (url, options) => {
   return $.ajax(options);
 };
 
-const replacePage = (link, pageName) => {
+export const replacePage = (link, pageName) => {
   document.title = `WorkRest | ${pageName}`;
   $.get(link)
    .done((pageTemplate) => {
@@ -22,6 +21,9 @@ const replacePage = (link, pageName) => {
    })
    .fail((xhr) => console.warn(link, xhr.statusText));
 };
+
+window.replacePage = replacePage;
+window.cachedScript = replacePage;
 
 $(menuContainerId)
 .dimmer('show');

@@ -11,7 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import org.klaster.domain.model.context.AbstractContext;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,13 +31,13 @@ public abstract class AbstractState<C extends AbstractContext> {
   protected final Logger logger = Logger.getLogger(getClass().getName());
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
   @CreatedDate
   private LocalDateTime createdAt;
 
-  @ManyToOne(targetEntity = AbstractContext.class, fetch = FetchType.LAZY)
+  @OneToOne(targetEntity = AbstractContext.class, fetch = FetchType.LAZY)
   @JsonBackReference
   private C context;
 

@@ -29,7 +29,7 @@
 
   <modules>
     <module>domain</module>
-    <module>web-application</module>
+    <module>rest-api</module>
   </modules>
 
   <dependencies>

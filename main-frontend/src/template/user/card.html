@@ -1,0 +1,17 @@
+<div class="ui link card">
+  <div class="content">
+    <div class="header">${login}</div>
+    <div class="description">${currentState}</div>
+  </div>
+  <div class="extra content">
+    <div class="ui two buttons">
+      {{if currentState == 'Blocked'}}
+      <a class="ui basic green button">Unblock</a>
+      {{/if}}
+      {{if currentState != 'Blocked'}}
+      <a class="ui basic yellow button">Block</a>
+      {{/if}}
+      <a class="ui basic red button">Delete</a>
+    </div>
+  </div>
+</div>

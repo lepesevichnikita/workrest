@@ -94,9 +94,7 @@ public class ApplicationUser extends AbstractContext<AbstractUserState> {
   }
 
   private AbstractUserState getDefaultState() {
-    AbstractUserState defaultState = new UnverifiedUserState();
-    defaultState.setContext(this);
-    return defaultState;
+    return new UnverifiedUserState();
   }
 
   public Set<Role> getRoles() {
