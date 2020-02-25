@@ -41,7 +41,7 @@ public class DefaultAdministratorService implements AdministratorService {
 
   @Override
   public ApplicationUser registerAdministrator(LoginInfo loginInfo) {
-    Set<Role> administratorRoles = roleRepository.findOrCreateAllByNames(RoleName.SYSTEM_ADMINISTRATOR, RoleName.USER);
+    Set<Role> administratorRoles = roleRepository.findOrCreateAllByNames(RoleName.ADMINISTRATOR, RoleName.USER);
     ApplicationUser administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
                                                                  .setRoles(administratorRoles)
                                                                  .build();
@@ -50,14 +50,14 @@ public class DefaultAdministratorService implements AdministratorService {
 
   @Override
   public List<ApplicationUser> findAll() {
-    return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR)
-                                          .getApplicationUsers());
+    return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR)
+                                          .getUsers());
   }
 
   @Override
   public ApplicationUser findById(long id) {
-    Role role = roleRepository.findFirstOrCreateByName(RoleName.SYSTEM_ADMINISTRATOR);
-    return role.getApplicationUsers()
+    Role role = roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR);
+    return role.getUsers()
                .stream()
                .filter(applicationUser -> applicationUser.getId() == id)
                .findFirst()

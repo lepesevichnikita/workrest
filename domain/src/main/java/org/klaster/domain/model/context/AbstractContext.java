@@ -52,6 +52,7 @@ public abstract class AbstractContext<S extends AbstractState> {
       states = new LinkedHashSet<>();
     }
     states.add(currentState);
+    currentState.setContext(this);
     currentState.setCreatedAt(LocalDateTime.now());
   }
 

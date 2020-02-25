@@ -7,6 +7,8 @@ package org.klaster.webapplication.repository;
  *
  */
 
+import java.util.Optional;
+import java.util.UUID;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -20,7 +22,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
 
-  LoginInfo findFirstByLogin(String login);
+  Optional<LoginInfo> findFirstByLogin(String login);
+
+  Optional<LoginInfo> findFirstByLoginAndPassword(String login, String password);
+
+  Optional<LoginInfo> findFirstByToken(UUID toke);
 
   boolean existsByLogin(String login);
 

@@ -24,11 +24,13 @@ public interface ApplicationUserService {
 
   ApplicationUser deleteById(long id);
 
-  ApplicationUser findFirst();
+  ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo);
 
   long count();
 
   ApplicationUser blockById(long id);
 
   ApplicationUser unblockById(long id);
+
+  ApplicationUser findFirstById(long id);
 }

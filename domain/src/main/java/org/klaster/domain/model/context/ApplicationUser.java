@@ -1,7 +1,10 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,7 +18,12 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
 import org.klaster.domain.model.entity.Role;
 import org.klaster.domain.model.state.user.AbstractUserState;
+import org.klaster.domain.model.state.user.BlockedUserState;
+import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * ApplicationUser
@@ -24,21 +32,24 @@ import org.klaster.domain.model.state.user.UnverifiedUserState;
  */
 
 @Entity
-public class ApplicationUser extends AbstractContext<AbstractUserState> {
+public class ApplicationUser extends AbstractContext<AbstractUserState> implements UserDetails {
 
   @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private LoginInfo loginInfo;
 
-  @ManyToMany
   @JsonManagedReference
+  @ManyToMany(fetch = FetchType.EAGER)
   private Set<Role> roles;
 
+  @JsonIgnore
   @Transient
   private FreelancerProfile freelancerProfile;
 
+  @JsonIgnore
   @Transient
   private EmployerProfile employerProfile;
 
+  @JsonIgnore
   @Transient
   private PersonalData personalData;
 
@@ -103,5 +114,58 @@ public class ApplicationUser extends AbstractContext<AbstractUserState> {
 
   public void setRoles(Set<Role> roles) {
     this.roles = roles;
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return roles
+        .stream()
+        .map(Role::getName)
+        .map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public String getPassword() {
+    return loginInfo.getPassword();
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public String getUsername() {
+    return loginInfo.getLogin();
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public boolean isAccountNonLocked() {
+    return !(getCurrentState() instanceof BlockedUserState);
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  public boolean isEnabled() {
+    return !(getCurrentState() instanceof DeletedUserState);
   }
 }

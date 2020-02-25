@@ -39,14 +39,27 @@
       <artifactId>hibernate-core</artifactId>
       <version>${hibernate.version}</version>
     </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
+      <artifactId>jackson-databind</artifactId>
       <version>2.10.2</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.10.2</version>
+    </dependency>
+
     <dependency>
       <artifactId>hibernate-validator</artifactId>
       <groupId>org.hibernate.validator</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring.version}</version>
     </dependency>
   </dependencies>
 

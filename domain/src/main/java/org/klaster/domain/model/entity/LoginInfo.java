@@ -2,6 +2,7 @@ package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,6 +34,8 @@ public class LoginInfo {
   @Column(nullable = false)
   private String password;
 
+  private UUID token;
+
   public long getId() {
     return id;
   }
@@ -63,5 +66,13 @@ public class LoginInfo {
 
   public void setLastAuthorizedAt(LocalDateTime lastAuthorizedAt) {
     this.lastAuthorizedAt = lastAuthorizedAt;
+  }
+
+  public UUID getToken() {
+    return token;
+  }
+
+  public void setToken(UUID token) {
+    this.token = token;
   }
 }

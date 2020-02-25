@@ -7,6 +7,7 @@ package org.klaster.webapplication.controller;
  *
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.URI;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.webapplication.dto.LoginInfoDTO;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +37,7 @@ public class UsersController {
   @Autowired
   private ApplicationUserService defaultApplicationUserService;
 
+
   @PostMapping
   public ResponseEntity<ApplicationUser> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     ApplicationUser registeredApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
@@ -47,11 +50,18 @@ public class UsersController {
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('ADMINISTRATOR')")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
   public ResponseEntity<ApplicationUser> delete(@PathVariable long id) {
     ApplicationUser deletedApplicationUser = defaultApplicationUserService.deleteById(id);
     return ResponseEntity.accepted()
                          .body(deletedApplicationUser);
   }
 
+
+  @GetMapping("/{id}")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<ApplicationUser> findFirstById(@PathVariable long id) throws JsonProcessingException {
+    ApplicationUser foundApplicationUser = defaultApplicationUserService.findFirstById(id);
+    return ResponseEntity.ok(foundApplicationUser);
+  }
 }

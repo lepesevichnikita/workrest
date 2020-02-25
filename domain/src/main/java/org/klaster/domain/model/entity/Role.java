@@ -7,10 +7,11 @@ package org.klaster.domain.model.entity;
  *
  */
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,8 +31,8 @@ public class Role {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @ManyToMany(mappedBy = "roles")
-  @JsonBackReference
+  @JsonIgnore
+  @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
   private Set<ApplicationUser> users;
 
   @Column(nullable = false, unique = true)
@@ -45,7 +46,7 @@ public class Role {
     this.name = name;
   }
 
-  public Set<ApplicationUser> getApplicationUsers() {
+  public Set<ApplicationUser> getUsers() {
     return users;
   }
 

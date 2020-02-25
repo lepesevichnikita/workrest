@@ -68,11 +68,8 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   }
 
   @Override
-  public ApplicationUser findFirst() {
-    return applicationUserRepository.findAll()
-                                    .stream()
-                                    .findFirst()
-                                    .orElse(null);
+  public ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo) {
+    return applicationUserRepository.findFirstByLoginInfo(loginInfo);
   }
 
   @Override
@@ -82,10 +79,10 @@ public class DefaultApplicationUserService implements ApplicationUserService {
 
   @Override
   public ApplicationUser blockById(long id) {
-    ApplicationUser deletedApplicationUser = applicationUserRepository.findById(id)
-                                                                      .orElseThrow(EntityNotFoundException::new);
-    deletedApplicationUser.setCurrentState(new BlockedUserState());
-    return applicationUserRepository.save(deletedApplicationUser);
+    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
+                                                                    .orElseThrow(EntityNotFoundException::new);
+    foundApplicationUser.setCurrentState(new BlockedUserState());
+    return applicationUserRepository.save(foundApplicationUser);
   }
 
   @Override
@@ -99,6 +96,12 @@ public class DefaultApplicationUserService implements ApplicationUserService {
       }
     }
     return applicationUserRepository.save(foundApplicationUser);
+  }
+
+  @Override
+  public ApplicationUser findFirstById(long id) {
+    return applicationUserRepository.findById(id)
+                                    .orElse(null);
   }
 
 }
