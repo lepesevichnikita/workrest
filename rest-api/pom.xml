@@ -67,6 +67,15 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <configuration>
+            <httpConnector>
+              <port>9091</port>
+            </httpConnector>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -76,12 +85,6 @@
       <artifactId>domain</artifactId>
       <groupId>org.klaster</groupId>
       <version>0.0.1</version>
-    </dependency>
-
-    <dependency>
-      <artifactId>tomcat-embed-jasper</artifactId>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -189,10 +192,16 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
       <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
     </dependency>
   </dependencies>
 </project>
