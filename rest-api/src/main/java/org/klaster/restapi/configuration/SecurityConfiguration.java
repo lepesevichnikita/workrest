@@ -39,8 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(HttpSecurity http) throws Exception {
-    http
-        .httpBasic()
+    http.httpBasic()
         .disable()
         .csrf()
         .disable()
@@ -53,11 +52,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .anyRequest()
         .authenticated()
         .and()
-        .apply(tokenConfigurer());
+        .apply(tokenSecurityConfig());
   }
 
   @Bean
-  public TokenConfigurer tokenConfigurer() {
-    return new TokenConfigurer();
+  public TokenSecurityConfig tokenSecurityConfig() {
+    return new TokenSecurityConfig(tokenAuthenticationFilter());
+  }
+
+  @Bean
+  public TokenAuthenticationFilter tokenAuthenticationFilter() {
+    return new TokenAuthenticationFilter();
   }
 }

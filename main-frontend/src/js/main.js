@@ -1,3 +1,5 @@
+import {AuthorizationService} from "./api";
+
 let menuContainerId = '#menu';
 let homePage = 'src/template/page/home.html';
 
@@ -26,6 +28,7 @@ export const replacePage = (link, pageName) => {
 window.replacePage = replacePage;
 window.cachedScript = replacePage;
 window.loadTemplateAndScript = loadTemplateAndScript;
+window.authorizationService = new AuthorizationService();
 
 $(menuContainerId).dimmer('show');
 $.get('src/template/main/menu.html').done(menuTemplate => {

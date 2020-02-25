@@ -7,7 +7,6 @@ package org.klaster.restapi.configuration;
  *
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
@@ -15,16 +14,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.stereotype.Component;
 
 /**
- * TokenConfigurer
+ * TokenConfig
  *
  * @author Nikita Lepesevich
  */
 
 @Component
-public class TokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+public class TokenSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-  @Autowired
   private TokenAuthenticationFilter tokenAuthenticationFilter;
+
+  public TokenSecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter) {
+    this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+  }
 
   @Override
   public void configure(HttpSecurity http) {
