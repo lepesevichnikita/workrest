@@ -7,9 +7,10 @@ package org.klaster.restapi.service;
  *
  */
 
-import java.util.UUID;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.repository.ApplicationUserRepository;
+import org.klaster.restapi.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetailsService {
+
+  @Autowired
+  private TokenRepository tokenRepository;
 
   @Autowired
   private LoginInfoService defaultLoginInfoService;
@@ -37,16 +41,37 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
 
   @Override
   public String createToken(String login, String password) {
-    LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLogin(login);
-    foundLoginInfo.setToken(UUID.randomUUID());
-    defaultLoginInfoService.save(foundLoginInfo);
-    return foundLoginInfo.getToken()
-                         .toString();
+    LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
+    Token newToken = new Token();
+    foundLoginInfo.addToken(newToken);
+    newToken = tokenRepository.save(newToken);
+    return newToken.getValue();
   }
 
   @Override
   public UserDetails findByToken(String token) {
-    LoginInfo loginInfo = defaultLoginInfoService.findFirstByToken(UUID.fromString(token));
-    return applicationUserRepository.findFirstByLoginInfo(loginInfo);
+    UserDetails userDetails = null;
+    Token foundToken = tokenRepository.findFirstByValue(token)
+                                      .orElse(null);
+    if (foundToken != null) {
+      LoginInfo loginInfo = foundToken.getLoginInfo();
+      userDetails = applicationUserRepository.findFirstByLoginInfo(loginInfo);
+    }
+    return userDetails;
+  }
+
+  @Override
+  public Token deleteToken(String token) {
+    Token foundToken = tokenRepository.findFirstByValue(token)
+                                      .orElse(null);
+    if (foundToken != null) {
+      tokenRepository.delete(foundToken);
+    }
+    return foundToken;
+  }
+
+  @Override
+  public boolean hasToken(String generatedTokenValue) {
+    return tokenRepository.existsByValue(generatedTokenValue);
   }
 }

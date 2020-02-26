@@ -28,7 +28,7 @@ import org.klaster.domain.model.context.ApplicationUser;
 public class Role {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @JsonIgnore

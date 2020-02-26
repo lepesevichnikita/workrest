@@ -2,12 +2,15 @@ package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -34,7 +37,9 @@ public class LoginInfo {
   @Column(nullable = false)
   private String password;
 
-  private UUID token;
+  @JsonIgnore
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo")
+  private Set<Token> tokens;
 
   public long getId() {
     return id;
@@ -68,11 +73,19 @@ public class LoginInfo {
     this.lastAuthorizedAt = lastAuthorizedAt;
   }
 
-  public UUID getToken() {
-    return token;
+  public Set<Token> getTokens() {
+    return tokens;
   }
 
-  public void setToken(UUID token) {
-    this.token = token;
+  public void setTokens(Set<Token> tokens) {
+    this.tokens = tokens;
+  }
+
+  public void addToken(Token token) {
+    if (tokens == null) {
+      tokens = new LinkedHashSet<>();
+    }
+    tokens.add(token);
+    token.setLoginInfo(this);
   }
 }

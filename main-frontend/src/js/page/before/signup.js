@@ -1,0 +1,5 @@
+{
+  checkIfAuthorized({
+                      onAuthorizedCallback: () => redirectToPage('home'),
+                    });
+}

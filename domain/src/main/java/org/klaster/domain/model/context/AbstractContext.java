@@ -28,7 +28,7 @@ import org.klaster.domain.model.state.general.AbstractState;
 public abstract class AbstractContext<S extends AbstractState> {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @OneToMany(fetch = FetchType.EAGER, targetEntity = AbstractState.class, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "context")

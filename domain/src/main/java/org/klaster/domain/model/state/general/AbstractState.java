@@ -31,7 +31,7 @@ public abstract class AbstractState<C extends AbstractContext> {
   protected final Logger logger = Logger.getLogger(getClass().getName());
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
   @CreatedDate

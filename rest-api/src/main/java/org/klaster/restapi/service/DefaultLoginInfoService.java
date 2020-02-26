@@ -7,7 +7,6 @@ package org.klaster.restapi.service;
  *
  */
 
-import java.util.UUID;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.repository.LoginInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +33,6 @@ public class DefaultLoginInfoService implements LoginInfoService {
   @Override
   public LoginInfo findFirstByLoginAndPassword(String login, String password) {
     return loginInfoRepository.findFirstByLoginAndPassword(login, password)
-                              .orElse(null);
-  }
-
-  @Override
-  public LoginInfo findFirstByToken(UUID token) {
-    return loginInfoRepository.findFirstByToken(token)
                               .orElse(null);
   }
 

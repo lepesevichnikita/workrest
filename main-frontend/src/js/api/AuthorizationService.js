@@ -1,48 +1,38 @@
-import {RestHelper} from "./RestHelper.js";
+import {RestClient} from './RestClient.js';
 
 export class AuthorizationService {
   constructor() {
-    this._superAgent = superagent;
-    this._restHelper = new RestHelper();
+    this._restClient = new RestClient();
   }
 
   hasToken() {
-    return sessionStorage.getItem(AuthorizationService.TOKEN) !== null
+    return localStorage.getItem(AuthorizationService.TOKEN) !== null;
+  }
+
+  verifyToken() {
+    return this._restClient.post('token/verify').send(this.getToken());
   }
 
   getToken() {
-    return sessionStorage.getItem(AuthorizationService.TOKEN);
+    return localStorage.getItem(AuthorizationService.TOKEN);
   }
 
-  signIn(loginInfo) {
-    this.post('token')
-        .send(loginInfo)
-        .then(response => sessionStorage.setItem(AuthorizationService.TOKEN, response.text))
+  signIn(loginInfo, successCallback, finallyCallback) {
+    this._restClient.post('token').send(loginInfo).then(response => {
+      localStorage.setItem(AuthorizationService.TOKEN, response.text);
+      successCallback(response);
+    });
   }
 
   signOut() {
-    return this.post('token')
-               .send(this.getToken())
-               .then()
-               .finally(() => sessionStorage.removeItem(AuthorizationService.TOKEN));
+    this._restClient.delete('token').
+         send(this.getToken()).
+         then().
+         finally(() => localStorage.removeItem(AuthorizationService.TOKEN));
   }
 
-  signUp(loginInfo) {
-    return this.post('users')
-               .send(loginInfo)
-               .then(response => {
-                 console.dir(response.body);
-               })
-  }
-
-  post(action) {
-    return this._superAgent.post(this._restHelper.getActionUrl(action))
-               .set('Content-Type', 'application/json');
-  }
-
-  delete(action) {
-    return this._superAgent.delete(this._restHelper.getActionUrl(action))
-               .set('Content-Type', 'application/json');
+  async signUp(loginInfo) {
+    return this._restClient.post('users').send(loginInfo);
   }
 }
 

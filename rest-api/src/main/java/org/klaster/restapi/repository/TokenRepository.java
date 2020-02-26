@@ -3,28 +3,28 @@ package org.klaster.restapi.repository;
 /*
  * workrest
  *
- * 13.02.2020
+ * 26.02.2020
  *
  */
 
 import java.util.Optional;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * LoginInfoRepository
+ * TokenRepository
  *
  * @author Nikita Lepesevich
  */
 
 @Repository
-public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
+public interface TokenRepository extends JpaRepository<Token, Long> {
 
-  Optional<LoginInfo> findFirstByLogin(String login);
+  Token findFirstByLoginInfo(LoginInfo loginInfo);
 
-  Optional<LoginInfo> findFirstByLoginAndPassword(String login, String password);
+  Optional<Token> findFirstByValue(String value);
 
-  boolean existsByLogin(String login);
-
+  boolean existsByValue(String value);
 }

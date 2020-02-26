@@ -7,7 +7,6 @@ package org.klaster.restapi.service;
  *
  */
 
-import java.util.UUID;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
@@ -21,8 +20,6 @@ public interface LoginInfoService {
   LoginInfo findFirstByLogin(String login);
 
   LoginInfo findFirstByLoginAndPassword(String login, String password);
-
-  LoginInfo findFirstByToken(UUID token);
 
   LoginInfo save(LoginInfo loginInfo);
 }

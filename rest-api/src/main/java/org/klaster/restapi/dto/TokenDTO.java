@@ -7,6 +7,8 @@ package org.klaster.restapi.dto;
  *
  */
 
+import org.klaster.domain.model.entity.Token;
+
 /**
  * TokenDTO
  *
@@ -16,6 +18,12 @@ package org.klaster.restapi.dto;
 public class TokenDTO {
 
   private String token;
+
+  public static TokenDTO fromToken(Token token) {
+    TokenDTO tokenDTO = new TokenDTO();
+    tokenDTO.setToken(token.getValue());
+    return tokenDTO;
+  }
 
 
   public String getToken() {

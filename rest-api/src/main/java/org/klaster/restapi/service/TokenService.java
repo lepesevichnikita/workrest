@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import org.klaster.domain.model.entity.Token;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -21,4 +22,7 @@ public interface TokenService {
 
   UserDetails findByToken(String token);
 
+  Token deleteToken(String token);
+
+  boolean hasToken(String generatedTokenValue);
 }
