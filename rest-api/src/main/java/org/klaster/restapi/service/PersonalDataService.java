@@ -8,6 +8,14 @@ package org.klaster.restapi.service;/*
  * Copyright(c) Nikita Lepesevich
  */
 
+import org.klaster.domain.model.entity.PersonalData;
+
 public interface PersonalDataService {
+
+  PersonalData save(PersonalData personalData);
+
+  PersonalData findByUserId(long id);
+
+  PersonalData updateByUserId(long id, PersonalData personalData);
 
 }

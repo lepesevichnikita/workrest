@@ -20,7 +20,7 @@ import java.security.SecureRandom;
 import java.util.UUID;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.constant.RoleName;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
@@ -124,6 +124,22 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(jsonPath("$.roles[0].name").value(RoleName.USER));
   }
 
+  @Test
+  public void returnsUnprocessableEntityWithError() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
+    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .content(loginInfoDTOAsJson))
+           .andExpect(status().isUnprocessableEntity())
+           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+           .andExpect(jsonPath("$.id").isNotEmpty())
+           .andExpect(jsonPath("$.loginInfo.login").value(login))
+           .andExpect(jsonPath("$.roles[0].name").value(RoleName.USER));
+  }
+
 
   @Test
   public void returnsUnauthorizedForAnonymousUserDeletingUser() throws Exception {
@@ -140,8 +156,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void deletesUserWithAdminToken() throws Exception {
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser deletedApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedApplicationUser.getId());
+    User deletedUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedUser.getId());
     LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(loginInfo);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(loginInfoDTO);
     mockMvc.perform(delete(uri).header(AUTHORIZATION, administratorToken)
@@ -149,21 +165,21 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
                                .accept(MediaType.APPLICATION_JSON)
                                .content(loginInfoDTOAsJson))
            .andExpect(status().isAccepted())
-           .andExpect(jsonPath("$.id").value(deletedApplicationUser.getId()));
+           .andExpect(jsonPath("$.id").value(deletedUser.getId()));
   }
 
   @Test
   public void getsUsersByIdWithAdminToken() throws Exception {
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser registeredApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredApplicationUser.getId());
+    User registeredUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     mockMvc.perform(get(uri).header(AUTHORIZATION, administratorToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(loginInfoDTOAsJson))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.id").value(registeredApplicationUser.getId()))
+           .andExpect(jsonPath("$.id").value(registeredUser.getId()))
            .andExpect(jsonPath("$.loginInfo.login").value(equalTo(login)));
   }
 

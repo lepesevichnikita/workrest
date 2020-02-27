@@ -8,10 +8,16 @@ package org.klaster.restapi.dto;/*
  * Copyright(c) Nikita Lepesevich
  */
 
-import org.klaster.domain.model.entity.FileInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.klaster.domain.builder.PersonalDataBuilder;
 import org.klaster.domain.model.entity.PersonalData;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class PersonalDataDTO {
+public class PersonalDataForAdministratorDTO {
+
+  @JsonIgnore
+  @Autowired
+  private PersonalDataBuilder defaultPersonalDataBuilder;
 
   private String documentNumber;
 
@@ -21,26 +27,25 @@ public class PersonalDataDTO {
 
   private String lastName;
 
-  private FileInfo documentScan;
+  private FileInfoDTO documentScan;
 
-  public static PersonalDataDTO fromPersonalData(PersonalData personalData) {
-    PersonalDataDTO personalDataDTO = new PersonalDataDTO();
+  public static PersonalDataForAdministratorDTO fromPersonalData(PersonalData personalData) {
+    PersonalDataForAdministratorDTO personalDataDTO = new PersonalDataForAdministratorDTO();
     personalDataDTO.setFirstName(personalData.getFirstName());
     personalDataDTO.setLastName(personalData.getLastName());
-    personalDataDTO.setDocumentScan(personalData.getDocumentScan());
+    personalDataDTO.setDocumentScan(FileInfoDTO.fromFileInfo(personalData.getDocumentScan()));
     personalDataDTO.setDocumentName(personalData.getDocumentName());
     personalDataDTO.setDocumentNumber(personalData.getDocumentNumber());
     return personalDataDTO;
   }
 
   public PersonalData toPersonalData() {
-    PersonalData personalData = new PersonalData();
-    personalData.setFirstName(this.firstName);
-    personalData.setLastName(this.lastName);
-    personalData.setDocumentScan(this.documentScan);
-    personalData.setDocumentName(this.documentName);
-    personalData.setDocumentNumber(this.documentNumber);
-    return personalData;
+    return defaultPersonalDataBuilder.setLastName(lastName)
+                                     .setFirstName(firstName)
+                                     .setDocumentScan(documentScan.toFileInfo())
+                                     .setDocumentNumber(documentNumber)
+                                     .setDocumentName(documentName)
+                                     .build();
   }
 
   public String getDocumentNumber() {
@@ -75,11 +80,11 @@ public class PersonalDataDTO {
     this.lastName = lastName;
   }
 
-  public FileInfo getDocumentScan() {
+  public FileInfoDTO getDocumentScan() {
     return documentScan;
   }
 
-  public void setDocumentScan(FileInfo documentScan) {
+  public void setDocumentScan(FileInfoDTO documentScan) {
     this.documentScan = documentScan;
   }
 }

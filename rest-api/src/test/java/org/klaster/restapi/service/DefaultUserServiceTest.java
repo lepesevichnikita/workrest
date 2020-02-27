@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.constant.RoleName;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
@@ -47,10 +47,10 @@ import org.testng.annotations.Test;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
-public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringContextTests {
+public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
 
   private LoginInfo loginInfo;
-  private ApplicationUser applicationUser;
+  private User user;
   private Faker faker;
 
   @Autowired
@@ -85,44 +85,44 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
 
-    assertThat(applicationUser, hasProperty("loginInfo", equalTo(loginInfo)));
+    assertThat(user, hasProperty("loginInfo", equalTo(loginInfo)));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    assertThat(applicationUser.getCurrentState(), isA(UnverifiedUserState.class));
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    assertThat(user.getCurrentState(), isA(UnverifiedUserState.class));
   }
 
   @Test
   public void registeredUserHasRoleUser() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    assertThat(new ArrayList<>(applicationUser.getRoles()), contains(hasProperty("name", equalTo(RoleName.USER))));
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    assertThat(new ArrayList<>(user.getRoles()), contains(hasProperty("name", equalTo(RoleName.USER))));
   }
 
   @Test
   public void deletesUsers() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    applicationUser = defaultApplicationUserService.deleteById(applicationUser.getId());
-    assertThat(applicationUser.getCurrentState(), isA(DeletedUserState.class));
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultApplicationUserService.deleteById(user.getId());
+    assertThat(user.getCurrentState(), isA(DeletedUserState.class));
   }
 
   @Test
   public void blocksUser() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    applicationUser = defaultApplicationUserService.blockById(applicationUser.getId());
-    assertThat(applicationUser.getCurrentState(), isA(BlockedUserState.class));
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultApplicationUserService.blockById(user.getId());
+    assertThat(user.getCurrentState(), isA(BlockedUserState.class));
   }
 
   @Test
   public void unblocksUser() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    applicationUser = defaultApplicationUserService.blockById(applicationUser.getId());
-    AbstractUserState previousState = applicationUser.getPreviousState();
-    applicationUser = defaultApplicationUserService.unblockById(applicationUser.getId());
-    assertThat(applicationUser.getCurrentState(), allOf(
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultApplicationUserService.blockById(user.getId());
+    AbstractUserState previousState = user.getPreviousState();
+    user = defaultApplicationUserService.unblockById(user.getId());
+    assertThat(user.getCurrentState(), allOf(
         hasProperty("id", equalTo(previousState.getId())),
         hasProperty("class", equalTo(previousState.getClass()))
     ));
@@ -130,8 +130,20 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
 
   @Test
   public void verifiesUserById() {
-    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    applicationUser = defaultApplicationUserService.verifyById(applicationUser.getId());
-    assertThat(applicationUser.getCurrentState(), isA(VerifiedUserState.class));
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultApplicationUserService.verifyById(user.getId());
+    assertThat(user.getCurrentState(), isA(VerifiedUserState.class));
+  }
+
+  @Test
+  public void notVerifiesUserIfIsVerified() {
+    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    AbstractUserState previousState = defaultApplicationUserService.verifyById(user.getId())
+                                                                   .getCurrentState();
+    defaultApplicationUserService.verifyById(user.getId());
+    assertThat(user.getCurrentState(), allOf(
+        hasProperty("class", equalTo(previousState.getClass())),
+        hasProperty("id", equalTo(previousState.getId()))
+    ));
   }
 }

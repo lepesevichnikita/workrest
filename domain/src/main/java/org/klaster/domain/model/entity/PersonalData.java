@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,7 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 
 /**
  * PersonalData
@@ -38,12 +39,12 @@ public class PersonalData {
   private String lastName;
 
   @JsonIgnore
-  @OneToOne(fetch = FetchType.EAGER)
+  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private FileInfo documentScan;
 
   @JsonIgnore
   @OneToOne(optional = false, fetch = FetchType.EAGER)
-  private ApplicationUser user;
+  private User user;
 
   public long getId() {
     return id;
@@ -93,11 +94,11 @@ public class PersonalData {
     this.documentScan = documentScan;
   }
 
-  public ApplicationUser getUser() {
+  public User getUser() {
     return user;
   }
 
-  public void setUser(ApplicationUser applicationUser) {
-    this.user = applicationUser;
+  public void setUser(User user) {
+    this.user = user;
   }
 }

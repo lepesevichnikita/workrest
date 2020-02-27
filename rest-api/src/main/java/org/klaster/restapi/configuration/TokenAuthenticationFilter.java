@@ -16,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,11 +46,11 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
     String token = httpServletRequest.getHeader(AUTHORIZATION);
     if (token != null) {
-      ApplicationUser applicationUser = (ApplicationUser) defaultTokenBasedUserDetailsService.findByToken(token);
-      if (applicationUser != null) {
-        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(applicationUser,
+      User user = (User) defaultTokenBasedUserDetailsService.findByToken(token);
+      if (user != null) {
+        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(user,
                                                                                        token,
-                                                                                       applicationUser.getAuthorities());
+                                                                                       user.getAuthorities());
         SecurityContextHolder.getContext()
                              .setAuthentication(requestAuthentication);
       }

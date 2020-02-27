@@ -48,7 +48,7 @@ public class VerifiedUserState extends AbstractUserState {
   public void authorizeUser(LocalDateTime authorizedAt) {
     getContext().getLoginInfo()
                 .setLastAuthorizedAt(authorizedAt);
-    final String message = String.format("ApplicationUser#%s was authorized at %s", getContext(), authorizedAt);
+    final String message = String.format("User#%s was authorized at %s", getContext(), authorizedAt);
     logger.info(message);
   }
 }

@@ -9,10 +9,10 @@ package org.klaster.restapi.advice;
  * Copyright(c) Nikita Lepesevich
  */
 
-import java.util.logging.Logger;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -23,29 +23,27 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
 
-  private Logger logger = Logger.getLogger(getClass().getName());
-
-  @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(EntityNotFoundException.class)
-  public void handle(EntityNotFoundException exception) {
-    logger.warning(exception.getMessage());
+  public ResponseEntity<String> handle(EntityNotFoundException exception) {
+    logger.warn(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @ExceptionHandler(ConstraintViolationException.class)
   public void handle(ConstraintViolationException exception) {
-    logger.warning(exception.getMessage());
+    logger.warn(exception);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(BadCredentialsException.class)
   public void handle(BadCredentialsException exception) {
-    logger.warning(exception.getMessage());
+    logger.warn(exception);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
   public void handle(AuthenticationCredentialsNotFoundException exception) {
-    logger.warning(exception.getMessage());
+    logger.warn(exception);
   }
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.constant.RoleName;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 import org.klaster.restapi.repository.ApplicationUserRepository;
@@ -40,22 +40,22 @@ public class DefaultAdministratorService implements AdministratorService {
   private ApplicationUserBuilder defaultApplicationUserBuilder;
 
   @Override
-  public ApplicationUser registerAdministrator(LoginInfo loginInfo) {
+  public User registerAdministrator(LoginInfo loginInfo) {
     Set<Role> administratorRoles = roleRepository.findOrCreateAllByNames(RoleName.ADMINISTRATOR, RoleName.USER);
-    ApplicationUser administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                                 .setRoles(administratorRoles)
-                                                                 .build();
+    User administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
+                                                      .setRoles(administratorRoles)
+                                                      .build();
     return applicationUserRepository.save(administrator);
   }
 
   @Override
-  public List<ApplicationUser> findAll() {
+  public List<User> findAll() {
     return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR)
                                           .getUsers());
   }
 
   @Override
-  public ApplicationUser findById(long id) {
+  public User findById(long id) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR);
     return role.getUsers()
                .stream()
@@ -65,8 +65,8 @@ public class DefaultAdministratorService implements AdministratorService {
   }
 
   @Override
-  public ApplicationUser deleteById(long id) {
-    ApplicationUser deletedAdministrator = findById(id);
+  public User deleteById(long id) {
+    User deletedAdministrator = findById(id);
     if (deletedAdministrator == null) {
       throw new EntityNotFoundException();
     }

@@ -7,7 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
@@ -18,21 +18,21 @@ import org.klaster.domain.model.entity.LoginInfo;
 
 public interface ApplicationUserService {
 
-  boolean hasUniqueLogin(ApplicationUser applicationUser);
+  boolean hasUniqueLogin(User user);
 
-  ApplicationUser registerUserByLoginInfo(LoginInfo loginInfo);
+  User registerUserByLoginInfo(LoginInfo loginInfo);
 
-  ApplicationUser deleteById(long id);
+  User deleteById(long id);
 
-  ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo);
+  User findFirstByLoginInfo(LoginInfo loginInfo);
 
   long count();
 
-  ApplicationUser blockById(long id);
+  User blockById(long id);
 
-  ApplicationUser unblockById(long id);
+  User unblockById(long id);
 
-  ApplicationUser findFirstById(long id);
+  User findFirstById(long id);
 
-  ApplicationUser verifyById(long userId);
+  User verifyById(long userId);
 }

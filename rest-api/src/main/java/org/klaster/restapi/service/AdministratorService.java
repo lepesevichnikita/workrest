@@ -9,16 +9,16 @@ package org.klaster.restapi.service;/*
  */
 
 import java.util.List;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 
 public interface AdministratorService {
 
-  ApplicationUser registerAdministrator(LoginInfo loginInfo);
+  User registerAdministrator(LoginInfo loginInfo);
 
-  List<ApplicationUser> findAll();
+  List<User> findAll();
 
-  ApplicationUser findById(long id);
+  User findById(long id);
 
-  ApplicationUser deleteById(long id);
+  User deleteById(long id);
 }

@@ -1,15 +1,13 @@
 <a class="ui link card" id="${id}">
   <div class="content">
-    <div class="header">${personalData.firstName} ${personalData.firstName}</div>
+    <div class="header">${personalData.firstName} ${personalData.lastName}</div>
     <div class="description">
       ${description}
     </div>
   </div>
   <div class="extra content">
-    <div class="extra content">
-      {{each skills}}
-      <span class="ui label">${$value.name}</span>
-      {{/each}}
-    </div>
+    {{each skills}}
+    <span class="ui label">${$value.name}</span>
+    {{/each}}
   </div>
 </a>

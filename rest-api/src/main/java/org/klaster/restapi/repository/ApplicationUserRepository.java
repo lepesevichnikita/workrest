@@ -7,7 +7,7 @@ package org.klaster.restapi.repository;
  *
  */
 
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, Long> {
+public interface ApplicationUserRepository extends JpaRepository<User, Long> {
 
-  ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo);
+  User findFirstByLoginInfo(LoginInfo loginInfo);
 }

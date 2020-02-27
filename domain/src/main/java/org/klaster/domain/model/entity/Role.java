@@ -16,7 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 
 /**
  * Role
@@ -33,7 +33,7 @@ public class Role {
 
   @JsonIgnore
   @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-  private Set<ApplicationUser> users;
+  private Set<User> users;
 
   @Column(nullable = false, unique = true)
   private String name;
@@ -46,11 +46,11 @@ public class Role {
     this.name = name;
   }
 
-  public Set<ApplicationUser> getUsers() {
+  public Set<User> getUsers() {
     return users;
   }
 
-  public void setUsers(Set<ApplicationUser> users) {
+  public void setUsers(Set<User> users) {
     this.users = users;
   }
 

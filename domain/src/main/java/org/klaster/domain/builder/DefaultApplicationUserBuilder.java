@@ -8,7 +8,7 @@ package org.klaster.domain.builder;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 import org.springframework.stereotype.Component;
@@ -56,11 +56,11 @@ public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
   }
 
   @Override
-  public ApplicationUser build() {
-    ApplicationUser applicationUser = new ApplicationUser();
-    applicationUser.setId(id);
-    applicationUser.setRoles(new LinkedHashSet<>(roles));
-    applicationUser.setLoginInfo(loginInfo);
-    return applicationUser;
+  public User build() {
+    User user = new User();
+    user.setId(id);
+    user.setRoles(new LinkedHashSet<>(roles));
+    user.setLoginInfo(loginInfo);
+    return user;
   }
 }

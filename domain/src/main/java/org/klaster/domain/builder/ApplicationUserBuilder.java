@@ -8,7 +8,7 @@ package org.klaster.domain.builder;
  */
 
 import java.util.Set;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 
@@ -18,7 +18,7 @@ import org.klaster.domain.model.entity.Role;
  * @author Nikita Lepesevich
  */
 
-public interface ApplicationUserBuilder extends Builder<ApplicationUser> {
+public interface ApplicationUserBuilder extends Builder<User> {
 
   ApplicationUserBuilder setLoginInfo(LoginInfo loginInfo);
 

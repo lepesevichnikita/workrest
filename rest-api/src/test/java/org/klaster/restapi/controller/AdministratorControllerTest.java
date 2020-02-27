@@ -21,7 +21,7 @@ import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.builder.RoleBuilder;
 import org.klaster.domain.constant.RoleName;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 import org.klaster.restapi.configuration.TestContext;
@@ -103,10 +103,10 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = defaultRoleBuilder.setName(RoleName.ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser registeredAdministrator = defaultApplicationUserBuilder.setId(id)
-                                                                           .setLoginInfo(loginInfo)
-                                                                           .setRoles(Collections.singleton(role))
-                                                                           .build();
+    User registeredAdministrator = defaultApplicationUserBuilder.setId(id)
+                                                                .setLoginInfo(loginInfo)
+                                                                .setRoles(Collections.singleton(role))
+                                                                .build();
     when(defaultAdministratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
     final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
@@ -143,9 +143,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     defaultApplicationUserBuilder.setLoginInfo(loginInfo)
                                  .setRoles(Collections.singleton(role))
                                  .build();
-    List<ApplicationUser> registeredAdministrators = Arrays.asList(defaultApplicationUserBuilder.setId(0)
-                                                                                                .build(),
-                                                                   defaultApplicationUserBuilder.setId(1)
+    List<User> registeredAdministrators = Arrays.asList(defaultApplicationUserBuilder.setId(0)
+                                                                                     .build(),
+                                                        defaultApplicationUserBuilder.setId(1)
                                                                                                 .build());
     when(defaultAdministratorService.findAll()).thenReturn(registeredAdministrators);
     final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
@@ -162,9 +162,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = new Role();
     role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    ApplicationUser expectedAdministrator = defaultApplicationUserBuilder.setId(id)
-                                                                         .setLoginInfo(loginInfo)
-                                                                         .build();
+    User expectedAdministrator = defaultApplicationUserBuilder.setId(id)
+                                                              .setLoginInfo(loginInfo)
+                                                              .build();
     when(defaultAdministratorService.deleteById(anyLong())).thenReturn(expectedAdministrator);
     final String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))

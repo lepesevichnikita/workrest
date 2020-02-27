@@ -25,7 +25,7 @@ const replacePage = (link, pageName) => {
 
 $(menuContainerId)
 .dimmer('show');
-$.get('src/template/main/menu.html')
+$.get('src/template/main/main.html')
  .done((menuTemplate) => {
    $(menuContainerId)
    .dimmer('hide');

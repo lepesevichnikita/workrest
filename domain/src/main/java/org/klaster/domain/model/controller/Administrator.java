@@ -1,6 +1,6 @@
 package org.klaster.domain.model.controller;
 
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
@@ -18,11 +18,9 @@ public class Administrator implements UserController {
   }
 
   @Override
-  public void verifyUser(ApplicationUser applicationUser) {
-    if (applicationUser.hasPersonalData()) {
-      UserController.super.verifyUser(applicationUser);
-      applicationUser.getPersonalData()
-                     .setConsideredBy(this);
+  public void verifyUser(User user) {
+    if (user.hasPersonalData()) {
+      UserController.super.verifyUser(user);
     }
   }
 

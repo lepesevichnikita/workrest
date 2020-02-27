@@ -7,12 +7,11 @@ package org.klaster.restapi.controller;
  *
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.net.URI;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.service.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * RegistrationController
@@ -39,29 +37,24 @@ public class UsersController {
 
 
   @PostMapping
-  public ResponseEntity<ApplicationUser> create(@RequestBody LoginInfoDTO loginInfoDTO) {
-    ApplicationUser registeredApplicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
-    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                                              .path("/{id}")
-                                              .buildAndExpand(registeredApplicationUser.getId())
-                                              .toUri();
-    return ResponseEntity.created(location)
-                         .body(registeredApplicationUser);
+  public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
+    User registeredUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
+    return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<ApplicationUser> delete(@PathVariable long id) {
-    ApplicationUser deletedApplicationUser = defaultApplicationUserService.deleteById(id);
+  public ResponseEntity<User> delete(@PathVariable long id) {
+    User deletedUser = defaultApplicationUserService.deleteById(id);
     return ResponseEntity.accepted()
-                         .body(deletedApplicationUser);
+                         .body(deletedUser);
   }
 
 
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<ApplicationUser> findFirstById(@PathVariable long id) throws JsonProcessingException {
-    ApplicationUser foundApplicationUser = defaultApplicationUserService.findFirstById(id);
-    return ResponseEntity.ok(foundApplicationUser);
+  public ResponseEntity<User> findFirstById(@PathVariable long id) {
+    User foundUser = defaultApplicationUserService.findFirstById(id);
+    return ResponseEntity.ok(foundUser);
   }
 }

@@ -11,7 +11,7 @@ import java.util.Collections;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.constant.RoleName;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 import org.klaster.domain.model.state.user.AbstractUserState;
@@ -46,30 +46,30 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   private RoleRepository roleRepository;
 
   @Override
-  public boolean hasUniqueLogin(ApplicationUser applicationUser) {
-    return !loginInfoRepository.existsByLogin(applicationUser.getLoginInfo()
-                                                             .getLogin());
+  public boolean hasUniqueLogin(User user) {
+    return !loginInfoRepository.existsByLogin(user.getLoginInfo()
+                                                  .getLogin());
   }
 
   @Override
-  public ApplicationUser registerUserByLoginInfo(LoginInfo loginInfo) {
+  public User registerUserByLoginInfo(LoginInfo loginInfo) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
-    ApplicationUser applicationUser = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                                   .setRoles(Collections.singleton(role))
-                                                                   .build();
-    return applicationUserRepository.save(applicationUser);
+    User user = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
+                                             .setRoles(Collections.singleton(role))
+                                             .build();
+    return applicationUserRepository.save(user);
   }
 
   @Override
-  public ApplicationUser deleteById(long id) {
-    ApplicationUser deletedApplicationUser = applicationUserRepository.findById(id)
-                                                                      .orElseThrow(EntityNotFoundException::new);
-    deletedApplicationUser.setCurrentState(new DeletedUserState());
-    return applicationUserRepository.save(deletedApplicationUser);
+  public User deleteById(long id) {
+    User deletedUser = applicationUserRepository.findById(id)
+                                                .orElseThrow(EntityNotFoundException::new);
+    deletedUser.setCurrentState(new DeletedUserState());
+    return applicationUserRepository.save(deletedUser);
   }
 
   @Override
-  public ApplicationUser findFirstByLoginInfo(LoginInfo loginInfo) {
+  public User findFirstByLoginInfo(LoginInfo loginInfo) {
     return applicationUserRepository.findFirstByLoginInfo(loginInfo);
   }
 
@@ -79,38 +79,40 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   }
 
   @Override
-  public ApplicationUser blockById(long id) {
-    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
-                                                                    .orElseThrow(EntityNotFoundException::new);
-    foundApplicationUser.setCurrentState(new BlockedUserState());
-    return applicationUserRepository.save(foundApplicationUser);
+  public User blockById(long id) {
+    User foundUser = applicationUserRepository.findById(id)
+                                              .orElseThrow(EntityNotFoundException::new);
+    foundUser.setCurrentState(new BlockedUserState());
+    return applicationUserRepository.save(foundUser);
   }
 
   @Override
-  public ApplicationUser unblockById(long id) {
-    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
-                                                                    .orElseThrow(EntityNotFoundException::new);
-    if (foundApplicationUser.getCurrentState() instanceof BlockedUserState) {
-      AbstractUserState previousState = foundApplicationUser.getPreviousState();
+  public User unblockById(long id) {
+    User foundUser = applicationUserRepository.findById(id)
+                                              .orElseThrow(EntityNotFoundException::new);
+    if (foundUser.getCurrentState() instanceof BlockedUserState) {
+      AbstractUserState previousState = foundUser.getPreviousState();
       if (previousState != null) {
-        foundApplicationUser.setCurrentState(previousState);
+        foundUser.setCurrentState(previousState);
       }
     }
-    return applicationUserRepository.save(foundApplicationUser);
+    return applicationUserRepository.save(foundUser);
   }
 
   @Override
-  public ApplicationUser findFirstById(long id) {
+  public User findFirstById(long id) {
     return applicationUserRepository.findById(id)
                                     .orElse(null);
   }
 
   @Override
-  public ApplicationUser verifyById(long id) {
-    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
-                                                                    .orElseThrow(EntityNotFoundException::new);
-    foundApplicationUser.setCurrentState(new VerifiedUserState());
-    return applicationUserRepository.save(foundApplicationUser);
+  public User verifyById(long id) {
+    User foundUser = applicationUserRepository.findById(id)
+                                              .orElseThrow(EntityNotFoundException::new);
+    if (!(foundUser.getCurrentState() instanceof VerifiedUserState)) {
+      foundUser.setCurrentState(new VerifiedUserState());
+    }
+    return applicationUserRepository.save(foundUser);
   }
 
 }

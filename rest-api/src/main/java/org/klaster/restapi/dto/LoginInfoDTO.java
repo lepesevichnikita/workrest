@@ -10,22 +10,18 @@ package org.klaster.restapi.dto;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.klaster.domain.builder.DefaultLoginInfoBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoginInfoDTO {
 
   @JsonIgnore
+  @Autowired
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   private String password;
   private String login;
-
-  public LoginInfoDTO() {
-    defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();
-  }
-
 
   public static LoginInfoDTO fromLoginInfo(LoginInfo loginInfo) {
     LoginInfoDTO loginInfoDTO = new LoginInfoDTO();

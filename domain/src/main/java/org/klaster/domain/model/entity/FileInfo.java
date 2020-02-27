@@ -24,6 +24,14 @@ public class FileInfo {
 
   private String path;
 
+  public void setMd5(String md5) {
+    this.md5 = md5;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
+  }
+
   public String getMd5() {
     return md5;
   }

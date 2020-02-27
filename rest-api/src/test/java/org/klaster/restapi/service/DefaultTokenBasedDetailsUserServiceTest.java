@@ -10,7 +10,7 @@ import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,12 +70,12 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
 
   @Test
   public void createsTokenForValidLoginAndPasswords() {
-    ApplicationUser applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    User user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
     final String generatedTokenValue = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
     assertThat(defaultTokenBasedUserDetailsService.findByToken(generatedTokenValue), allOf(
-        hasProperty("password", equalTo(applicationUser.getPassword())),
-        hasProperty("username", equalTo(applicationUser.getUsername())),
-        hasProperty("id", equalTo(applicationUser.getId()))
+        hasProperty("password", equalTo(user.getPassword())),
+        hasProperty("username", equalTo(user.getUsername())),
+        hasProperty("id", equalTo(user.getId()))
     ));
   }
 

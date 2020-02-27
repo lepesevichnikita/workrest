@@ -9,7 +9,7 @@ package org.klaster.restapi.controller;
 
 import java.net.URI;
 import java.util.List;
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.repository.RoleRepository;
@@ -44,21 +44,21 @@ public class AdministratorController {
   private AdministratorService administratorService;
 
   @GetMapping
-  public ResponseEntity<List<ApplicationUser>> findAll() {
+  public ResponseEntity<List<User>> findAll() {
     return ResponseEntity.ok(administratorService.findAll());
   }
 
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApplicationUser> findById(@PathVariable long id) {
-    ApplicationUser foundAdministrator = administratorService.findById(id);
+  public ResponseEntity<User> findById(@PathVariable long id) {
+    User foundAdministrator = administratorService.findById(id);
     return ResponseEntity.ok(foundAdministrator);
   }
 
   @PostMapping
-  public ResponseEntity<ApplicationUser> create(@RequestBody LoginInfoDTO loginInfoDTO) {
+  public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
-    ApplicationUser registeredAdministrator = administratorService.registerAdministrator(loginInfo);
+    User registeredAdministrator = administratorService.registerAdministrator(loginInfo);
     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                                               .path("/{id}")
                                               .buildAndExpand(registeredAdministrator.getId())
@@ -68,8 +68,8 @@ public class AdministratorController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<ApplicationUser> delete(@PathVariable long id) {
-    ApplicationUser deletedAdministrator = administratorService.deleteById(id);
+  public ResponseEntity<User> delete(@PathVariable long id) {
+    User deletedAdministrator = administratorService.deleteById(id);
     return ResponseEntity.accepted()
                          .body(deletedAdministrator);
   }

@@ -26,13 +26,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * ApplicationUser
+ * User
  *
  * @author Nikita Lepesevich
  */
 
 @Entity
-public class ApplicationUser extends AbstractContext<AbstractUserState> implements UserDetails {
+public class User extends AbstractContext<AbstractUserState> implements UserDetails {
 
   @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private LoginInfo loginInfo;

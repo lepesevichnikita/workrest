@@ -7,7 +7,6 @@ package org.klaster.restapi.controller;
  *
  */
 
-import java.util.logging.Logger;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
@@ -55,8 +54,6 @@ public class TokenController {
 
   @PostMapping("/verify")
   public ResponseEntity<TokenDTO> verify(@RequestBody TokenDTO tokenDTO) {
-    Logger.getLogger(getClass().getName())
-          .warning(String.format("%s", tokenDTO));
     ResponseEntity result = ResponseEntity.notFound()
                                           .build();
     if (defaultTokenBasedUserDetailsService.hasToken(tokenDTO.getToken())) {

@@ -8,9 +8,9 @@ package org.klaster.restapi.controller;/*
  * Copyright(c) Nikita Lepesevich
  */
 
-import org.klaster.domain.model.context.ApplicationUser;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.restapi.dto.PersonalDataDTO;
+import org.klaster.restapi.dto.PersonalDataForAdministratorDTO;
 import org.klaster.restapi.service.ApplicationUserService;
 import org.klaster.restapi.service.PersonalDataService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
@@ -39,47 +39,42 @@ public class PersonalDataController {
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
-  @GetMapping("/{userId")
-  @PreAuthorize("hasAuthority(ADMINISTRATOR)")
-  public ResponseEntity<PersonalData> getByUserId(@PathVariable long userId) {
-    ResponseEntity result = ResponseEntity.notFound()
-                                          .build();
-    ApplicationUser foundApplicationUser = defaultApplicationUserService.findFirstById(userId);
-    if (!(foundApplicationUser == null || foundApplicationUser.getPersonalData() == null)) {
-      result = ResponseEntity.ok(foundApplicationUser.getPersonalData());
-    }
-    return result;
+  @GetMapping("/{userId}")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<PersonalDataForAdministratorDTO> getByUserId(@PathVariable long userId) {
+    PersonalData foundPersonalData = defaultPersonalDataService.findByUserId(userId);
+    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(foundPersonalData));
   }
 
   @PostMapping("/{userId}/verify")
   @PreAuthorize("hasAuthority(ADMINISTRATOR)")
-  public ResponseEntity<PersonalData> verifyByUserId(@PathVariable long userId) {
+  public ResponseEntity<PersonalDataForAdministratorDTO> verifyByUserId(@PathVariable long userId) {
     ResponseEntity result = ResponseEntity.notFound()
                                           .build();
-    ApplicationUser foundApplicationUser = defaultApplicationUserService.findFirstById(userId);
-    if (!(foundApplicationUser == null || foundApplicationUser.getPersonalData() == null)) {
+    User foundUser = defaultApplicationUserService.findFirstById(userId);
+    if (!(foundUser == null || foundUser.getPersonalData() == null)) {
       defaultApplicationUserService.verifyById(userId);
-      result = ResponseEntity.ok(foundApplicationUser.getPersonalData());
+      result = ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(foundUser.getPersonalData()));
     }
     return result;
   }
 
 
   @PostMapping("/{userId}")
-  public ResponseEntity<PersonalData> createByUserId(@PathVariable long userId, @RequestBody PersonalDataDTO personalDataDTO) {
-    ApplicationUser loggedUser = (ApplicationUser) SecurityContextHolder.getContext()
-                                                                        .getAuthentication()
-                                                                        .getPrincipal();
+  public ResponseEntity<PersonalData> createByUserId(@PathVariable long userId, @RequestBody PersonalDataForAdministratorDTO personalDataDTO) {
+    User loggedUser = (User) SecurityContextHolder.getContext()
+                                                  .getAuthentication()
+                                                  .getPrincipal();
     ResponseEntity result = ResponseEntity.notFound()
                                           .build();
     if (loggedUser.getId() != userId) {
       result = ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .build();
     } else {
-      ApplicationUser foundApplicationUser = defaultApplicationUserService.findFirstById(userId);
-      if (!(foundApplicationUser == null || foundApplicationUser.getPersonalData() == null)) {
+      User foundUser = defaultApplicationUserService.findFirstById(userId);
+      if (!(foundUser == null || foundUser.getPersonalData() == null)) {
         PersonalData newPersonalData = personalDataDTO.toPersonalData();
-        result = ResponseEntity.ok(foundApplicationUser.getPersonalData());
+        result = ResponseEntity.ok(foundUser.getPersonalData());
       }
     }
     return result;

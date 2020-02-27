@@ -44,8 +44,8 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
     Token newToken = new Token();
     foundLoginInfo.addToken(newToken);
-    newToken = tokenRepository.save(newToken);
-    return newToken.getValue();
+    return tokenRepository.save(newToken)
+                          .getValue();
   }
 
   @Override
