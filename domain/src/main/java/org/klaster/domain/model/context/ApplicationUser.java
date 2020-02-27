@@ -50,7 +50,7 @@ public class ApplicationUser extends AbstractContext<AbstractUserState> implemen
   private EmployerProfile employerProfile;
 
   @JsonIgnore
-  @Transient
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
   private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {

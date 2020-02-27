@@ -7,6 +7,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
 import org.klaster.domain.model.context.ApplicationUser;
 import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.state.general.AbstractState;
 
@@ -42,6 +43,11 @@ public abstract class AbstractUserState extends AbstractState<ApplicationUser> {
 
   public void createFreelancerProfile() {
     final String message = String.format("Failed attempt to create freelancer profile for user #%s", getContext());
+    logger.warning(message);
+  }
+
+  public void updatePersonalData(String firstName, String lastName, String documentName, String documentNumber, FileInfo documentScan) {
+    final String message = String.format("Failed attempt to update personal data for user #%s", getContext());
     logger.warning(message);
   }
 

@@ -17,6 +17,7 @@ import org.klaster.domain.model.entity.Role;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
+import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.klaster.restapi.repository.LoginInfoRepository;
 import org.klaster.restapi.repository.RoleRepository;
@@ -102,6 +103,14 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   public ApplicationUser findFirstById(long id) {
     return applicationUserRepository.findById(id)
                                     .orElse(null);
+  }
+
+  @Override
+  public ApplicationUser verifyById(long id) {
+    ApplicationUser foundApplicationUser = applicationUserRepository.findById(id)
+                                                                    .orElseThrow(EntityNotFoundException::new);
+    foundApplicationUser.setCurrentState(new VerifiedUserState());
+    return applicationUserRepository.save(foundApplicationUser);
   }
 
 }

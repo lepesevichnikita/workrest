@@ -20,6 +20,7 @@ import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
+import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,5 +126,12 @@ public class DefaultApplicationUserServiceTest extends AbstractTestNGSpringConte
         hasProperty("id", equalTo(previousState.getId())),
         hasProperty("class", equalTo(previousState.getClass()))
     ));
+  }
+
+  @Test
+  public void verifiesUserById() {
+    applicationUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    applicationUser = defaultApplicationUserService.verifyById(applicationUser.getId());
+    assertThat(applicationUser.getCurrentState(), isA(VerifiedUserState.class));
   }
 }

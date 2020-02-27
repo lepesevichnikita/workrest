@@ -1,20 +1,28 @@
 package org.klaster.domain.model.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * FileInfo
  *
  * @author Nikita Lepesevich
  */
 
+@Entity
 public class FileInfo {
 
-  private final String md5;
-  private final String path;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;
 
-  public FileInfo(String md5, String path) {
-    this.md5 = md5;
-    this.path = path;
-  }
+  @Column(updatable = false)
+  private String md5;
+
+  private String path;
 
   public String getMd5() {
     return md5;
@@ -22,5 +30,13 @@ public class FileInfo {
 
   public String getPath() {
     return path;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 }

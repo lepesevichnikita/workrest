@@ -33,4 +33,6 @@ public interface ApplicationUserService {
   ApplicationUser unblockById(long id);
 
   ApplicationUser findFirstById(long id);
+
+  ApplicationUser verifyById(long userId);
 }
