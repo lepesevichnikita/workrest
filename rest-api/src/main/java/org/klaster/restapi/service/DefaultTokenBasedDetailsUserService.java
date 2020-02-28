@@ -7,10 +7,13 @@ package org.klaster.restapi.service;
  *
  */
 
+import javax.persistence.EntityNotFoundException;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.klaster.restapi.repository.TokenRepository;
+import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -40,38 +43,38 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   }
 
   @Override
-  public String createToken(String login, String password) {
+  public Token createToken(String login, String password) {
     LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
     Token newToken = new Token();
     foundLoginInfo.addToken(newToken);
-    return tokenRepository.save(newToken)
-                          .getValue();
+    return tokenRepository.save(newToken);
   }
 
   @Override
-  public UserDetails findByToken(String token) {
-    UserDetails userDetails = null;
+  public User findByTokenValue(String token) {
+    User foundUser = null;
     Token foundToken = tokenRepository.findFirstByValue(token)
                                       .orElse(null);
     if (foundToken != null) {
-      LoginInfo loginInfo = foundToken.getLoginInfo();
-      userDetails = applicationUserRepository.findFirstByLoginInfo(loginInfo);
+      foundUser = applicationUserRepository.findFirstByLoginInfo(foundToken.getLoginInfo());
     }
-    return userDetails;
+    return foundUser;
   }
 
   @Override
-  public Token deleteToken(String token) {
+  public Token deleteTokenByValue(String token) {
     Token foundToken = tokenRepository.findFirstByValue(token)
-                                      .orElse(null);
-    if (foundToken != null) {
-      tokenRepository.delete(foundToken);
-    }
+                                      .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class, "value", token)));
+    tokenRepository.delete(foundToken);
     return foundToken;
   }
 
   @Override
-  public boolean hasToken(String generatedTokenValue) {
-    return tokenRepository.existsByValue(generatedTokenValue);
+  public boolean hasTokenWithValue(String tokenValue) {
+    boolean hasToken = tokenRepository.existsByValue(tokenValue);
+    if (!hasToken) {
+      throw new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class, "value", tokenValue));
+    }
+    return hasToken;
   }
 }

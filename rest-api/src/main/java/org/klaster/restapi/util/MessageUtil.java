@@ -18,7 +18,7 @@ public class MessageUtil {
   private static final String USER_BY_LOGIN_NOT_FOUND_TEMPLATE = "User @%s not found";
   private static final String AUTHENTICATION_CREDENTIALS_NOT_FOUND_TEMPLATE = "Credentials for @%s not found";
   private static final String USER_BY_TOKEN_NOT_FOUND_TEMPLATE = "User with token #%s not found";
-  private static final String ENTITY_BY_ID_NOT_FOUND_TEMPLATE = "Entity %s with id=#%s not found";
+  private static final String ENTITY_BY_FIELD_NOT_FOUND_TEMPLATE = "Entity %s with %s=#%s not found";
   private static final String ENTITY_BY_PARENT_ID_NOT_FOUND_TEMPLATE = "Entity %s with parent id=#%s not found";
 
   private MessageUtil() {
@@ -37,10 +37,14 @@ public class MessageUtil {
   }
 
   public static <T> String getEntityByIdNotFoundMessage(Class entityClass, T id) {
-    return String.format(ENTITY_BY_ID_NOT_FOUND_TEMPLATE, entityClass.getSimpleName(), id);
+    return getEntityByFieldNotFound(entityClass, "id", id);
   }
 
   public static <T> String getEntityByParentIdNotFoundMessage(Class entityClass, T id) {
     return String.format(ENTITY_BY_PARENT_ID_NOT_FOUND_TEMPLATE, entityClass.getSimpleName(), id);
+  }
+
+  public static <T> String getEntityByFieldNotFound(Class entityClass, String fieldName, T value) {
+    return String.format(ENTITY_BY_FIELD_NOT_FOUND_TEMPLATE, entityClass.getSimpleName(), fieldName, value);
   }
 }

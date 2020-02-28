@@ -9,7 +9,7 @@ package org.klaster.restapi.controller;
 
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.dto.LoginInfoDTO;
-import org.klaster.restapi.service.ApplicationUserService;
+import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,19 +33,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsersController {
 
   @Autowired
-  private ApplicationUserService defaultApplicationUserService;
+  private UserService defaultUserService;
 
 
   @PostMapping
   public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
-    User registeredUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
+    User registeredUser = defaultUserService.registerUserByLoginInfo(loginInfoDTO.toLoginInfo());
     return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
   public ResponseEntity<User> delete(@PathVariable long id) {
-    User deletedUser = defaultApplicationUserService.deleteById(id);
+    User deletedUser = defaultUserService.deleteById(id);
     return ResponseEntity.accepted()
                          .body(deletedUser);
   }
@@ -54,7 +54,7 @@ public class UsersController {
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
   public ResponseEntity<User> findFirstById(@PathVariable long id) {
-    User foundUser = defaultApplicationUserService.findFirstById(id);
+    User foundUser = defaultUserService.findFirstById(id);
     return ResponseEntity.ok(foundUser);
   }
 }

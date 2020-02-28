@@ -60,7 +60,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserService defaultApplicationUserService;
+  private UserService defaultUserService;
 
   @Autowired
   private ApplicationUserRepository applicationUserRepository;
@@ -85,43 +85,43 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
 
     assertThat(user, hasProperty("loginInfo", equalTo(loginInfo)));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
     assertThat(user.getCurrentState(), isA(UnverifiedUserState.class));
   }
 
   @Test
   public void registeredUserHasRoleUser() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
     assertThat(new ArrayList<>(user.getRoles()), contains(hasProperty("name", equalTo(RoleName.USER))));
   }
 
   @Test
   public void deletesUsers() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    user = defaultApplicationUserService.deleteById(user.getId());
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.deleteById(user.getId());
     assertThat(user.getCurrentState(), isA(DeletedUserState.class));
   }
 
   @Test
   public void blocksUser() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    user = defaultApplicationUserService.blockById(user.getId());
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.blockById(user.getId());
     assertThat(user.getCurrentState(), isA(BlockedUserState.class));
   }
 
   @Test
   public void unblocksUser() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    user = defaultApplicationUserService.blockById(user.getId());
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.blockById(user.getId());
     AbstractUserState previousState = user.getPreviousState();
-    user = defaultApplicationUserService.unblockById(user.getId());
+    user = defaultUserService.unblockById(user.getId());
     assertThat(user.getCurrentState(), allOf(
         hasProperty("id", equalTo(previousState.getId())),
         hasProperty("class", equalTo(previousState.getClass()))
@@ -130,17 +130,17 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void verifiesUserById() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    user = defaultApplicationUserService.verifyById(user.getId());
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.verifyById(user.getId());
     assertThat(user.getCurrentState(), isA(VerifiedUserState.class));
   }
 
   @Test
   public void notVerifiesUserIfIsVerified() {
-    user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    AbstractUserState previousState = defaultApplicationUserService.verifyById(user.getId())
-                                                                   .getCurrentState();
-    defaultApplicationUserService.verifyById(user.getId());
+    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    AbstractUserState previousState = defaultUserService.verifyById(user.getId())
+                                                        .getCurrentState();
+    defaultUserService.verifyById(user.getId());
     assertThat(user.getCurrentState(), allOf(
         hasProperty("class", equalTo(previousState.getClass())),
         hasProperty("id", equalTo(previousState.getId()))

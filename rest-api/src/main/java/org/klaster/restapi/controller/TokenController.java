@@ -12,6 +12,7 @@ import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,32 +34,21 @@ public class TokenController {
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @PostMapping
-  public ResponseEntity<TokenDTO> get(@RequestBody LoginInfoDTO loginInfoDTO) {
-    String token = defaultTokenBasedUserDetailsService.createToken(loginInfoDTO.getLogin(), loginInfoDTO.getPassword());
-    TokenDTO tokenDTO = new TokenDTO();
-    tokenDTO.setToken(token);
-    return ResponseEntity.ok(tokenDTO);
+  public ResponseEntity<TokenDTO> create(@RequestBody LoginInfoDTO loginInfoDTO) {
+    Token createdToken = defaultTokenBasedUserDetailsService.createToken(loginInfoDTO.getLogin(), loginInfoDTO.getPassword());
+    return new ResponseEntity<>(TokenDTO.fromToken(createdToken), HttpStatus.CREATED);
   }
 
   @DeleteMapping
   public ResponseEntity<TokenDTO> delete(@RequestBody TokenDTO tokenDTO) {
-    Token deletedToken = defaultTokenBasedUserDetailsService.deleteToken(tokenDTO.getToken());
-    ResponseEntity result = ResponseEntity.notFound()
-                                          .build();
-    if (deletedToken != null) {
-      result = ResponseEntity.accepted()
-                             .body(deletedToken);
-    }
-    return result;
+    Token deletedToken = defaultTokenBasedUserDetailsService.deleteTokenByValue(tokenDTO.getToken());
+    return ResponseEntity.accepted()
+                         .body(TokenDTO.fromToken(deletedToken));
   }
 
   @PostMapping("/verify")
   public ResponseEntity<TokenDTO> verify(@RequestBody TokenDTO tokenDTO) {
-    ResponseEntity result = ResponseEntity.notFound()
-                                          .build();
-    if (defaultTokenBasedUserDetailsService.hasToken(tokenDTO.getToken())) {
-      result = ResponseEntity.ok(tokenDTO);
-    }
-    return result;
+    defaultTokenBasedUserDetailsService.hasTokenWithValue(tokenDTO.getToken());
+    return ResponseEntity.ok(tokenDTO);
   }
 }

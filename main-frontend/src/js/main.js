@@ -1,4 +1,6 @@
-import {Action, AuthorizationService, FreelancerService, UserService} from './api';
+import {
+  Action, AuthorizationService, FreelancerService, JobService, UserService,
+} from './api';
 import {TemplateHelper} from './helper';
 
 const menuContainerId = '#menu';
@@ -95,6 +97,7 @@ window.authorizationService = new AuthorizationService();
 window.freelancerService = new FreelancerService();
 window.templateHelper = new TemplateHelper();
 window.userService = new UserService();
+window.jobService = new JobService();
 window.redirectToPage = redirectToPage;
 window.defineFormSubmitCallback = defineFormSubmitCallback;
 window.checkIsAuthorized = checkIsAuthorized;
@@ -104,7 +107,7 @@ authorizationService.subscribe(Action.SIGNED_IN, () => {
   loadMenu('authorized');
   redirectToPage('user');
 }).subscribe(Action.LOGGED_OUT, () => {
-  loadMenu('menu');
+  loadMenu('main');
   redirectToPage('login');
 }).subscribe(Action.SIGNED_UP, () => {
   redirectToPage('login');

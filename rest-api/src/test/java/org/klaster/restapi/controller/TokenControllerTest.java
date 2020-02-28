@@ -11,18 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.UUID;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
+import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.repository.TokenRepository;
-import org.klaster.restapi.service.ApplicationUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
+import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -58,9 +58,8 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
 
   private MockMvc mockMvc;
-  private Faker faker;
-  private String login;
-  private String password;
+  private RandomLoginInfoFactory randomLoginInfoFactory;
+  private LoginInfo randomLoginInfo;
   private ObjectMapper objectMapper;
 
   @Autowired
@@ -73,14 +72,14 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserService defaultApplicationUserService;
+  private UserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
@@ -90,45 +89,37 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
 
   @BeforeMethod
   public void reset() {
-    login = faker.name()
-                 .username();
-    password = faker.internet()
-                    .password();
+    randomLoginInfo = randomLoginInfoFactory.build();
     defaultLoginInfoBuilder.reset();
-    defaultLoginInfoBuilder.setLogin(login)
-                           .setPassword(password);
   }
 
   @Test
-  public void createsTokenForCorrectCredentials() throws Exception {
+  public void createdForPostWithCorrectCredentials() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
                              .contentType(MediaType.APPLICATION_JSON)
                              .content(loginInfoDTOAsJson))
-           .andExpect(status().isOk())
+           .andExpect(status().isCreated())
            .andExpect(jsonPath("$.token").value(not(empty())));
   }
 
   @Test
-  public void deletesToken() throws Exception {
+  public void acceptedForDeleteWithValidToken() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    String deletedTokenId = defaultTokenBasedUserDetailsService.createToken(login, password);
-    TokenDTO deletedTokenDTO = new TokenDTO();
-    deletedTokenDTO.setToken(deletedTokenId);
-    final String tokenDTOAsJson = objectMapper.writeValueAsString(deletedTokenDTO);
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    Token deletedToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
+    final String tokenDTOAsJson = objectMapper.writeValueAsString(TokenDTO.fromToken(deletedToken));
     mockMvc.perform(delete(uri).accept(MediaType.APPLICATION_JSON)
                                .contentType(MediaType.APPLICATION_JSON)
                                .content(tokenDTOAsJson))
-           .andExpect(status().isAccepted());
+           .andExpect(status().isAccepted())
+           .andExpect(jsonPath("$.token").value(deletedToken.getValue()));
   }
 
   @Test
-  public void returnsNotFoundInvalidTokenDeleting() throws Exception {
+  public void notFoundForDeleteWithInvalidToken() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     TokenDTO invalidTokenDTO = new TokenDTO();
     final String invalidTokenId = UUID.randomUUID()
@@ -142,22 +133,20 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void returnsOkIfTokenValid() throws Exception {
+  public void okForVerificationWithValidToken() throws Exception {
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, "verify");
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    String validTokenValue = defaultTokenBasedUserDetailsService.createToken(login, password);
-    TokenDTO validTokenDTO = new TokenDTO();
-    validTokenDTO.setToken(validTokenValue);
-    final String tokenDTOAsJson = objectMapper.writeValueAsString(validTokenDTO);
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    Token createdToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
+    final String tokenDTOAsJson = objectMapper.writeValueAsString(TokenDTO.fromToken(createdToken));
     mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
                              .contentType(MediaType.APPLICATION_JSON)
                              .content(tokenDTOAsJson))
-           .andExpect(status().isOk());
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.token").value(createdToken.getValue()));
   }
 
   @Test
-  public void returnsNotFoundForInvalidTokenForVerification() throws Exception {
+  public void notFoundForVerificationPostWithInvalidToken() throws Exception {
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, "verify");
     TokenDTO invalidTokenDTO = new TokenDTO();
     invalidTokenDTO.setToken(UUID.randomUUID()

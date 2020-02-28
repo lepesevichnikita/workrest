@@ -11,12 +11,12 @@ import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
- * ApplicationUserService
+ * UserService
  *
  * @author Nikita Lepesevich
  */
 
-public interface ApplicationUserService {
+public interface UserService {
 
   boolean hasUniqueLogin(User user);
 

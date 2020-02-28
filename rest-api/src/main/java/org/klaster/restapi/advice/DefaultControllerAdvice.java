@@ -11,6 +11,7 @@ package org.klaster.restapi.advice;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -29,10 +30,16 @@ public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
   }
 
-  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-  @ExceptionHandler(ConstraintViolationException.class)
-  public void handle(ConstraintViolationException exception) {
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<String> handle(DataIntegrityViolationException exception) {
     logger.warn(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<String> handle(ConstraintViolationException exception) {
+    logger.warn(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)

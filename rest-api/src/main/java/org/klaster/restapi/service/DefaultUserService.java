@@ -21,6 +21,7 @@ import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.klaster.restapi.repository.LoginInfoRepository;
 import org.klaster.restapi.repository.RoleRepository;
+import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class DefaultApplicationUserService implements ApplicationUserService {
+public class DefaultUserService implements UserService {
 
   @Autowired
   private LoginInfoRepository loginInfoRepository;
@@ -102,7 +103,7 @@ public class DefaultApplicationUserService implements ApplicationUserService {
   @Override
   public User findFirstById(long id) {
     return applicationUserRepository.findById(id)
-                                    .orElse(null);
+                                    .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
   @Override

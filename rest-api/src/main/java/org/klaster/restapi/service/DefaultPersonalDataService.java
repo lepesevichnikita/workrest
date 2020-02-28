@@ -11,7 +11,6 @@ package org.klaster.restapi.service;/*
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.klaster.restapi.repository.PersonalDataRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultPersonalDataService implements PersonalDataService {
-
   @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  private UserService defaultUserService;
 
   @Autowired
   private PersonalDataRepository personalDataRepository;
@@ -33,24 +31,25 @@ public class DefaultPersonalDataService implements PersonalDataService {
 
   @Override
   public PersonalData findByUserId(long id) {
-    User foundUser = getPersonalDataByUserId(id);
+    User foundUser = defaultUserService.findFirstById(id);
+    if (foundUser.getPersonalData() == null) {
+      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class, id));
+    }
     return foundUser.getPersonalData();
   }
 
   @Override
   public PersonalData updateByUserId(long id, PersonalData personalData) {
-    User foundUser = getPersonalDataByUserId(id);
+    User foundUser = defaultUserService.findFirstById(id);
     foundUser.getCurrentState()
              .updatePersonalData(personalData);
     return personalDataRepository.save(personalData);
   }
 
-  private User getPersonalDataByUserId(long id) {
-    User foundUser = applicationUserRepository.findById(id)
-                                              .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
-    if (foundUser.getPersonalData() == null) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class, id));
-    }
-    return foundUser;
+  @Override
+  public PersonalData verifyByUserId(long id) {
+    PersonalData foundPersonalData = findByUserId(id);
+    defaultUserService.verifyById(id);
+    return foundPersonalData;
   }
 }

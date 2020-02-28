@@ -18,4 +18,6 @@ public interface PersonalDataService {
 
   PersonalData updateByUserId(long id, PersonalData personalData);
 
+  PersonalData verifyByUserId(long id);
+
 }

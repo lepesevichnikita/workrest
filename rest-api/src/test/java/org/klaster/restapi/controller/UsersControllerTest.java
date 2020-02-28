@@ -1,6 +1,5 @@
 package org.klaster.restapi.controller;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -14,9 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.UUID;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.constant.RoleName;
@@ -24,9 +21,10 @@ import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
+import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.service.AdministratorService;
-import org.klaster.restapi.service.ApplicationUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
+import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -63,11 +61,10 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
 
-  private Faker faker;
   private ObjectMapper objectMapper;
   private MockMvc mockMvc;
-  private String password;
-  private String login;
+  private RandomLoginInfoFactory randomLoginInfoFactory;
+  private LoginInfo randomLoginInfo;
 
   private String administratorToken;
 
@@ -81,7 +78,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   private AdministratorService defaultAdministratorService;
 
   @Autowired
-  private ApplicationUserService defaultApplicationUserService;
+  private UserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
@@ -90,7 +87,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   public void setup() throws NoSuchAlgorithmException {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
@@ -99,45 +96,34 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @BeforeMethod
   public void initialize() {
-    login = faker.name()
-                 .username();
-    password = faker.internet()
-                    .password();
+    randomLoginInfo = randomLoginInfoFactory.build();
     defaultLoginInfoBuilder.reset();
-    defaultLoginInfoBuilder.setPassword(password)
-                           .setLogin(login);
   }
 
 
   @Test
   public void registersUniqueUser() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
                              .content(loginInfoDTOAsJson))
            .andExpect(status().isCreated())
            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").isNotEmpty())
-           .andExpect(jsonPath("$.loginInfo.login").value(login))
+           .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()))
            .andExpect(jsonPath("$.roles[0].name").value(RoleName.USER));
   }
 
   @Test
   public void returnsUnprocessableEntityWithError() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
                              .content(loginInfoDTOAsJson))
-           .andExpect(status().isUnprocessableEntity())
-           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-           .andExpect(jsonPath("$.id").isNotEmpty())
-           .andExpect(jsonPath("$.loginInfo.login").value(login))
-           .andExpect(jsonPath("$.roles[0].name").value(RoleName.USER));
+           .andExpect(status().isUnprocessableEntity());
   }
 
 
@@ -155,10 +141,9 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void deletesUserWithAdminToken() throws Exception {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User deletedUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    User deletedUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedUser.getId());
-    LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(loginInfo);
+    LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(randomLoginInfo);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(loginInfoDTO);
     mockMvc.perform(delete(uri).header(AUTHORIZATION, administratorToken)
                                .contentType(MediaType.APPLICATION_JSON)
@@ -170,17 +155,16 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void getsUsersByIdWithAdminToken() throws Exception {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User registeredUser = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(get(uri).header(AUTHORIZATION, administratorToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(loginInfoDTOAsJson))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$.id").value(registeredUser.getId()))
-           .andExpect(jsonPath("$.loginInfo.login").value(equalTo(login)));
+           .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()));
   }
 
   private void registerAdministrator() {
@@ -188,7 +172,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
                                                  .setPassword(VALID_ADMIN_PASSWORD)
                                                  .build();
     defaultAdministratorService.registerAdministrator(loginInfo);
-    administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD);
+    administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
+                                                            .getValue();
   }
 
 }

@@ -9,14 +9,14 @@ package org.klaster.restapi.dto;/*
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.klaster.domain.builder.DefaultPersonalDataBuilder;
 import org.klaster.domain.builder.PersonalDataBuilder;
+import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class PersonalDataForAdministratorDTO {
 
   @JsonIgnore
-  @Autowired
   private PersonalDataBuilder defaultPersonalDataBuilder;
 
   private String documentNumber;
@@ -27,13 +27,17 @@ public class PersonalDataForAdministratorDTO {
 
   private String lastName;
 
-  private FileInfoDTO documentScan;
+  private FileInfo documentScan;
+
+  public PersonalDataForAdministratorDTO() {
+    defaultPersonalDataBuilder = new DefaultPersonalDataBuilder();
+  }
 
   public static PersonalDataForAdministratorDTO fromPersonalData(PersonalData personalData) {
     PersonalDataForAdministratorDTO personalDataDTO = new PersonalDataForAdministratorDTO();
     personalDataDTO.setFirstName(personalData.getFirstName());
     personalDataDTO.setLastName(personalData.getLastName());
-    personalDataDTO.setDocumentScan(FileInfoDTO.fromFileInfo(personalData.getDocumentScan()));
+    personalDataDTO.setDocumentScan(personalData.getDocumentScan());
     personalDataDTO.setDocumentName(personalData.getDocumentName());
     personalDataDTO.setDocumentNumber(personalData.getDocumentNumber());
     return personalDataDTO;
@@ -42,7 +46,7 @@ public class PersonalDataForAdministratorDTO {
   public PersonalData toPersonalData() {
     return defaultPersonalDataBuilder.setLastName(lastName)
                                      .setFirstName(firstName)
-                                     .setDocumentScan(documentScan.toFileInfo())
+                                     .setDocumentScan(documentScan)
                                      .setDocumentNumber(documentNumber)
                                      .setDocumentName(documentName)
                                      .build();
@@ -80,11 +84,11 @@ public class PersonalDataForAdministratorDTO {
     this.lastName = lastName;
   }
 
-  public FileInfoDTO getDocumentScan() {
+  public FileInfo getDocumentScan() {
     return documentScan;
   }
 
-  public void setDocumentScan(FileInfoDTO documentScan) {
+  public void setDocumentScan(FileInfo documentScan) {
     this.documentScan = documentScan;
   }
 }

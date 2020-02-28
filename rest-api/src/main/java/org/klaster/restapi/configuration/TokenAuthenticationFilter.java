@@ -46,7 +46,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
     String token = httpServletRequest.getHeader(AUTHORIZATION);
     if (token != null) {
-      User user = (User) defaultTokenBasedUserDetailsService.findByToken(token);
+      User user = defaultTokenBasedUserDetailsService.findByTokenValue(token);
       if (user != null) {
         Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(user,
                                                                                        token,

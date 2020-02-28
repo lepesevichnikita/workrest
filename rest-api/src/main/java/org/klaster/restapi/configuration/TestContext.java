@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.klaster.restapi.service.AdministratorService;
-import org.klaster.restapi.service.ApplicationUserService;
-import org.klaster.restapi.service.DefaultApplicationUserService;
+import org.klaster.restapi.service.DefaultUserService;
+import org.klaster.restapi.service.UserService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,8 +41,8 @@ public class TestContext {
   }
 
   @Bean
-  public ApplicationUserService defaultApplicationUserService() {
-    return Mockito.spy(new DefaultApplicationUserService());
+  public UserService defaultApplicationUserService() {
+    return Mockito.spy(new DefaultUserService());
   }
 
 }

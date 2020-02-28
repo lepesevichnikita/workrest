@@ -1,5 +1,5 @@
 checkIsAuthorized().
-then(response => redirectToPage('home')).
+then(() => redirectToPage('home')).
 catch(() => replacePage('login').then(() => {
   const form = document.getElementById('loginForm');
   const sendForm = formData => authorizationService.signIn(formData).

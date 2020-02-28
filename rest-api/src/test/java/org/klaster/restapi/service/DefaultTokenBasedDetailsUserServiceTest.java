@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,7 +50,7 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserService defaultApplicationUserService;
+  private UserService defaultUserService;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
@@ -70,9 +71,9 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
 
   @Test
   public void createsTokenForValidLoginAndPasswords() {
-    User user = defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String generatedTokenValue = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
-    assertThat(defaultTokenBasedUserDetailsService.findByToken(generatedTokenValue), allOf(
+    User user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    Token createdToken = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
+    assertThat(defaultTokenBasedUserDetailsService.findByTokenValue(createdToken.getValue()), allOf(
         hasProperty("password", equalTo(user.getPassword())),
         hasProperty("username", equalTo(user.getUsername())),
         hasProperty("id", equalTo(user.getId()))
@@ -82,17 +83,17 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
   @Test
 
   public void returnsTrueIfHasToken() {
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String generatedTokenValue = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
-    assertThat(defaultTokenBasedUserDetailsService.hasToken(generatedTokenValue), is(true));
+    defaultUserService.registerUserByLoginInfo(loginInfo);
+    Token createdToken = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
+    assertThat(defaultTokenBasedUserDetailsService.hasTokenWithValue(createdToken.getValue()), is(true));
   }
 
   @Test
   public void deletesToken() {
-    defaultApplicationUserService.registerUserByLoginInfo(loginInfo);
-    final String generatedTokenValue = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
-    defaultTokenBasedUserDetailsService.deleteToken(generatedTokenValue);
-    assertThat(defaultTokenBasedUserDetailsService.hasToken(generatedTokenValue), is(false));
+    defaultUserService.registerUserByLoginInfo(loginInfo);
+    Token createdToken = defaultTokenBasedUserDetailsService.createToken(loginInfo.getLogin(), loginInfo.getPassword());
+    defaultTokenBasedUserDetailsService.deleteTokenByValue(createdToken.getValue());
+    assertThat(defaultTokenBasedUserDetailsService.hasTokenWithValue(createdToken.getValue()), is(false));
   }
 
 }

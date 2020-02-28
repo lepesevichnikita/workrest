@@ -1,7 +1,5 @@
-checkIsAuthorized()
-.then(() => {
+checkIsAuthorized().then(() => {
   replacePage('user');
-})
-.catch(() => {
+}).catch(() => {
   redirectToPage('login');
 });
