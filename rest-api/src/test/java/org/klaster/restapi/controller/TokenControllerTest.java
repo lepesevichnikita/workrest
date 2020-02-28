@@ -13,14 +13,12 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
-import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
-import org.klaster.restapi.repository.TokenRepository;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +61,7 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private TokenRepository tokenRepository;
-
-  @Autowired
   private WebApplicationContext webApplicationContext;
-
-  @Autowired
-  private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
   private UserService defaultUserService;
@@ -90,7 +82,6 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   @BeforeMethod
   public void reset() {
     randomLoginInfo = randomLoginInfoFactory.build();
-    defaultLoginInfoBuilder.reset();
   }
 
   @Test

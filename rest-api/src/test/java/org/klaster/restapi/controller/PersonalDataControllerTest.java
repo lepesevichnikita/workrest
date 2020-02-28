@@ -13,10 +13,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
-import org.klaster.domain.builder.FileInfoBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.builder.PersonalDataBuilder;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
@@ -62,7 +59,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
   private static final String INVALID_TOKEN = "faketoken";
 
-
   private String administratorToken;
 
   private ObjectMapper objectMapper;
@@ -89,12 +85,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @Autowired
-  private PersonalDataBuilder defaultPersonalDataBuilder;
-
-  @Autowired
-  private FileInfoBuilder defaultFileInfoBuilder;
-
-  @Autowired
   private PersonalDataService defaultPersonalDataService;
 
   @BeforeClass
@@ -113,8 +103,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   public void initialize() {
     randomLoginInfo = randomLoginInfoFactory.build();
     randomPersonalData = randomPersonalDataFactory.build();
-    defaultFileInfoBuilder.reset();
-    defaultPersonalDataBuilder.reset();
   }
 
   @Test
@@ -188,9 +176,7 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String personalDataDTOAsJson = objectMapper.writeValueAsString(PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
-    final String invalidToken = UUID.randomUUID()
-                                    .toString();
-    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, invalidToken)
+    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, INVALID_TOKEN)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(personalDataDTOAsJson))

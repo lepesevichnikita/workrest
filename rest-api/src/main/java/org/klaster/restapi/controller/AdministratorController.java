@@ -7,7 +7,6 @@ package org.klaster.restapi.controller;
  *
  */
 
-import java.net.URI;
 import java.util.List;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -15,6 +14,7 @@ import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.repository.RoleRepository;
 import org.klaster.restapi.service.AdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * SystemAdministratorController
@@ -59,12 +58,7 @@ public class AdministratorController {
   public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
     User registeredAdministrator = administratorService.registerAdministrator(loginInfo);
-    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                                              .path("/{id}")
-                                              .buildAndExpand(registeredAdministrator.getId())
-                                              .toUri();
-    return ResponseEntity.created(location)
-                         .body(registeredAdministrator);
+    return new ResponseEntity<>(registeredAdministrator, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
