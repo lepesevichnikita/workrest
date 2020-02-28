@@ -6,7 +6,7 @@ package org.klaster.restapi.advice;
  *
  * 2/20/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import javax.persistence.EntityNotFoundException;

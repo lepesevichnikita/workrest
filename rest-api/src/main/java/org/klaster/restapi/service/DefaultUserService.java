@@ -24,6 +24,7 @@ import org.klaster.restapi.repository.RoleRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * RegistrationService
@@ -32,7 +33,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class DefaultUserService implements UserService {
+public class DefaultUserService {
 
   @Autowired
   private LoginInfoRepository loginInfoRepository;
@@ -46,13 +47,12 @@ public class DefaultUserService implements UserService {
   @Autowired
   private RoleRepository roleRepository;
 
-  @Override
   public boolean hasUniqueLogin(User user) {
     return !loginInfoRepository.existsByLogin(user.getLoginInfo()
                                                   .getLogin());
   }
 
-  @Override
+  @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
     User user = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
@@ -61,7 +61,7 @@ public class DefaultUserService implements UserService {
     return applicationUserRepository.save(user);
   }
 
-  @Override
+  @Transactional
   public User deleteById(long id) {
     User deletedUser = applicationUserRepository.findById(id)
                                                 .orElseThrow(EntityNotFoundException::new);
@@ -69,17 +69,15 @@ public class DefaultUserService implements UserService {
     return applicationUserRepository.save(deletedUser);
   }
 
-  @Override
   public User findFirstByLoginInfo(LoginInfo loginInfo) {
     return applicationUserRepository.findFirstByLoginInfo(loginInfo);
   }
 
-  @Override
   public long count() {
     return applicationUserRepository.count();
   }
 
-  @Override
+  @Transactional
   public User blockById(long id) {
     User foundUser = applicationUserRepository.findById(id)
                                               .orElseThrow(EntityNotFoundException::new);
@@ -87,7 +85,7 @@ public class DefaultUserService implements UserService {
     return applicationUserRepository.save(foundUser);
   }
 
-  @Override
+  @Transactional
   public User unblockById(long id) {
     User foundUser = applicationUserRepository.findById(id)
                                               .orElseThrow(EntityNotFoundException::new);
@@ -100,13 +98,12 @@ public class DefaultUserService implements UserService {
     return applicationUserRepository.save(foundUser);
   }
 
-  @Override
   public User findFirstById(long id) {
     return applicationUserRepository.findById(id)
                                     .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
-  @Override
+  @Transactional
   public User verifyById(long id) {
     User foundUser = applicationUserRepository.findById(id)
                                               .orElseThrow(EntityNotFoundException::new);

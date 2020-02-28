@@ -22,13 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * AdministratorService
+ * DefaultAdministratorService
  *
  * @author Nikita Lepesevich
  */
 
 @Service
-public class DefaultAdministratorService implements AdministratorService {
+public class DefaultAdministratorService {
 
   @Autowired
   private RoleRepository roleRepository;
@@ -39,7 +39,6 @@ public class DefaultAdministratorService implements AdministratorService {
   @Autowired
   private ApplicationUserBuilder defaultApplicationUserBuilder;
 
-  @Override
   public User registerAdministrator(LoginInfo loginInfo) {
     Set<Role> administratorRoles = roleRepository.findOrCreateAllByNames(RoleName.ADMINISTRATOR, RoleName.USER);
     User administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
@@ -48,13 +47,11 @@ public class DefaultAdministratorService implements AdministratorService {
     return applicationUserRepository.save(administrator);
   }
 
-  @Override
   public List<User> findAll() {
     return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR)
                                           .getUsers());
   }
 
-  @Override
   public User findById(long id) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR);
     return role.getUsers()
@@ -64,7 +61,6 @@ public class DefaultAdministratorService implements AdministratorService {
                .orElse(null);
   }
 
-  @Override
   public User deleteById(long id) {
     User deletedAdministrator = findById(id);
     if (deletedAdministrator == null) {

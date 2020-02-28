@@ -19,8 +19,8 @@ import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
+import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -64,7 +64,7 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   private WebApplicationContext webApplicationContext;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;

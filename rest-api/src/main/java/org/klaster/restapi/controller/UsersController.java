@@ -9,7 +9,7 @@ package org.klaster.restapi.controller;
 
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.dto.LoginInfoDTO;
-import org.klaster.restapi.service.UserService;
+import org.klaster.restapi.service.DefaultUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsersController {
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
 
   @PostMapping

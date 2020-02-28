@@ -50,7 +50,7 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {

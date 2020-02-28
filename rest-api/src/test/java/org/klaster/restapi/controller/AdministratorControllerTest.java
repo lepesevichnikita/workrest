@@ -1,7 +1,5 @@
 package org.klaster.restapi.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
@@ -16,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.builder.RoleBuilder;
@@ -26,7 +23,7 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 import org.klaster.restapi.configuration.TestContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
-import org.klaster.restapi.service.AdministratorService;
+import org.klaster.restapi.service.DefaultAdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -81,7 +78,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   private ObjectMapper objectMapper;
 
   @Autowired
-  private AdministratorService defaultAdministratorService;
+  private DefaultAdministratorService defaultAdministratorService;
 
   @BeforeClass
   public void setup() {
@@ -107,7 +104,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
                                                                 .setLoginInfo(loginInfo)
                                                                 .setRoles(Collections.singleton(role))
                                                                 .build();
-    when(defaultAdministratorService.registerAdministrator(any())).thenReturn(registeredAdministrator);
     final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
     mockMvc.perform(post(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
@@ -165,7 +161,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     User expectedAdministrator = defaultApplicationUserBuilder.setId(id)
                                                               .setLoginInfo(loginInfo)
                                                               .build();
-    when(defaultAdministratorService.deleteById(anyLong())).thenReturn(expectedAdministrator);
     final String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -177,7 +172,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   public void returnsNotFoundIfDeletedAdministratorDoesntExists() throws Exception {
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    when(defaultAdministratorService.deleteById(id)).thenThrow(EntityNotFoundException.class);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isNotFound());
@@ -188,7 +182,6 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   public void returnsNotFoundIfRequiredAdministratorNotFound() throws Exception {
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    when(defaultAdministratorService.findById(id)).thenThrow(EntityNotFoundException.class);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isNotFound());

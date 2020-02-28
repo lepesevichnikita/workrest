@@ -19,14 +19,12 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
-public class DefaultFileService implements FileService {
+public class DefaultFileService {
 
-  @Override
   public FileInfo saveFile(InputStream inputStream) {
     return new FileInfo();
   }
 
-  @Override
   public File findFirstById(long id) {
     return new File("image.png");
   }

@@ -22,9 +22,9 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
-import org.klaster.restapi.service.AdministratorService;
+import org.klaster.restapi.service.DefaultAdministratorService;
+import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -75,10 +75,10 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private AdministratorService defaultAdministratorService;
+  private DefaultAdministratorService defaultAdministratorService;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;

@@ -2,26 +2,30 @@ checkIsAuthorized().then(() => {
   const cardTemplateName = 'freelancer/card';
   const popupTemplateName = 'freelancer/popup';
   const containerSelector = '#freelancer-cards';
+  const maxDescriptionLength = 70;
+  const cardDescriptionSelector = '.ui.card > .content > .description';
+  const modalsSelector = '.ui.modals';
+  const cardSelector = '.ui.link.card';
+  const getModalSelectorById = id => `#freelancer${id}.ui.modal`;
   const loadData = () => {
     freelancerService.getFreelancers().then(response => {
       const freelancers = response.body;
       $.get(templateHelper.getTemplatePath(cardTemplateName)).done(cardBody => {
         $.tmpl(cardBody, freelancers).appendTo(containerSelector);
-        limitContentText('.ui.card > .content > .description', 70);
+        limitContentText(cardDescriptionSelector, maxDescriptionLength);
         $.get(templateHelper.getTemplatePath(popupTemplateName)).
           done(popupBody => {
-            $('.ui.modals').remove();
+            $(modalsSelector).remove(); // Remove previous placed by Semantic UI modals
             $.tmpl(popupBody, freelancers).appendTo(containerSelector);
-            $('.ui.link.card').unbind();
-            $('.ui.link.card').click(function(event) {
+            $(cardSelector).unbind();
+            $(cardSelector).click(function(event) {
               event.preventDefault();
               const id = $(this).attr('id');
-              $(`#freelancer${id}.ui.modal`).modal('show');
+              $(getModalSelectorById(id)).modal('show');
             });
           });
       });
     });
   };
-  replacePage('freelancers');
-  loadData();
+  replacePage('freelancers').then(() => loadData());
 }).catch(() => redirectToPage('login'));

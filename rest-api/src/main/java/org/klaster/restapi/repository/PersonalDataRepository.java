@@ -7,7 +7,7 @@ package org.klaster.restapi.repository;
  *
  * 2/27/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import org.klaster.domain.model.entity.PersonalData;

@@ -10,7 +10,7 @@ package org.klaster.restapi.controller;
 import java.io.FileInputStream;
 import java.io.IOException;
 import org.klaster.domain.model.entity.FileInfo;
-import org.klaster.restapi.service.FileService;
+import org.klaster.restapi.service.DefaultFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -36,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileInfoController {
 
   @Autowired
-  private FileService defaultFileService;
+  private DefaultFileService defaultFileService;
 
   @PostMapping
   public ResponseEntity<FileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {

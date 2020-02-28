@@ -5,7 +5,7 @@ package org.klaster.restapi.dto;/*
  *
  * 2/27/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

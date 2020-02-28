@@ -11,8 +11,7 @@ import java.util.List;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.dto.LoginInfoDTO;
-import org.klaster.restapi.repository.RoleRepository;
-import org.klaster.restapi.service.AdministratorService;
+import org.klaster.restapi.service.DefaultAdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,33 +36,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdministratorController {
 
   @Autowired
-  private RoleRepository roleRepository;
-
-  @Autowired
-  private AdministratorService administratorService;
+  private DefaultAdministratorService defaultAdministratorService;
 
   @GetMapping
   public ResponseEntity<List<User>> findAll() {
-    return ResponseEntity.ok(administratorService.findAll());
+    return ResponseEntity.ok(defaultAdministratorService.findAll());
   }
 
 
   @GetMapping("/{id}")
   public ResponseEntity<User> findById(@PathVariable long id) {
-    User foundAdministrator = administratorService.findById(id);
+    User foundAdministrator = defaultAdministratorService.findById(id);
     return ResponseEntity.ok(foundAdministrator);
   }
 
   @PostMapping
   public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
-    User registeredAdministrator = administratorService.registerAdministrator(loginInfo);
+    User registeredAdministrator = defaultAdministratorService.registerAdministrator(loginInfo);
     return new ResponseEntity<>(registeredAdministrator, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<User> delete(@PathVariable long id) {
-    User deletedAdministrator = administratorService.deleteById(id);
+    User deletedAdministrator = defaultAdministratorService.deleteById(id);
     return ResponseEntity.accepted()
                          .body(deletedAdministrator);
   }

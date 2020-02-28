@@ -6,7 +6,7 @@ package org.klaster.domain.builder;
  *
  * 2/20/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import org.klaster.domain.model.entity.Role;

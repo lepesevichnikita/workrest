@@ -1,26 +1,33 @@
-replacePage('jobs').then(() => {
+{
   const cardTemplateName = 'job/card';
   const popupTemplateName = 'job/popup';
   const containerSelector = '#job-cards';
+  const maxDescriptionLength = 70;
+  const cardDescriptionSelector = '.ui.card > .content > .description';
+  const modalsSelector = '.ui.modals';
+  const cardSelector = '.ui.link.card';
+  const getModalSelectorById = id => `#job${id}.ui.modal`;
   const loadData = () => {
-    jobService.getJobs().then((response) => {
+    jobService.getJobs().then(response => {
       const jobs = response.body;
       $.get(templateHelper.getTemplatePath(cardTemplateName), cardBody => {
         $.tmpl(cardBody, jobs).appendTo(containerSelector);
-        limitContentText('.ui.card > .content > .description', 70);
+        limitContentText(cardDescriptionSelector, maxDescriptionLength);
         $.get(templateHelper.getTemplatePath(popupTemplateName), popupBody => {
-          $('.ui.modals').remove();
+          $(modalsSelector).remove();
           $.tmpl(popupBody, jobs).appendTo(containerSelector);
           $(containerSelector).dimmer('hide');
-          $('.ui.link.card').unbind();
-          $('.ui.link.card').click(function(event) {
+          $(cardSelector).unbind();
+          $(cardSelector).click(function(event) {
             event.preventDefault();
             const id = $(this).attr('id');
-            $(`#job${id}.ui.modal`).modal('show');
+            $(getModalSelectorById(id)).modal('show');
           });
         });
       });
     });
   };
-  loadData();
-});
+  replacePage('jobs').then(() => {
+    loadData();
+  });
+}

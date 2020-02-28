@@ -17,6 +17,7 @@ import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * UserDetailsServiceImplementation
@@ -31,7 +32,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   private TokenRepository tokenRepository;
 
   @Autowired
-  private LoginInfoService defaultLoginInfoService;
+  private DefaultLoginInfoService defaultLoginInfoService;
 
   @Autowired
   private ApplicationUserRepository applicationUserRepository;
@@ -42,6 +43,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     return applicationUserRepository.findFirstByLoginInfo(loginInfo);
   }
 
+  @Transactional
   @Override
   public Token createToken(String login, String password) {
     LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
@@ -61,6 +63,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     return foundUser;
   }
 
+  @Transactional
   @Override
   public Token deleteTokenByValue(String token) {
     Token foundToken = tokenRepository.findFirstByValue(token)
@@ -71,10 +74,6 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
 
   @Override
   public boolean hasTokenWithValue(String tokenValue) {
-    boolean hasToken = tokenRepository.existsByValue(tokenValue);
-    if (!hasToken) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class, "value", tokenValue));
-    }
-    return hasToken;
+    return tokenRepository.existsByValue(tokenValue);
   }
 }

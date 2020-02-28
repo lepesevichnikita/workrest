@@ -10,10 +10,6 @@ package org.klaster.restapi.configuration;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.klaster.restapi.service.AdministratorService;
-import org.klaster.restapi.service.DefaultUserService;
-import org.klaster.restapi.service.UserService;
-import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,20 +25,10 @@ import org.springframework.context.annotation.Configuration;
 public class TestContext {
 
   @Bean
-  public AdministratorService defaultAdministratorService() {
-    return Mockito.mock(AdministratorService.class);
-  }
-
-  @Bean
   public ObjectMapper objectMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     return objectMapper;
-  }
-
-  @Bean
-  public UserService defaultApplicationUserService() {
-    return Mockito.spy(new DefaultUserService());
   }
 
 }

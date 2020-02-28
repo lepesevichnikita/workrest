@@ -5,7 +5,7 @@ package org.klaster.restapi.service;/*
  *
  * 2/27/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import javax.persistence.EntityNotFoundException;
@@ -17,19 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DefaultPersonalDataService implements PersonalDataService {
+public class DefaultPersonalDataService {
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private PersonalDataRepository personalDataRepository;
 
-  @Override
   public PersonalData save(PersonalData personalData) {
     return personalDataRepository.save(personalData);
   }
 
-  @Override
   public PersonalData findByUserId(long id) {
     User foundUser = defaultUserService.findFirstById(id);
     if (foundUser.getPersonalData() == null) {
@@ -38,7 +36,6 @@ public class DefaultPersonalDataService implements PersonalDataService {
     return foundUser.getPersonalData();
   }
 
-  @Override
   public PersonalData updateByUserId(long id, PersonalData personalData) {
     User foundUser = defaultUserService.findFirstById(id);
     foundUser.getCurrentState()
@@ -46,7 +43,6 @@ public class DefaultPersonalDataService implements PersonalDataService {
     return personalDataRepository.save(personalData);
   }
 
-  @Override
   public PersonalData verifyByUserId(long id) {
     PersonalData foundPersonalData = findByUserId(id);
     defaultUserService.verifyById(id);

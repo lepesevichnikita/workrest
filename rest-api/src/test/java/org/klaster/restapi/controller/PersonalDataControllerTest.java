@@ -21,10 +21,10 @@ import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.dto.PersonalDataForAdministratorDTO;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.factory.RandomPersonalDataFactory;
-import org.klaster.restapi.service.AdministratorService;
-import org.klaster.restapi.service.PersonalDataService;
+import org.klaster.restapi.service.DefaultAdministratorService;
+import org.klaster.restapi.service.DefaultPersonalDataService;
+import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.service.UserService;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +45,7 @@ import org.testng.annotations.Test;
  *
  * 2/27/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 @WebAppConfiguration
@@ -76,16 +76,16 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private AdministratorService defaultAdministratorService;
+  private DefaultAdministratorService defaultAdministratorService;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @Autowired
-  private PersonalDataService defaultPersonalDataService;
+  private DefaultPersonalDataService defaultPersonalDataService;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {

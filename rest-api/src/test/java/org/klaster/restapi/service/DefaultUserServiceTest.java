@@ -60,7 +60,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private ApplicationUserRepository applicationUserRepository;
@@ -140,9 +140,10 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     user = defaultUserService.registerUserByLoginInfo(loginInfo);
     AbstractUserState previousState = defaultUserService.verifyById(user.getId())
                                                         .getCurrentState();
-    defaultUserService.verifyById(user.getId());
-    assertThat(user.getCurrentState(), allOf(
-        hasProperty("class", equalTo(previousState.getClass())),
+    AbstractUserState currentState = defaultUserService.verifyById(user.getId())
+                                                       .getCurrentState();
+    assertThat(currentState, allOf(
+        isA(previousState.getClass()),
         hasProperty("id", equalTo(previousState.getId()))
     ));
   }

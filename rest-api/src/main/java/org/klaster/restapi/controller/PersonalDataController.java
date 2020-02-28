@@ -5,16 +5,16 @@ package org.klaster.restapi.controller;/*
  *
  * 2/27/20
  *
- * Copyright(c) Nikita Lepesevich
+ * Copyright(c) JazzTeam
  */
 
 import java.security.Principal;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.klaster.restapi.dto.PersonalDataForAdministratorDTO;
-import org.klaster.restapi.service.PersonalDataService;
+import org.klaster.restapi.service.DefaultPersonalDataService;
+import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,10 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class PersonalDataController {
 
   @Autowired
-  private PersonalDataService defaultPersonalDataService;
+  private DefaultPersonalDataService defaultPersonalDataService;
 
   @Autowired
-  private UserService defaultUserService;
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
