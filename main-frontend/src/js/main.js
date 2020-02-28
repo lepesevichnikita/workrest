@@ -1,4 +1,4 @@
-import {Action, AuthorizationService, FreelancerService} from './api';
+import {Action, AuthorizationService, FreelancerService, UserService} from './api';
 import {TemplateHelper} from './helper';
 
 const menuContainerId = '#menu';
@@ -94,6 +94,7 @@ window.loadScript = loadScript;
 window.authorizationService = new AuthorizationService();
 window.freelancerService = new FreelancerService();
 window.templateHelper = new TemplateHelper();
+window.userService = new UserService();
 window.redirectToPage = redirectToPage;
 window.defineFormSubmitCallback = defineFormSubmitCallback;
 window.checkIsAuthorized = checkIsAuthorized;
