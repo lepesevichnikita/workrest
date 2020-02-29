@@ -14,36 +14,36 @@ import org.klaster.domain.model.entity.Role;
 import org.springframework.stereotype.Component;
 
 /**
- * DefaultApplicationUserBuilder
+ * DefaultUserBuilder
  *
  * @author Nikita Lepesevich
  */
 
 @Component
-public class DefaultApplicationUserBuilder implements ApplicationUserBuilder {
+public class DefaultUserBuilder implements UserBuilder {
 
   private LoginInfo loginInfo;
   private Set<Role> roles;
   private long id;
 
-  public DefaultApplicationUserBuilder() {
+  public DefaultUserBuilder() {
     reset();
   }
 
   @Override
-  public ApplicationUserBuilder setLoginInfo(LoginInfo loginInfo) {
+  public UserBuilder setLoginInfo(LoginInfo loginInfo) {
     this.loginInfo = loginInfo;
     return this;
   }
 
   @Override
-  public ApplicationUserBuilder setRoles(Set<Role> roles) {
+  public UserBuilder setRoles(Set<Role> roles) {
     this.roles = roles;
     return this;
   }
 
   @Override
-  public ApplicationUserBuilder setId(long id) {
+  public UserBuilder setId(long id) {
     this.id = id;
     return this;
   }

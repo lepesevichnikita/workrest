@@ -168,12 +168,13 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   private void registerAdministrator() {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
-                                                 .setPassword(VALID_ADMIN_PASSWORD)
-                                                 .build();
-    defaultAdministratorService.registerAdministrator(loginInfo);
+    if (!defaultAdministratorService.existsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
+      LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
+                                                   .setPassword(VALID_ADMIN_PASSWORD)
+                                                   .build();
+      defaultAdministratorService.registerAdministrator(loginInfo);
+    }
     administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
                                                             .getValue();
   }
-
 }

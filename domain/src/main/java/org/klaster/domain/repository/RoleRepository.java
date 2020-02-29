@@ -1,4 +1,4 @@
-package org.klaster.restapi.repository;
+package org.klaster.domain.repository;
 
 /*
  * workrest

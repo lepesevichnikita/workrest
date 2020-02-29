@@ -11,8 +11,8 @@ import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
+import org.klaster.domain.builder.UserBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -21,8 +21,8 @@ import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
+import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.configuration.ApplicationContext;
-import org.klaster.restapi.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -54,7 +54,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private Faker faker;
 
   @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
+  private UserBuilder defaultUserBuilder;
 
   @Autowired
   private LoginInfoBuilder defaultLoginInfoBuilder;
@@ -63,7 +63,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private DefaultUserService defaultUserService;
 
   @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  private UserRepository userRepository;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
@@ -76,7 +76,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
                         .username();
     String password = faker.internet()
                            .password();
-    defaultApplicationUserBuilder.reset();
+    defaultUserBuilder.reset();
     defaultLoginInfoBuilder.reset();
     loginInfo = defaultLoginInfoBuilder.setLogin(login)
                                        .setPassword(password)

@@ -1,4 +1,4 @@
-package org.klaster.restapi.repository;
+package org.klaster.domain.repository;
 
 /*
  * workrest
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface ApplicationUserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
   User findFirstByLoginInfo(LoginInfo loginInfo);
 }

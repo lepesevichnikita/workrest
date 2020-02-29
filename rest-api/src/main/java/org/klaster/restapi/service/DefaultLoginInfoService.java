@@ -8,7 +8,7 @@ package org.klaster.restapi.service;
  */
 
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.restapi.repository.LoginInfoRepository;
+import org.klaster.domain.repository.LoginInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

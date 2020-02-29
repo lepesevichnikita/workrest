@@ -34,11 +34,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 public class User extends AbstractContext<AbstractUserState> implements UserDetails {
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   private LoginInfo loginInfo;
 
   @JsonManagedReference
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<Role> roles;
 
   @JsonIgnore
@@ -50,7 +50,7 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
   private EmployerProfile employerProfile;
 
   @JsonIgnore
-  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {

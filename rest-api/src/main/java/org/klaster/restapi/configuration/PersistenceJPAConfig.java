@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"org.klaster.restapi.repository"})
+@EnableJpaRepositories(basePackages = {"org.klaster.domain.repository"})
 @PropertySource(value = {"classpath:application.properties"})
 public class PersistenceJPAConfig {
 

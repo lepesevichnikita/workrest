@@ -58,7 +58,7 @@ public class DefaultJobBuilder implements JobBuilder {
 
   @Override
   public void reset() {
-    User user = new DefaultApplicationUserBuilder().build();
+    User user = new DefaultUserBuilder().build();
     AbstractUserState verifiedUserState = new VerifiedUserState();
     verifiedUserState.setContext(user);
     user.setCurrentState(verifiedUserState);

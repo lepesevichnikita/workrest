@@ -10,14 +10,16 @@ package org.klaster.restapi.service;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.persistence.EntityNotFoundException;
-import org.klaster.domain.builder.ApplicationUserBuilder;
+import org.klaster.domain.builder.UserBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
-import org.klaster.restapi.repository.ApplicationUserRepository;
-import org.klaster.restapi.repository.RoleRepository;
+import org.klaster.domain.repository.LoginInfoRepository;
+import org.klaster.domain.repository.RoleRepository;
+import org.klaster.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,21 +32,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultAdministratorService {
 
+  private static String[] administratorRolesNames = {RoleName.ADMINISTRATOR, RoleName.USER};
+
   @Autowired
   private RoleRepository roleRepository;
 
   @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  private UserRepository userRepository;
 
   @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
+  private LoginInfoRepository loginInfoRepository;
+
+  @Autowired
+  private UserBuilder defaultUserBuilder;
 
   public User registerAdministrator(LoginInfo loginInfo) {
-    Set<Role> administratorRoles = roleRepository.findOrCreateAllByNames(RoleName.ADMINISTRATOR, RoleName.USER);
-    User administrator = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                                      .setRoles(administratorRoles)
-                                                      .build();
-    return applicationUserRepository.save(administrator);
+    Set<Role> administratorRoles = getAdministratorRoles();
+    User registeredAdministrator = defaultUserBuilder.setLoginInfo(loginInfo)
+                                                     .setRoles(administratorRoles)
+                                                     .build();
+    return userRepository.save(registeredAdministrator);
   }
 
   public List<User> findAll() {
@@ -69,8 +76,25 @@ public class DefaultAdministratorService {
     deletedAdministrator.getRoles()
                         .removeIf(role -> role.getName()
                                               .equals(RoleName.SYSTEM_ADMINISTRATOR));
-    applicationUserRepository.save(deletedAdministrator);
+    userRepository.save(deletedAdministrator);
     return deletedAdministrator;
   }
 
+  public boolean existsByLoginAndPassword(String login, String password) {
+    boolean result = false;
+    LoginInfo foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password)
+                                                  .orElse(null);
+    if (foundLoginInfo != null) {
+      User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo);
+      result = foundUser.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .anyMatch(Predicate.isEqual(RoleName.ADMINISTRATOR));
+    }
+    return result;
+  }
+
+  private Set<Role> getAdministratorRoles() {
+    return roleRepository.findOrCreateAllByNames(administratorRolesNames);
+  }
 }

@@ -14,9 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.klaster.domain.builder.ApplicationUserBuilder;
 import org.klaster.domain.builder.LoginInfoBuilder;
 import org.klaster.domain.builder.RoleBuilder;
+import org.klaster.domain.builder.UserBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -72,7 +72,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
+  private UserBuilder defaultUserBuilder;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -90,7 +90,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @BeforeMethod
   public void reset() {
     defaultLoginInfoBuilder.reset();
-    defaultApplicationUserBuilder.reset();
+    defaultUserBuilder.reset();
   }
 
   @Test
@@ -100,10 +100,10 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = defaultRoleBuilder.setName(RoleName.ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User registeredAdministrator = defaultApplicationUserBuilder.setId(id)
-                                                                .setLoginInfo(loginInfo)
-                                                                .setRoles(Collections.singleton(role))
-                                                                .build();
+    User registeredAdministrator = defaultUserBuilder.setId(id)
+                                                     .setLoginInfo(loginInfo)
+                                                     .setRoles(Collections.singleton(role))
+                                                     .build();
     final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
     mockMvc.perform(post(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
@@ -136,13 +136,13 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = defaultRoleBuilder.setName(RoleName.SYSTEM_ADMINISTRATOR)
                                   .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                 .setRoles(Collections.singleton(role))
-                                 .build();
-    List<User> registeredAdministrators = Arrays.asList(defaultApplicationUserBuilder.setId(0)
-                                                                                     .build(),
-                                                        defaultApplicationUserBuilder.setId(1)
-                                                                                                .build());
+    defaultUserBuilder.setLoginInfo(loginInfo)
+                      .setRoles(Collections.singleton(role))
+                      .build();
+    List<User> registeredAdministrators = Arrays.asList(defaultUserBuilder.setId(0)
+                                                                          .build(),
+                                                        defaultUserBuilder.setId(1)
+                                                                          .build());
     when(defaultAdministratorService.findAll()).thenReturn(registeredAdministrators);
     final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
     mockMvc.perform(get(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
@@ -158,9 +158,9 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     Role role = new Role();
     role.setName(RoleName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User expectedAdministrator = defaultApplicationUserBuilder.setId(id)
-                                                              .setLoginInfo(loginInfo)
-                                                              .build();
+    User expectedAdministrator = defaultUserBuilder.setId(id)
+                                                   .setLoginInfo(loginInfo)
+                                                   .build();
     final String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
     mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
                                .accept(MediaType.APPLICATION_JSON_VALUE))

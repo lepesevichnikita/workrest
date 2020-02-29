@@ -154,7 +154,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                 .getValue();
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String personalDataDTOAsJson = objectMapper.writeValueAsString(PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -175,7 +176,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   public void unauthenticatedForPutWithInvalidToken() throws Exception {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String personalDataDTOAsJson = objectMapper.writeValueAsString(PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, INVALID_TOKEN)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -187,7 +189,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   public void unauthenticatedForPutWithAdministratorToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
-    final String personalDataDTOAsJson = objectMapper.writeValueAsString(PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -206,10 +209,12 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   }
 
   private void registerAdministrator() {
-    LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
-                                                 .setPassword(VALID_ADMIN_PASSWORD)
-                                                 .build();
-    defaultAdministratorService.registerAdministrator(loginInfo);
+    if (!defaultAdministratorService.existsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
+      LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
+                                                   .setPassword(VALID_ADMIN_PASSWORD)
+                                                   .build();
+      defaultAdministratorService.registerAdministrator(loginInfo);
+    }
     administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
                                                             .getValue();
   }

@@ -11,7 +11,7 @@ package org.klaster.restapi.service;/*
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.restapi.repository.PersonalDataRepository;
+import org.klaster.domain.repository.PersonalDataRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -13,16 +13,16 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Role;
 
 /**
- * ApplicationUserBuilder
+ * UserBuilder
  *
  * @author Nikita Lepesevich
  */
 
-public interface ApplicationUserBuilder extends Builder<User> {
+public interface UserBuilder extends Builder<User> {
 
-  ApplicationUserBuilder setLoginInfo(LoginInfo loginInfo);
+  UserBuilder setLoginInfo(LoginInfo loginInfo);
 
-  ApplicationUserBuilder setRoles(Set<Role> roles);
+  UserBuilder setRoles(Set<Role> roles);
 
-  ApplicationUserBuilder setId(long id);
+  UserBuilder setId(long id);
 }

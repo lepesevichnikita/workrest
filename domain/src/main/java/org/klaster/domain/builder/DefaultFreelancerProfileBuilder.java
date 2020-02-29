@@ -43,7 +43,7 @@ public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder
   @Override
   public void reset() {
     skills = new LinkedHashSet<>();
-    owner = new DefaultApplicationUserBuilder().build();
+    owner = new DefaultUserBuilder().build();
   }
 
   @Override

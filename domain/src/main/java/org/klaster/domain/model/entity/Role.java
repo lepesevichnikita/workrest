@@ -9,6 +9,7 @@ package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,7 +33,7 @@ public class Role {
   private long id;
 
   @JsonIgnore
-  @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
   private Set<User> users;
 
   @Column(nullable = false, unique = true)

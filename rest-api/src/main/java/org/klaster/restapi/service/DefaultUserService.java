@@ -9,7 +9,7 @@ package org.klaster.restapi.service;
 
 import java.util.Collections;
 import javax.persistence.EntityNotFoundException;
-import org.klaster.domain.builder.ApplicationUserBuilder;
+import org.klaster.domain.builder.UserBuilder;
 import org.klaster.domain.constant.RoleName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -18,9 +18,9 @@ import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
-import org.klaster.restapi.repository.ApplicationUserRepository;
-import org.klaster.restapi.repository.LoginInfoRepository;
-import org.klaster.restapi.repository.RoleRepository;
+import org.klaster.domain.repository.LoginInfoRepository;
+import org.klaster.domain.repository.RoleRepository;
+import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,10 +39,10 @@ public class DefaultUserService {
   private LoginInfoRepository loginInfoRepository;
 
   @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  private UserRepository userRepository;
 
   @Autowired
-  private ApplicationUserBuilder defaultApplicationUserBuilder;
+  private UserBuilder defaultUserBuilder;
 
   @Autowired
   private RoleRepository roleRepository;
@@ -55,62 +55,58 @@ public class DefaultUserService {
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
-    User user = defaultApplicationUserBuilder.setLoginInfo(loginInfo)
-                                             .setRoles(Collections.singleton(role))
-                                             .build();
-    return applicationUserRepository.save(user);
+    User user = defaultUserBuilder.setLoginInfo(loginInfo)
+                                  .setRoles(Collections.singleton(role))
+                                  .build();
+    return userRepository.save(user);
   }
 
   @Transactional
   public User deleteById(long id) {
-    User deletedUser = applicationUserRepository.findById(id)
-                                                .orElseThrow(EntityNotFoundException::new);
+    User deletedUser = userRepository.findById(id)
+                                     .orElseThrow(EntityNotFoundException::new);
     deletedUser.setCurrentState(new DeletedUserState());
-    return applicationUserRepository.save(deletedUser);
-  }
-
-  public User findFirstByLoginInfo(LoginInfo loginInfo) {
-    return applicationUserRepository.findFirstByLoginInfo(loginInfo);
+    return userRepository.save(deletedUser);
   }
 
   public long count() {
-    return applicationUserRepository.count();
+    return userRepository.count();
   }
 
   @Transactional
   public User blockById(long id) {
-    User foundUser = applicationUserRepository.findById(id)
-                                              .orElseThrow(EntityNotFoundException::new);
+    User foundUser = userRepository.findById(id)
+                                   .orElseThrow(EntityNotFoundException::new);
     foundUser.setCurrentState(new BlockedUserState());
-    return applicationUserRepository.save(foundUser);
+    return userRepository.save(foundUser);
   }
 
   @Transactional
   public User unblockById(long id) {
-    User foundUser = applicationUserRepository.findById(id)
-                                              .orElseThrow(EntityNotFoundException::new);
+    User foundUser = userRepository.findById(id)
+                                   .orElseThrow(EntityNotFoundException::new);
     if (foundUser.getCurrentState() instanceof BlockedUserState) {
       AbstractUserState previousState = foundUser.getPreviousState();
       if (previousState != null) {
         foundUser.setCurrentState(previousState);
       }
     }
-    return applicationUserRepository.save(foundUser);
+    return userRepository.save(foundUser);
   }
 
   public User findFirstById(long id) {
-    return applicationUserRepository.findById(id)
-                                    .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
+    return userRepository.findById(id)
+                         .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
   @Transactional
   public User verifyById(long id) {
-    User foundUser = applicationUserRepository.findById(id)
-                                              .orElseThrow(EntityNotFoundException::new);
+    User foundUser = userRepository.findById(id)
+                                   .orElseThrow(EntityNotFoundException::new);
     if (!(foundUser.getCurrentState() instanceof VerifiedUserState)) {
       foundUser.setCurrentState(new VerifiedUserState());
     }
-    return applicationUserRepository.save(foundUser);
+    return userRepository.save(foundUser);
   }
 
 }

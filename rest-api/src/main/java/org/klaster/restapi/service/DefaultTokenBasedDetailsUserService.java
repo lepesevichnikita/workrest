@@ -11,8 +11,8 @@ import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
-import org.klaster.restapi.repository.ApplicationUserRepository;
-import org.klaster.restapi.repository.TokenRepository;
+import org.klaster.domain.repository.TokenRepository;
+import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,12 +35,12 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   private DefaultLoginInfoService defaultLoginInfoService;
 
   @Autowired
-  private ApplicationUserRepository applicationUserRepository;
+  private UserRepository userRepository;
 
   @Override
   public UserDetails loadUserByUsername(String login) {
     LoginInfo loginInfo = defaultLoginInfoService.findFirstByLogin(login);
-    return applicationUserRepository.findFirstByLoginInfo(loginInfo);
+    return userRepository.findFirstByLoginInfo(loginInfo);
   }
 
   @Transactional
@@ -58,7 +58,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     Token foundToken = tokenRepository.findFirstByValue(token)
                                       .orElse(null);
     if (foundToken != null) {
-      foundUser = applicationUserRepository.findFirstByLoginInfo(foundToken.getLoginInfo());
+      foundUser = userRepository.findFirstByLoginInfo(foundToken.getLoginInfo());
     }
     return foundUser;
   }

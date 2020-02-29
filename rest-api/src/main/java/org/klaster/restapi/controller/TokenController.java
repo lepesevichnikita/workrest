@@ -7,10 +7,12 @@ package org.klaster.restapi.controller;
  *
  */
 
+import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.dto.TokenDTO;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
+import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +50,9 @@ public class TokenController {
 
   @PostMapping("/verify")
   public ResponseEntity<TokenDTO> verify(@RequestBody TokenDTO tokenDTO) {
-    defaultTokenBasedUserDetailsService.hasTokenWithValue(tokenDTO.getToken());
+    if (!defaultTokenBasedUserDetailsService.hasTokenWithValue(tokenDTO.getToken())) {
+      throw new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class, "value", tokenDTO.getToken()));
+    }
     return ResponseEntity.ok(tokenDTO);
   }
 }

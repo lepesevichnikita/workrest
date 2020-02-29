@@ -38,7 +38,7 @@ public class LoginInfo {
   private String password;
 
   @JsonIgnore
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo")
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo", orphanRemoval = true)
   private Set<Token> tokens;
 
   public long getId() {

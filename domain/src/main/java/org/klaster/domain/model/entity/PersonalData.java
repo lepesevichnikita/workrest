@@ -39,7 +39,7 @@ public class PersonalData {
   private String lastName;
 
   @JsonIgnore
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   private FileInfo documentScan;
 
   @JsonIgnore
