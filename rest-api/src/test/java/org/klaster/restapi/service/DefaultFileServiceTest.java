@@ -4,19 +4,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
+import java.nio.file.attribute.FileTime;
+import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
+import org.klaster.restapi.configuration.FilesConfig;
+import org.klaster.restapi.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -39,31 +40,32 @@ import org.testng.annotations.Test;
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
 
+  @Autowired
+  private FilesConfig filesConfig;
+
   private final static String FILE_INPUT_FOLDER = "input";
   private final static String INPUT_FILE_NAME = "image.jpg";
   private final static String OUTPUT_FILE_NAME = "image.jpg";
 
-  private ClassLoader classloader;
-  private File inputFolder;
-
-  @Autowired
-  private DefaultFileService defaultFileService;
   private String inputFilePath;
   private String outputFilePath;
 
+
+  @Autowired
+  private DefaultFileService defaultFileService;
+
   @BeforeClass
   public void setup() {
-    classloader = Thread.currentThread()
-                        .getContextClassLoader();
-    URL url = getClass().getResource(FILE_INPUT_FOLDER);
-    inputFolder = new File(url.getPath());
-    inputFilePath = inputFolder.getPath()
-                               .concat("/")
-                               .concat(INPUT_FILE_NAME);
-    outputFilePath = inputFolder.getParentFile()
-                                .getPath()
-                                .concat("/")
-                                .concat(OUTPUT_FILE_NAME);
+    ClassLoader classloader = Thread.currentThread()
+                                    .getContextClassLoader();
+    String inputFolderPath = classloader.getResource(FILE_INPUT_FOLDER)
+                                        .getPath();
+    inputFilePath = new File(inputFolderPath.concat("/")
+                                            .concat(INPUT_FILE_NAME)).getPath();
+    outputFilePath = new File(filesConfig.getOutputFolder()
+                                         .getPath()
+                                         .concat("/")
+                                         .concat(INPUT_FILE_NAME)).getPath();
   }
 
   @AfterClass
@@ -72,21 +74,53 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void createsFile() throws FileNotFoundException {
+  public void createsFile() throws IOException {
     InputStream inputStream = new FileInputStream(inputFilePath);
-    FileInfo savedFile = defaultFileService.saveFile(inputStream);
+    FileInfo savedFile = defaultFileService.saveFile(inputStream, OUTPUT_FILE_NAME);
     assertThat(savedFile, allOf(
         hasProperty("id", notNullValue()),
-        hasProperty("md5", notNullValue()),
+        hasProperty("md5", equalTo(FileUtil.getHexMd5OfInputStream(inputStream))),
         hasProperty("path", equalTo(outputFilePath))
     ));
+    defaultFileService.deleteByID(savedFile.getId());
+  }
+
+  @Test
+  public void findsFile() throws IOException {
+    final String newOutputFilePath = OUTPUT_FILE_NAME.concat("2");
+    InputStream inputStream = new FileInputStream(inputFilePath);
+    FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFilePath);
+    assertThat(defaultFileService.findFirstById(savedFile.getId()), notNullValue());
+  }
+
+  @Test
+  public void overWritesExistedFile() throws IOException {
+    final String newOutputFileName = OUTPUT_FILE_NAME.concat("3");
+    InputStream inputStream = new FileInputStream(inputFilePath);
+    FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
+    FileTime firstSaveTime = Files.getLastModifiedTime(new File(savedFile.getPath()).toPath());
+    FileInfo anotherSavedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
+    FileTime overwriteTime = Files.getLastModifiedTime(new File(anotherSavedFile.getPath()).toPath());
+    assertThat(firstSaveTime, not(equalTo(overwriteTime)));
+  }
+
+
+  @Test(expectedExceptions = EntityNotFoundException.class)
+  public void throwsEntityNotFoundForBadFileInfoId() throws IOException {
+    final long invalidId = 100000000L;
+    defaultFileService.deleteByID(invalidId);
   }
 
   private void deleteOutputFiles() throws IOException {
-    Files.walk(inputFolder.toPath())
-         .sorted(Comparator.reverseOrder())
-         .map(Path::toFile)
-         .forEach(File::delete);
+    Files.walk(filesConfig.getOutputFolder()
+                          .toPath())
+         .forEach(path -> {
+           try {
+             Files.delete(path);
+           } catch (IOException e) {
+             logger.error(e);
+           }
+         });
   }
 
 }

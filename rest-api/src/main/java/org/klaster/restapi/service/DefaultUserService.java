@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
+@Transactional
 public class DefaultUserService {
 
   @Autowired
@@ -52,7 +53,6 @@ public class DefaultUserService {
                                                   .getLogin());
   }
 
-  @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
     User user = defaultUserBuilder.setLoginInfo(loginInfo)
@@ -61,7 +61,6 @@ public class DefaultUserService {
     return userRepository.save(user);
   }
 
-  @Transactional
   public User deleteById(long id) {
     User deletedUser = userRepository.findById(id)
                                      .orElseThrow(EntityNotFoundException::new);
@@ -73,7 +72,6 @@ public class DefaultUserService {
     return userRepository.count();
   }
 
-  @Transactional
   public User blockById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
@@ -81,7 +79,6 @@ public class DefaultUserService {
     return userRepository.save(foundUser);
   }
 
-  @Transactional
   public User unblockById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
@@ -99,7 +96,6 @@ public class DefaultUserService {
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
-  @Transactional
   public User verifyById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
@@ -108,5 +104,4 @@ public class DefaultUserService {
     }
     return userRepository.save(foundUser);
   }
-
 }

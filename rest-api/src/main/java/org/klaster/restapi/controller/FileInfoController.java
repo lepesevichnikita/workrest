@@ -7,16 +7,15 @@ package org.klaster.restapi.controller;
  *
  */
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import javax.servlet.http.HttpServletResponse;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.restapi.service.DefaultFileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,15 +39,15 @@ public class FileInfoController {
 
   @PostMapping
   public ResponseEntity<FileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
-    return new ResponseEntity<>(defaultFileService.saveFile(file.getInputStream()), HttpStatus.CREATED);
+    FileInfo savedFileInfo = defaultFileService.saveFile(file.getInputStream(), file.getOriginalFilename());
+    return new ResponseEntity<>(savedFileInfo, HttpStatus.CREATED);
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<InputStreamResource> findByName(@PathVariable long id) throws IOException {
-    InputStreamResource result = new InputStreamResource(new FileInputStream(defaultFileService.findFirstById(id)));
-    MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-    headers.add("Content-Length", String.valueOf(result.contentLength()));
-    return new ResponseEntity<>(result, headers, HttpStatus.OK);
-  }
 
+  @GetMapping(value = "/{id}")
+  public void getFile(@PathVariable("id") long id, HttpServletResponse response) throws IOException {
+    InputStream foundFileInputStream = defaultFileService.findFirstById(id);
+    StreamUtils.copy(foundFileInputStream, response.getOutputStream());
+    response.flushBuffer();
+  }
 }

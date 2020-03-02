@@ -8,8 +8,19 @@ package org.klaster.restapi.service;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import javax.persistence.EntityNotFoundException;
+import org.klaster.domain.builder.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
+import org.klaster.domain.repository.FileInfoRepository;
+import org.klaster.restapi.configuration.FilesConfig;
+import org.klaster.restapi.util.FileUtil;
+import org.klaster.restapi.util.MessageUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,11 +32,57 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultFileService {
 
-  public FileInfo saveFile(InputStream inputStream) {
-    return new FileInfo();
+  private FileInfoBuilder defaultFileInfoBuilder;
+
+  private FileInfoRepository fileInfoRepository;
+
+  private FilesConfig filesConfig;
+
+  @Autowired
+  public DefaultFileService(FileInfoBuilder defaultFileInfoBuilder, FileInfoRepository fileInfoRepository, FilesConfig filesConfig) throws IOException {
+    this.defaultFileInfoBuilder = defaultFileInfoBuilder;
+    this.fileInfoRepository = fileInfoRepository;
+    this.filesConfig = filesConfig;
+    initializeOutputFolder();
   }
 
-  public File findFirstById(long id) {
-    return new File("image.png");
+  public FileInfo saveFile(InputStream inputStream, String outputFileName) throws IOException {
+    File resultFile = FileUtil.makeChildItem(filesConfig.getOutputFolder(), outputFileName);
+    overwriteFile(resultFile, inputStream);
+    defaultFileInfoBuilder.setMd5(FileUtil.getHexMd5OfInputStream(inputStream))
+                          .setPath(resultFile.getPath());
+    return fileInfoRepository.save(defaultFileInfoBuilder.build());
+  }
+
+  public FileInputStream findFirstById(long id) throws FileNotFoundException {
+    FileInfo foundFileInfo = fileInfoRepository.findById(id)
+                                               .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(FileInfo.class, id)));
+    File foundFile = new File(foundFileInfo.getPath());
+    return new FileInputStream(foundFile);
+  }
+
+  public FileInfo deleteByID(long id) throws IOException {
+    FileInfo removedFileInfo = fileInfoRepository.findById(id)
+                                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(FileInfo.class, id)));
+    File deletedFile = new File(removedFileInfo.getPath());
+    Files.delete(deletedFile.toPath());
+    fileInfoRepository.delete(removedFileInfo);
+    return removedFileInfo;
+  }
+
+  private void initializeOutputFolder() throws IOException {
+    File outputFolder = filesConfig.getOutputFolder();
+    if (!outputFolder.exists()) {
+      Files.createDirectory(filesConfig.getOutputFolder()
+                                       .toPath());
+    }
+  }
+
+
+  private void overwriteFile(File overwritedFile, InputStream source) throws IOException {
+    if (overwritedFile.exists()) {
+      Files.delete(overwritedFile.toPath());
+    }
+    Files.copy(source, overwritedFile.toPath());
   }
 }
