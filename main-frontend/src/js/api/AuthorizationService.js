@@ -1,21 +1,11 @@
 import {RestClient} from './RestClient.js';
-import Action from './Action.js';
+import {Action} from './Action.js';
+import {ContentType, Subscribable} from '../model';
 
-export class AuthorizationService {
+export class AuthorizationService extends Subscribable {
   constructor() {
+    super();
     this._restClient = new RestClient();
-    this._subscribers = {};
-  }
-
-  subscribe(actionName, callback) {
-    const callbacks = this._subscribers[actionName] || [];
-    this._subscribers[actionName] = [...callbacks, callback];
-    return this;
-  }
-
-  notifyAllSubscribers(actionName, data) {
-    const callbacks = this._subscribers[actionName] || [];
-    callbacks.forEach(callback => callback(data));
   }
 
   hasToken() {
@@ -25,6 +15,8 @@ export class AuthorizationService {
   verifyToken() {
     return new Promise((resolve, reject) => {
       this._restClient.post('token/verify').
+           accept(ContentType.APPLICATION_JSON).
+           set('Content-Type', ContentType.APPLICATION_JSON).
            send(this.getToken()).
            then(response => {
              this.notifyAllSubscribers(Action.TOKEN_CORRECT);
@@ -38,21 +30,28 @@ export class AuthorizationService {
   }
 
   getToken() {
-    return localStorage.getItem(AuthorizationService.TOKEN);
+    return JSON.parse(localStorage.getItem(AuthorizationService.TOKEN));
   }
 
   signIn(loginInfo) {
     return new Promise((resolve, reject) => {
-      this._restClient.post('token').send(loginInfo).then(response => {
-        localStorage.setItem(AuthorizationService.TOKEN, response.text);
-        this.notifyAllSubscribers(Action.SIGNED_IN, response.text);
-        resolve(response);
-      }).catch(reject);
+      this._restClient.post('token').
+           accept(ContentType.APPLICATION_JSON).
+           set('Content-Type', ContentType.APPLICATION_JSON).
+           send(loginInfo).
+           then(response => {
+             localStorage.setItem(AuthorizationService.TOKEN, response.text);
+             this.notifyAllSubscribers(Action.SIGNED_IN, response.text);
+             resolve(response);
+           }).
+           catch(reject);
     });
   }
 
   signOut() {
     this._restClient.delete('token').
+         accept(ContentType.APPLICATION_JSON).
+         set('Content-Type', ContentType.APPLICATION_JSON).
          send(this.getToken()).
          then().
          finally(() => {
@@ -63,10 +62,15 @@ export class AuthorizationService {
 
   signUp(loginInfo) {
     return new Promise((resolve, reject) => {
-      this._restClient.post('users').send(loginInfo).then(response => {
-        resolve(response);
-        this.notifyAllSubscribers(Action.SIGNED_UP);
-      }).catch(reject);
+      this._restClient.post('users').
+           accept(ContentType.APPLICATION_JSON).
+           set('Content-Type', ContentType.APPLICATION_JSON).
+           send(loginInfo).
+           then(response => {
+             resolve(response);
+             this.notifyAllSubscribers(Action.SIGNED_UP);
+           }).
+           catch(reject);
     });
   }
 }

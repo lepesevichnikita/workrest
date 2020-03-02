@@ -1,0 +1,65 @@
+<div class="ui page container middle aligned center aligned grid">
+  <div class="column">
+    <h1 class="ui center aligned header icon">
+      <i class="paw icon"></i>
+      Personal data verification
+    </h1>
+    <form class="ui large form" id="personalDataForm">
+      <div class="ui loader"></div>
+      <div class="ui segment">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input
+                name="firstName"
+                placeholder="Enter your first name"
+                type="text"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user outline icon"></i>
+            <input
+                name="lastName"
+                placeholder="Enter your last name"
+                type="text"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="address card outline icon"></i>
+            <input
+                name="documentName"
+                placeholder="Enter document name"
+                type="text"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="address card icon"></i>
+            <input
+                name="documentNumber"
+                placeholder="Enter document number"
+                type="text"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon fluid button" id="fileChooseButton">
+            <i class="file icon"></i>
+            Choose document scan
+          </div>
+        </div>
+        <input
+            class="ui fluid large primary submit button"
+            type="submit"
+            value="Send"
+        />
+      </div>
+    </form>
+    <input hidden name="file" type="file"/>
+  </div>
+</div>

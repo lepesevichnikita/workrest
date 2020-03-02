@@ -2,8 +2,21 @@ import {
   Action, AuthorizationService, FreelancerService, JobService, UserService,
 } from './api';
 import {TemplateHelper} from './helper';
+import {
+  Freelancers, Home, Jobs, Login, PersonalData, SignUp, User,
+} from './page';
 
 const menuContainerId = '#menu';
+
+const pages = {
+  home: new Home(),
+  user: new User(),
+  freelancers: new Freelancers(),
+  jobs: new Jobs(),
+  login: new Login(),
+  signup: new SignUp(),
+  personal_data: new PersonalData(),
+};
 
 const formToObject = form => {
   const formData = new FormData(form);
@@ -59,8 +72,9 @@ export const defineFormSubmitCallback = (form, submitCallback) => {
 
 export const getPageScriptUrl = pageName => `src/js/page/${pageName}.js`;
 
-export const redirectToPage = pageName => loadScript(
-    getPageScriptUrl(pageName));
+export const redirectToPage = pageName => {
+  pages[pageName].process();
+};
 
 export const loadScript = url => new Promise(function(resolve, reject) {
   $.get(url).done(resolve).catch(reject);
@@ -110,7 +124,7 @@ authorizationService.subscribe(Action.SIGNED_IN, () => {
   loadMenu('main');
   redirectToPage('login');
 }).subscribe(Action.SIGNED_UP, () => {
-  redirectToPage('login');
+  redirectToPage('personal_data');
 }).subscribe(Action.TOKEN_CORRECT, () => {
   loadMenu('authorized');
 }).subscribe(Action.TOKEN_INCORRECT, () => {
@@ -120,4 +134,4 @@ authorizationService.subscribe(Action.SIGNED_IN, () => {
 checkIsAuthorized().
 then(() => loadMenu('authorized')).
 catch(() => loadMenu('main')).
-finally(() => redirectToPage('home'));
+finally(() => replacePage('home'));

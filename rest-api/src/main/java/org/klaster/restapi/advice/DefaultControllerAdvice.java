@@ -26,7 +26,7 @@ public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<String> handle(EntityNotFoundException exception) {
-    logger.warn(exception);
+    logger.error(exception);
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
   }
 

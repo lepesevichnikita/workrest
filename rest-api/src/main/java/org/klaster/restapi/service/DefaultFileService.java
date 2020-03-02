@@ -61,7 +61,7 @@ public class DefaultFileService {
     return new FileInputStream(foundFile);
   }
 
-  public FileInfo deleteByID(long id) throws IOException {
+  public FileInfo deleteById(long id) throws IOException {
     FileInfo removedFileInfo = fileInfoRepository.findById(id)
                                                  .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(FileInfo.class, id)));
     File deletedFile = new File(removedFileInfo.getPath());

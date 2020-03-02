@@ -82,7 +82,6 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
         hasProperty("md5", equalTo(FileUtil.getHexMd5OfInputStream(inputStream))),
         hasProperty("path", equalTo(outputFilePath))
     ));
-    defaultFileService.deleteByID(savedFile.getId());
   }
 
   @Test
@@ -108,7 +107,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   @Test(expectedExceptions = EntityNotFoundException.class)
   public void throwsEntityNotFoundForBadFileInfoId() throws IOException {
     final long invalidId = 100000000L;
-    defaultFileService.deleteByID(invalidId);
+    defaultFileService.deleteById(invalidId);
   }
 
   private void deleteOutputFiles() throws IOException {

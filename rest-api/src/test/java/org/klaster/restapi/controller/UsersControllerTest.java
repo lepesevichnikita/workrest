@@ -100,7 +100,6 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     defaultLoginInfoBuilder.reset();
   }
 
-
   @Test
   public void registersUniqueUser() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);

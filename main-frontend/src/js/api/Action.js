@@ -4,6 +4,7 @@ export const Action = {
   SIGNED_IN: 'signed_in',
   SIGNED_UP: 'signed_up',
   LOGGED_OUT: 'logged_out',
+  LOADING_PROGRESS: 'loading_progress',
 };
 
 export default Action;
