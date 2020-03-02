@@ -1,7 +1,7 @@
-import {AuthorizationService} from './AuthorizationService.js';
-import {RestClient} from './RestClient.js';
-import {Subscribable} from '../model';
-import {Action} from './Action.js';
+import {AuthorizationService} from "./AuthorizationService.js";
+import {RestClient} from "./RestClient.js";
+import {Subscribable} from "../model";
+import {Action} from "../constant";
 
 export class FileService extends Subscribable {
   constructor() {
@@ -12,14 +12,15 @@ export class FileService extends Subscribable {
 
   uploadFile(file) {
     return new Promise((resolve, reject) => {
-      this._restClient.post('file').
-           secured(this._authorizationService.getToken().token).
-           attach('file', file).
-           on('progress', event => {
-             this.notifyAllSubscribers(Action.LOADING_PROGRESS, event);
-           }).
-           then(resolve).
-           catch(reject);
+      this._restClient
+          .post("file")
+          .secured(this._authorizationService.getToken().token)
+          .attach("file", file)
+          .on("progress", event => {
+            this.notifyAllSubscribers(Action.LOADING_PROGRESS, event);
+          })
+          .then(resolve)
+          .catch(reject);
     });
   }
 }

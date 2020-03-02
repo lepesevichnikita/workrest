@@ -1,11 +1,14 @@
-import Page from './Page.js';
+import {Page} from "./Page.js";
 
 export class User extends Page {
   process() {
-    checkIsAuthorized().then(() => {
-      replacePage('user').then(() => super.process());
-    }).catch(() => {
-      redirectToPage('login');
+    checkIsAuthorized()
+    .then(() => {
+      replacePage("user")
+      .then(() => super.process());
+    })
+    .catch(() => {
+      redirectToPage("login");
     });
   }
 }

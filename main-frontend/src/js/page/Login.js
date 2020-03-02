@@ -12,6 +12,7 @@ export class Login extends Page {
                                                           dimmer('hide');
                                                         });
       defineFormSubmitCallback(form, sendForm);
+      super.process();
     }));
   }
 }

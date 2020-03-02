@@ -13,7 +13,6 @@ export class Token extends Serializable {
   set token(value) {
     this._token = value;
   }
-
 }
 
 export default Token;

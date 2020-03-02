@@ -50,7 +50,7 @@ public class DefaultFileService {
     File resultFile = FileUtil.makeChildItem(filesConfig.getOutputFolder(), outputFileName);
     overwriteFile(resultFile, inputStream);
     defaultFileInfoBuilder.setMd5(FileUtil.getHexMd5OfInputStream(inputStream))
-                          .setPath(resultFile.getPath());
+                          .setPath(resultFile.getAbsolutePath());
     return fileInfoRepository.save(defaultFileInfoBuilder.build());
   }
 

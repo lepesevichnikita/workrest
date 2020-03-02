@@ -17,6 +17,16 @@ export class RestClient {
     return this._wrapRequest(request);
   }
 
+  update(action) {
+    const request = this._superagent.delete(RestClient.getActionUrl(action));
+    return this._wrapRequest(request);
+  }
+
+  put(action) {
+    const request = this._superagent.put(RestClient.getActionUrl(action));
+    return this._wrapRequest(request);
+  }
+
   _wrapRequest(request) {
     request.secured = this.secured.bind(request);
     return request;

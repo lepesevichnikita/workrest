@@ -45,7 +45,6 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
 
   private final static String FILE_INPUT_FOLDER = "input";
   private final static String INPUT_FILE_NAME = "image.jpg";
-  private final static String OUTPUT_FILE_NAME = "image.jpg";
 
   private String inputFilePath;
   private String outputFilePath;
@@ -76,7 +75,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   @Test
   public void createsFile() throws IOException {
     InputStream inputStream = new FileInputStream(inputFilePath);
-    FileInfo savedFile = defaultFileService.saveFile(inputStream, OUTPUT_FILE_NAME);
+    FileInfo savedFile = defaultFileService.saveFile(inputStream, INPUT_FILE_NAME);
     assertThat(savedFile, allOf(
         hasProperty("id", notNullValue()),
         hasProperty("md5", equalTo(FileUtil.getHexMd5OfInputStream(inputStream))),
@@ -86,7 +85,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void findsFile() throws IOException {
-    final String newOutputFilePath = OUTPUT_FILE_NAME.concat("2");
+    final String newOutputFilePath = INPUT_FILE_NAME.concat("2");
     InputStream inputStream = new FileInputStream(inputFilePath);
     FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFilePath);
     assertThat(defaultFileService.findFirstById(savedFile.getId()), notNullValue());
@@ -94,7 +93,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void overWritesExistedFile() throws IOException {
-    final String newOutputFileName = OUTPUT_FILE_NAME.concat("3");
+    final String newOutputFileName = INPUT_FILE_NAME.concat("3");
     InputStream inputStream = new FileInputStream(inputFilePath);
     FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
     FileTime firstSaveTime = Files.getLastModifiedTime(new File(savedFile.getPath()).toPath());

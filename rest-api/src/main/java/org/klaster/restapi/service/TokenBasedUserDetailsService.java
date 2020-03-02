@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import org.klaster.domain.model.context.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -16,5 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  */
 
 public interface TokenBasedUserDetailsService extends UserDetailsService, TokenService {
+
+  @Override
+  User loadUserByUsername(String login);
 
 }

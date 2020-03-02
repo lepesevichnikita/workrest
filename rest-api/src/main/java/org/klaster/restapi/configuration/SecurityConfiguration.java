@@ -7,10 +7,14 @@ package org.klaster.restapi.configuration;
  *
  */
 
+import org.klaster.restapi.service.TokenBasedUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -26,9 +30,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
+@ComponentScan(value = {"org.klaster.restapi"})
 @PropertySource("classpath:application.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
+
+  @Override
+
+  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(defaultTokenBasedUserDetailsService);
+  }
 
   @Override
   public void configure(WebSecurity web) {
@@ -48,8 +62,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers("/token/*")
-        .permitAll()
         .anyRequest()
         .authenticated()
         .and()
@@ -65,4 +77,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   public TokenAuthenticationFilter tokenAuthenticationFilter() {
     return new TokenAuthenticationFilter();
   }
+
 }

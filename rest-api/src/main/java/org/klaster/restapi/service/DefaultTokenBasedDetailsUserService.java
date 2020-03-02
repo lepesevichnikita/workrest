@@ -15,7 +15,6 @@ import org.klaster.domain.repository.TokenRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +37,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   private UserRepository userRepository;
 
   @Override
-  public UserDetails loadUserByUsername(String login) {
+  public User loadUserByUsername(String login) {
     LoginInfo loginInfo = defaultLoginInfoService.findFirstByLogin(login);
     return userRepository.findFirstByLoginInfo(loginInfo);
   }

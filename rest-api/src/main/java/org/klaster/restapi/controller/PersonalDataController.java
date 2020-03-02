@@ -8,7 +8,6 @@ package org.klaster.restapi.controller;/*
  * Copyright(c) JazzTeam
  */
 
-import java.security.Principal;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.klaster.restapi.dto.PersonalDataForAdministratorDTO;
@@ -18,7 +17,7 @@ import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,10 +55,8 @@ public class PersonalDataController {
   }
 
   @PutMapping
-  @PreAuthorize("not hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<PersonalDataForAdministratorDTO> updateForCurrentUser(@RequestBody PersonalDataForAdministratorDTO personalDataDTO, Principal currentUserPrincipal) {
-    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) currentUserPrincipal;
-    User currentUser = (User) usernamePasswordAuthenticationToken.getPrincipal();
+  public ResponseEntity<PersonalDataForAdministratorDTO> updateForCurrentUser(@RequestBody PersonalDataForAdministratorDTO personalDataDTO,
+                                                                              @AuthenticationPrincipal User currentUser) {
     PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(currentUser.getId(), personalDataDTO.toPersonalData());
     return ResponseEntity.accepted()
                          .body(PersonalDataForAdministratorDTO.fromPersonalData(updatedPersonalData));
