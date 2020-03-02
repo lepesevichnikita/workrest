@@ -65,7 +65,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
                                           .file(mockMultipartUploadFile)
                                           .accept(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").value(notNullValue()))
-           .andExpect(jsonPath("$.path").value(endsWith("input/".concat(UPLOAD_FILE_NAME))))
+           .andExpect(jsonPath("$.path").value(endsWith("output/".concat(UPLOAD_FILE_NAME))))
            .andExpect(jsonPath("$.md5").value(notNullValue()));
   }
 }
