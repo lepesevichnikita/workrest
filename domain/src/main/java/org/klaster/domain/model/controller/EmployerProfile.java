@@ -1,12 +1,9 @@
 package org.klaster.domain.model.controller;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import org.klaster.domain.builder.DefaultJobBuilder;
-import org.klaster.domain.builder.JobBuilder;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.AbstractProfile;
 
 /**
@@ -15,50 +12,18 @@ import org.klaster.domain.model.entity.AbstractProfile;
  * @author Nikita Lepesevich
  */
 
-public class EmployerProfile extends AbstractProfile implements JobController {
+@Entity
+public class EmployerProfile extends AbstractProfile {
 
+  @OneToMany(mappedBy = "employerProfile", orphanRemoval = true)
   private Set<Job> jobs;
 
-  public EmployerProfile(User owner) {
-    super(owner);
-    jobs = new LinkedHashSet<>();
-  }
 
   public Set<Job> getJobs() {
     return jobs;
   }
 
-  public Job createJob(String description, LocalDateTime endDateTime) {
-    final JobBuilder defaultJobBuilder = new DefaultJobBuilder();
-    final Job newJob = defaultJobBuilder.setEmployerProfile(this)
-                                        .setDescription(description)
-                                        .setEndDateTime(endDateTime)
-                                        .build();
-    jobs.add(newJob);
-    return newJob;
-  }
-
-  @Override
-  public void deleteJob(Job job) {
-    if (job.getEmployerProfile()
-           .equals(this)) {
-      JobController.super.deleteJob(job);
-    }
-  }
-
-  @Override
-  public void startJob(Job job) {
-    if (job.getEmployerProfile()
-           .equals(this)) {
-      JobController.super.startJob(job);
-    }
-  }
-
-  @Override
-  public void finishJob(Job job) {
-    if (job.getEmployerProfile()
-           .equals(this)) {
-      JobController.super.finishJob(job);
-    }
+  public void setJobs(Set<Job> jobs) {
+    this.jobs = jobs;
   }
 }

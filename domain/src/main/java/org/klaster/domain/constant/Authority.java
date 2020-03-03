@@ -8,17 +8,17 @@ package org.klaster.domain.constant;
  */
 
 /**
- * RoleName
+ * Authority
  *
  * @author Nikita Lepesevich
  */
 
-public class RoleName {
+public class Authority {
 
   public static final String ADMINISTRATOR = "ADMINISTRATOR";
   public static final String SYSTEM_ADMINISTRATOR = "SYSTEM_ADMINISTRATOR";
   public static final String USER = "USER";
 
-  private RoleName() {
+  private Authority() {
   }
 }

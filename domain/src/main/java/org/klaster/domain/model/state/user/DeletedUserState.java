@@ -1,6 +1,7 @@
 package org.klaster.domain.model.state.user;
 
 import javax.persistence.Entity;
+import org.klaster.domain.constant.UserStateName;
 
 /**
  * DeletedUserState
@@ -11,4 +12,8 @@ import javax.persistence.Entity;
 @Entity
 public class DeletedUserState extends AbstractUserState {
 
+  @Override
+  public String getName() {
+    return UserStateName.DELETED;
+  }
 }

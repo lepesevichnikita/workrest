@@ -7,11 +7,9 @@ package org.klaster.restapi.factory;
  *
  */
 
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import org.klaster.domain.builder.DefaultLoginInfoBuilder;
-import org.klaster.domain.builder.LoginInfoBuilder;
+import org.klaster.domain.builder.concrete.DefaultLoginInfoBuilder;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
@@ -20,15 +18,14 @@ import org.klaster.domain.model.entity.LoginInfo;
  * @author Nikita Lepesevich
  */
 
-public class RandomLoginInfoFactory {
+public class RandomLoginInfoFactory extends AbstractRandomFactory<LoginInfo> {
 
   private static RandomLoginInfoFactory instance;
 
-  private Faker faker;
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   private RandomLoginInfoFactory() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    super();
     defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();
   }
 
@@ -42,13 +39,13 @@ public class RandomLoginInfoFactory {
   }
 
   private String getLogin() {
-    return faker.name()
-                .username();
+    return getFaker().name()
+                     .username();
   }
 
   private String getPassword() {
-    return faker.internet()
-                .password();
+    return getFaker().internet()
+                     .password();
   }
 
   public LoginInfo build() {

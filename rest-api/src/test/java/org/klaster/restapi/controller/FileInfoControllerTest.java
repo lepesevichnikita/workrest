@@ -114,7 +114,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file", INPUT_FILE_NAME, MediaType.IMAGE_JPEG.toString(), inputStream);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String expectedFilePath = FileUtil.makeChildItem(filesConfig.getOutputFolder(), INPUT_FILE_NAME)
-                                            .getPath();
+                                            .getAbsolutePath();
     mockMvc.perform(MockMvcRequestBuilders.multipart(uri)
                                           .file(mockMultipartUploadFile)
                                           .accept(MediaType.APPLICATION_JSON)

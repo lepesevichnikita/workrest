@@ -1,5 +1,15 @@
 package org.klaster.domain.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import org.klaster.domain.model.context.User;
 
 /**
@@ -8,15 +18,42 @@ import org.klaster.domain.model.context.User;
  * @author Nikita Lepesevich
  */
 
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractProfile {
 
-  private final User owner;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long id;
 
-  public AbstractProfile(User owner) {
-    this.owner = owner;
-  }
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.EAGER, optional = false)
+  private User owner;
+
+  @NotNull
+  private String description;
 
   public User getOwner() {
     return owner;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public void setOwner(User owner) {
+    this.owner = owner;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

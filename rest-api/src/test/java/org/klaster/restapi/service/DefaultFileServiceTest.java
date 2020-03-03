@@ -62,7 +62,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
     inputFilePath = new File(inputFolderPath.concat("/")
                                             .concat(INPUT_FILE_NAME)).getPath();
     outputFilePath = new File(filesConfig.getOutputFolder()
-                                         .getPath()
+                                         .getAbsolutePath()
                                          .concat("/")
                                          .concat(INPUT_FILE_NAME)).getPath();
   }

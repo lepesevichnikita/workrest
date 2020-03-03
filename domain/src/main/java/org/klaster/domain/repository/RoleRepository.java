@@ -11,9 +11,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.klaster.domain.builder.DefaultRoleBuilder;
-import org.klaster.domain.builder.RoleBuilder;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.builder.concrete.DefaultRoleBuilder;
+import org.klaster.domain.builder.general.RoleBuilder;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,20 +24,20 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<UserAuthority, Long> {
 
-  Optional<Role> findFirstByName(String name);
+  Optional<UserAuthority> findFirstByAuthority(String authority);
 
-  default Role findFirstOrCreateByName(String name) {
+  default UserAuthority findFirstOrCreateByAuthority(String authority) {
     RoleBuilder defaultRoleBuilder = new DefaultRoleBuilder();
-    Optional<Role> foundRole = findFirstByName(name);
-    return foundRole.orElseGet(() -> save(defaultRoleBuilder.setName(name)
+    Optional<UserAuthority> foundRole = findFirstByAuthority(authority);
+    return foundRole.orElseGet(() -> save(defaultRoleBuilder.setAuhtority(authority)
                                                             .build()));
   }
 
-  default Set<Role> findOrCreateAllByNames(String... names) {
+  default Set<UserAuthority> findOrCreateAllByNames(String... names) {
     return Arrays.stream(names)
-                 .map(this::findFirstOrCreateByName)
+                 .map(this::findFirstOrCreateByAuthority)
                  .collect(Collectors.toSet());
   }
 }

@@ -1,4 +1,4 @@
-package org.klaster.restapi.configuration;
+package org.klaster.restapi.filter;
 
 /*
  * workrest
@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
@@ -48,11 +47,11 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     if (token != null) {
       User user = defaultTokenBasedUserDetailsService.findByTokenValue(token);
       if (user != null) {
-        Authentication requestAuthentication = new UsernamePasswordAuthenticationToken(user,
-                                                                                       token,
-                                                                                       user.getAuthorities());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user,
+                                                                                                                          token,
+                                                                                                                          user.getAuthorities());
         SecurityContextHolder.getContext()
-                             .setAuthentication(requestAuthentication);
+                             .setAuthentication(usernamePasswordAuthenticationToken);
       }
     }
     filterChain.doFilter(servletRequest, servletResponse);

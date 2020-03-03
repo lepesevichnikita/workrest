@@ -1,4 +1,4 @@
-package org.klaster.restapi.dto;
+package org.klaster.domain.dto;
 
 /*
  * org.klaster.restapi.dto
@@ -11,8 +11,8 @@ package org.klaster.restapi.dto;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.klaster.domain.builder.DefaultLoginInfoBuilder;
-import org.klaster.domain.builder.LoginInfoBuilder;
+import org.klaster.domain.builder.concrete.DefaultLoginInfoBuilder;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
 
 public class LoginInfoDTO {

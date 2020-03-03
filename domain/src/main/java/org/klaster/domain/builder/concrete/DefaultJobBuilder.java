@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;/*
+package org.klaster.domain.builder.concrete;/*
  * practice
  *
  * 11.02.2020
@@ -8,12 +8,14 @@ package org.klaster.domain.builder;/*
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.klaster.domain.builder.general.JobBuilder;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.controller.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
+import org.springframework.stereotype.Component;
 
 /**
  * DefaultJobBuilder builds new job with default employer as a new verified user
@@ -21,6 +23,7 @@ import org.klaster.domain.model.state.user.VerifiedUserState;
  * @author Nikita Lepesevich
  */
 
+@Component
 public class DefaultJobBuilder implements JobBuilder {
 
   private EmployerProfile employerProfile;

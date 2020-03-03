@@ -64,4 +64,7 @@ public abstract class AbstractState<C extends AbstractContext> {
   public void setCreatedAt(LocalDateTime createdAt) {
     this.createdAt = createdAt;
   }
+
+  @Transient
+  abstract public String getName();
 }

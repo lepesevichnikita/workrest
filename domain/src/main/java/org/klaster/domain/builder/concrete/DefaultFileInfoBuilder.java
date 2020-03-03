@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;
+package org.klaster.domain.builder.concrete;
 
 /*
  * workrest
@@ -7,6 +7,7 @@ package org.klaster.domain.builder;
  *
  */
 
+import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.springframework.stereotype.Component;
 

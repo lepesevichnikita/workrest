@@ -7,11 +7,9 @@ package org.klaster.restapi.factory;
  *
  */
 
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import org.klaster.domain.builder.DefaultFileInfoBuilder;
-import org.klaster.domain.builder.FileInfoBuilder;
+import org.klaster.domain.builder.concrete.DefaultFileInfoBuilder;
+import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 
 /**
@@ -20,14 +18,13 @@ import org.klaster.domain.model.entity.FileInfo;
  * @author Nikita Lepesevich
  */
 
-public class RandomFileInfoFactory {
+public class RandomFileInfoFactory extends AbstractRandomFactory<FileInfo> {
 
   private static RandomFileInfoFactory instance;
   private FileInfoBuilder defaultFileInfoBuilder;
-  private Faker faker;
 
   private RandomFileInfoFactory() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    super();
     defaultFileInfoBuilder = new DefaultFileInfoBuilder();
   }
 
@@ -43,13 +40,13 @@ public class RandomFileInfoFactory {
   private String getMd5() {
     final int startRange = (int) Math.pow(2, 128);
     final int endRange = (int) Math.pow(2, 129 - 1);
-    return Integer.toHexString(faker.number()
-                                    .numberBetween(startRange, endRange));
+    return Integer.toHexString(getFaker().number()
+                                         .numberBetween(startRange, endRange));
   }
 
   private String getPath() {
-    return faker.file()
-                .fileName();
+    return getFaker().file()
+                     .fileName();
   }
 
   public FileInfo build() {

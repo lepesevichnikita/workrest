@@ -8,9 +8,9 @@ package org.klaster.restapi.controller;
  */
 
 import java.util.List;
+import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

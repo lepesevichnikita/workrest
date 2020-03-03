@@ -18,15 +18,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import org.klaster.domain.model.context.User;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
- * Role
+ * UserAuthority
  *
  * @author Nikita Lepesevich
  */
 
 @Entity
-public class Role {
+public class UserAuthority implements GrantedAuthority {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,14 +38,15 @@ public class Role {
   private Set<User> users;
 
   @Column(nullable = false, unique = true)
-  private String name;
+  private String authority;
 
-  public String getName() {
-    return name;
+  @Override
+  public String getAuthority() {
+    return authority;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setAuthority(String authority) {
+    this.authority = authority;
   }
 
   public Set<User> getUsers() {

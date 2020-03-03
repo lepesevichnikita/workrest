@@ -22,33 +22,25 @@ import org.klaster.domain.model.state.general.AbstractState;
 public abstract class AbstractUserState extends AbstractState<User> {
 
   @Transient
-  public FreelancerProfile getAccessToFreelancerProfile() {
+  public FreelancerProfile getFreelancerProfile() {
     return null;
   }
 
   @Transient
-  public EmployerProfile getAccessToEmployerProfile() {
+  public EmployerProfile getEmployerProfile() {
     return null;
   }
 
   public void authorizeUser(LocalDateTime authorizedAt) {
-    final String message = String.format("Failed attempt to authorize user #%s at%s", getContext(), authorizedAt);
-    logger.warning(message);
   }
 
   public void createEmployerProfile() {
-    final String message = String.format("Failed attempt to create employer profile for user #%s", getContext());
-    logger.warning(message);
   }
 
   public void createFreelancerProfile() {
-    final String message = String.format("Failed attempt to create freelancer profile for user #%s", getContext());
-    logger.warning(message);
   }
 
   public void updatePersonalData(PersonalData personalData) {
-    final String message = String.format("Failed attempt to update personal data for user #%s", getContext());
-    logger.warning(message);
   }
 
 }

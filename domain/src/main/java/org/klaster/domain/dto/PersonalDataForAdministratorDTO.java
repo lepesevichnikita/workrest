@@ -1,4 +1,4 @@
-package org.klaster.restapi.dto;/*
+package org.klaster.domain.dto;/*
  * org.klaster.restapi.dto
  *
  * workrest
@@ -9,8 +9,8 @@ package org.klaster.restapi.dto;/*
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.klaster.domain.builder.DefaultPersonalDataBuilder;
-import org.klaster.domain.builder.PersonalDataBuilder;
+import org.klaster.domain.builder.concrete.DefaultPersonalDataBuilder;
+import org.klaster.domain.builder.general.PersonalDataBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
 

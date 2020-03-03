@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;/*
+package org.klaster.domain.builder.general;/*
  * practice
  *
  * 11.02.2020

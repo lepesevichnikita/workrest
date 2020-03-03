@@ -1,14 +1,12 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import org.klaster.domain.model.context.User;
 
 /**
@@ -18,41 +16,28 @@ import org.klaster.domain.model.context.User;
  */
 
 @Entity
-public class PersonalData {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id;
-
+public class PersonalData extends Attachable {
   @JsonIgnore
+  @NotNull
   @Column(nullable = false)
   private String documentNumber;
 
   @JsonIgnore
+  @NotNull
   @Column(nullable = false)
   private String documentName;
 
   @Column(nullable = false)
+  @NotNull
   private String firstName;
 
   @Column(nullable = false)
+  @NotNull
   private String lastName;
-
-  @JsonIgnore
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  private FileInfo documentScan;
 
   @JsonIgnore
   @OneToOne(optional = false, fetch = FetchType.EAGER)
   private User user;
-
-  public long getId() {
-    return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
 
   public String getDocumentNumber() {
     return documentNumber;
@@ -86,12 +71,14 @@ public class PersonalData {
     this.lastName = lastName;
   }
 
+  @Transient
   public FileInfo getDocumentScan() {
-    return documentScan;
+    return getAttachment();
   }
 
+  @Transient
   public void setDocumentScan(FileInfo documentScan) {
-    this.documentScan = documentScan;
+    setAttachment(documentScan);
   }
 
   public User getUser() {

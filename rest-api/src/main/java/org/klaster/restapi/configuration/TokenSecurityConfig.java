@@ -7,6 +7,7 @@ package org.klaster.restapi.configuration;
  *
  */
 
+import org.klaster.restapi.filter.TokenAuthenticationFilter;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;

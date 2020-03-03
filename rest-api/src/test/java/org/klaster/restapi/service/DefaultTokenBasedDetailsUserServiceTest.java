@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.is;
 import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import org.klaster.domain.builder.LoginInfoBuilder;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;

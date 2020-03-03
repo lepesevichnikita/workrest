@@ -11,9 +11,9 @@ import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.builder.UserBuilder;
-import org.klaster.domain.constant.RoleName;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.builder.general.UserBuilder;
+import org.klaster.domain.constant.Authority;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.state.user.AbstractUserState;
@@ -99,7 +99,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   @Test
   public void registeredUserHasRoleUser() {
     user = defaultUserService.registerUserByLoginInfo(loginInfo);
-    assertThat(new ArrayList<>(user.getRoles()), contains(hasProperty("name", equalTo(RoleName.USER))));
+    assertThat(new ArrayList<>(user.getAuthorities()), contains(hasProperty("authority", equalTo(Authority.USER))));
   }
 
   @Test

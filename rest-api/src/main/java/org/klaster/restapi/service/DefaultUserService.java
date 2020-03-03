@@ -7,13 +7,13 @@ package org.klaster.restapi.service;
  *
  */
 
-import java.util.Collections;
+import java.util.Set;
 import javax.persistence.EntityNotFoundException;
-import org.klaster.domain.builder.UserBuilder;
-import org.klaster.domain.constant.RoleName;
+import org.klaster.domain.builder.general.UserBuilder;
+import org.klaster.domain.constant.Authority;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
@@ -36,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultUserService {
 
+  private static String[] userAuthorities = {Authority.USER};
+
   @Autowired
   private LoginInfoRepository loginInfoRepository;
 
@@ -54,9 +56,9 @@ public class DefaultUserService {
   }
 
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
-    Role role = roleRepository.findFirstOrCreateByName(RoleName.USER);
+    Set<UserAuthority> userAuthorities = roleRepository.findOrCreateAllByNames(DefaultUserService.userAuthorities);
     User user = defaultUserBuilder.setLoginInfo(loginInfo)
-                                  .setRoles(Collections.singleton(role))
+                                  .setRoles(userAuthorities)
                                   .build();
     return userRepository.save(user);
   }

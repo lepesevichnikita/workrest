@@ -19,12 +19,12 @@ public class ApplicationInitializer extends AbstractAnnotationConfigDispatcherSe
 
   @Override
   protected Class<?>[] getRootConfigClasses() {
-    return new Class[]{PersistenceJPAConfig.class, SecurityConfiguration.class};
+    return new Class[]{PersistenceJPAConfig.class, SecurityConfiguration.class, ApplicationContext.class};
   }
 
   @Override
   protected Class<?>[] getServletConfigClasses() {
-    return new Class[]{ApplicationContext.class};
+    return new Class[]{};
   }
 
   @Override

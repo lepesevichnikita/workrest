@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;/*
+package org.klaster.domain.builder.general;/*
  * workrest
  *
  * 07.02.2020

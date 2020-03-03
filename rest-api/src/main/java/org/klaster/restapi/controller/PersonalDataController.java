@@ -8,12 +8,10 @@ package org.klaster.restapi.controller;/*
  * Copyright(c) JazzTeam
  */
 
+import org.klaster.domain.dto.PersonalDataForAdministratorDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.restapi.dto.PersonalDataForAdministratorDTO;
 import org.klaster.restapi.service.DefaultPersonalDataService;
-import org.klaster.restapi.service.DefaultUserService;
-import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,11 +31,11 @@ public class PersonalDataController {
   @Autowired
   private DefaultPersonalDataService defaultPersonalDataService;
 
-  @Autowired
-  private DefaultUserService defaultUserService;
-
-  @Autowired
-  private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
+  @GetMapping
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<PersonalDataForAdministratorDTO> getByCurrentUser(@AuthenticationPrincipal User currentUser) {
+    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(currentUser.getPersonalData()));
+  }
 
   @GetMapping("/{userId}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
@@ -49,9 +47,8 @@ public class PersonalDataController {
   @PostMapping("/{userId}/verify")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
   public ResponseEntity<PersonalDataForAdministratorDTO> verifyByUserId(@PathVariable long userId) {
-    PersonalData foundUserPersonalData = defaultPersonalDataService.findByUserId(userId);
-    defaultUserService.verifyById(userId);
-    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(foundUserPersonalData));
+    PersonalData verifiedPersonalData = defaultPersonalDataService.verifyByUserId(userId);
+    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(verifiedPersonalData));
   }
 
   @PutMapping

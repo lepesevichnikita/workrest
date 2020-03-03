@@ -8,9 +8,9 @@ package org.klaster.restapi.controller;
  */
 
 import javax.persistence.EntityNotFoundException;
+import org.klaster.domain.dto.LoginInfoDTO;
+import org.klaster.domain.dto.TokenDTO;
 import org.klaster.domain.model.entity.Token;
-import org.klaster.restapi.dto.LoginInfoDTO;
-import org.klaster.restapi.dto.TokenDTO;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;

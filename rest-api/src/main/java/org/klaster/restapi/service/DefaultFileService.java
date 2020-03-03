@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import javax.persistence.EntityNotFoundException;
-import org.klaster.domain.builder.FileInfoBuilder;
+import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.restapi.configuration.FilesConfig;

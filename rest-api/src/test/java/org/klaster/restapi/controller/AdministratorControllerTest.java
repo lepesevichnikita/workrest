@@ -14,15 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.builder.RoleBuilder;
-import org.klaster.domain.builder.UserBuilder;
-import org.klaster.domain.constant.RoleName;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.builder.general.RoleBuilder;
+import org.klaster.domain.builder.general.UserBuilder;
+import org.klaster.domain.constant.Authority;
+import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.restapi.configuration.TestContext;
-import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -97,12 +97,12 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   public void createsAdministrator() throws Exception {
     final long id = 0;
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    Role role = defaultRoleBuilder.setName(RoleName.ADMINISTRATOR)
-                                  .build();
+    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(Authority.ADMINISTRATOR)
+                                                    .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     User registeredAdministrator = defaultUserBuilder.setId(id)
                                                      .setLoginInfo(loginInfo)
-                                                     .setRoles(Collections.singleton(role))
+                                                     .setRoles(Collections.singleton(userAuthority))
                                                      .build();
     final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
     final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
@@ -133,11 +133,11 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void getsListOfAdministrators() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    Role role = defaultRoleBuilder.setName(RoleName.SYSTEM_ADMINISTRATOR)
-                                  .build();
+    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(Authority.SYSTEM_ADMINISTRATOR)
+                                                    .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     defaultUserBuilder.setLoginInfo(loginInfo)
-                      .setRoles(Collections.singleton(role))
+                      .setRoles(Collections.singleton(userAuthority))
                       .build();
     List<User> registeredAdministrators = Arrays.asList(defaultUserBuilder.setId(0)
                                                                           .build(),
@@ -155,8 +155,8 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   public void deletesAdministrator() throws Exception {
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    Role role = new Role();
-    role.setName(RoleName.SYSTEM_ADMINISTRATOR);
+    UserAuthority userAuthority = new UserAuthority();
+    userAuthority.setAuthority(Authority.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     User expectedAdministrator = defaultUserBuilder.setId(id)
                                                    .setLoginInfo(loginInfo)

@@ -7,11 +7,9 @@ package org.klaster.restapi.factory;
  *
  */
 
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import org.klaster.domain.builder.DefaultPersonalDataBuilder;
-import org.klaster.domain.builder.PersonalDataBuilder;
+import org.klaster.domain.builder.concrete.DefaultPersonalDataBuilder;
+import org.klaster.domain.builder.general.PersonalDataBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
 
@@ -21,16 +19,16 @@ import org.klaster.domain.model.entity.PersonalData;
  * @author Nikita Lepesevich
  */
 
-public class RandomPersonalDataFactory {
+public class RandomPersonalDataFactory extends AbstractRandomFactory<PersonalData> {
 
   private static RandomPersonalDataFactory instance;
 
   private PersonalDataBuilder defaultPersonalDataBuilder;
   private RandomFileInfoFactory randomFileInfoFactory;
-  private Faker faker;
+
 
   private RandomPersonalDataFactory() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    super();
     defaultPersonalDataBuilder = new DefaultPersonalDataBuilder();
     randomFileInfoFactory = RandomFileInfoFactory.getInstance();
   }
@@ -45,24 +43,24 @@ public class RandomPersonalDataFactory {
   }
 
   private String getFirstName() {
-    return faker.name()
-                .firstName();
+    return getFaker().name()
+                     .firstName();
   }
 
   private String getLastName() {
-    return faker.name()
-                .lastName();
+    return getFaker().name()
+                     .lastName();
   }
 
 
   private String getDocumentName() {
-    return faker.book()
-                .title();
+    return getFaker().book()
+                     .title();
   }
 
   private String getDocumentNumber() {
-    return faker.idNumber()
-                .validSvSeSsn();
+    return getFaker().idNumber()
+                     .validSvSeSsn();
   }
 
   private FileInfo getDocumentScan() {

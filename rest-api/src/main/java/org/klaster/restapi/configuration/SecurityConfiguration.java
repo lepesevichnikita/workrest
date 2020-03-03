@@ -7,20 +7,25 @@ package org.klaster.restapi.configuration;
  *
  */
 
-import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.google.common.collect.ImmutableList;
+import java.util.Arrays;
+import java.util.Collections;
+import org.klaster.restapi.filter.TokenAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * SecurityConfiguration
@@ -29,25 +34,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
  */
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @ComponentScan(value = {"org.klaster.restapi"})
 @PropertySource("classpath:application.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
-
-  @Override
-
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(defaultTokenBasedUserDetailsService);
-  }
-
   @Override
   public void configure(WebSecurity web) {
     web.ignoring()
-       .antMatchers("/token")
+       .antMatchers("/token/**")
        .antMatchers(HttpMethod.POST, "/users")
        .antMatchers(HttpMethod.GET, "/file/*");
   }
@@ -65,7 +61,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .anyRequest()
         .authenticated()
         .and()
+        .cors()
+        .configurationSource(corsConfigurationSource())
+        .and()
         .apply(tokenSecurityConfig());
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    final CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Collections.singletonList("*"));
+    configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));
+    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 
   @Bean
@@ -76,6 +87,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public TokenAuthenticationFilter tokenAuthenticationFilter() {
     return new TokenAuthenticationFilter();
+  }
+
+  @Bean
+  public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
 }

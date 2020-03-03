@@ -11,7 +11,6 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
@@ -28,9 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(value = {"org.klaster.domain", "org.klaster.restapi"}, excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestContext.class)
-})
+@ComponentScan(value = {"org.klaster.domain", "org.klaster.restapi"})
 public class ApplicationContext implements WebMvcConfigurer {
 
   @Bean
@@ -46,7 +43,8 @@ public class ApplicationContext implements WebMvcConfigurer {
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**")
-            .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+            .allowedOrigins("*")
+            .allowedMethods("*");
   }
 
   @Override

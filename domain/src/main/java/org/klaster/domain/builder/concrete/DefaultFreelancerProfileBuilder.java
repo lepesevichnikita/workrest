@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;
+package org.klaster.domain.builder.concrete;
 
 /*
  * practice
@@ -9,9 +9,11 @@ package org.klaster.domain.builder;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.klaster.domain.builder.general.FreelancerProfileBuilder;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
+import org.springframework.stereotype.Component;
 
 /**
  * DefaultFreelancerProfileBuilder
@@ -19,10 +21,12 @@ import org.klaster.domain.model.entity.Skill;
  * @author Nikita Lepesevich
  */
 
+@Component
 public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder {
 
   private Set<Skill> skills;
   private User owner;
+  private String description;
 
   public DefaultFreelancerProfileBuilder() {
     reset();
@@ -41,14 +45,23 @@ public class DefaultFreelancerProfileBuilder implements FreelancerProfileBuilder
   }
 
   @Override
+  public FreelancerProfileBuilder setDescription(String description) {
+    this.description = description;
+    return this;
+  }
+
+  @Override
   public void reset() {
+    description = "";
     skills = new LinkedHashSet<>();
     owner = new DefaultUserBuilder().build();
   }
 
   @Override
   public FreelancerProfile build() {
-    FreelancerProfile freelancerProfile = new FreelancerProfile(owner);
+    FreelancerProfile freelancerProfile = new FreelancerProfile();
+    freelancerProfile.setDescription(description);
+    freelancerProfile.setOwner(owner);
     freelancerProfile.setSkills(skills);
     return freelancerProfile;
   }

@@ -15,12 +15,12 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
-import org.klaster.domain.builder.LoginInfoBuilder;
-import org.klaster.domain.constant.RoleName;
+import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.constant.Authority;
+import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
-import org.klaster.restapi.dto.LoginInfoDTO;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultUserService;
@@ -111,7 +111,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").isNotEmpty())
            .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()))
-           .andExpect(jsonPath("$.roles[0].name").value(RoleName.USER));
+           .andExpect(jsonPath("$.authorities[0].authority").value(Authority.USER));
   }
 
   @Test

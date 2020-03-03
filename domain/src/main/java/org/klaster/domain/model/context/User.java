@@ -2,9 +2,7 @@ package org.klaster.domain.model.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,13 +14,11 @@ import org.klaster.domain.model.controller.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -39,14 +35,14 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
 
   @JsonManagedReference
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-  private Set<Role> roles;
+  private Set<UserAuthority> authorities;
 
-  @JsonIgnore
-  @Transient
+  @JsonManagedReference
+  @OneToOne(mappedBy = "owner")
   private FreelancerProfile freelancerProfile;
 
-  @JsonIgnore
-  @Transient
+  @JsonManagedReference
+  @OneToOne(mappedBy = "owner")
   private EmployerProfile employerProfile;
 
   @JsonIgnore
@@ -108,23 +104,15 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
     return new UnverifiedUserState();
   }
 
-  public Set<Role> getRoles() {
-    return roles;
-  }
-
-  public void setRoles(Set<Role> roles) {
-    this.roles = roles;
-  }
-
   @Override
   @Transient
   @JsonIgnore
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles
-        .stream()
-        .map(Role::getName)
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toSet());
+  public Set<UserAuthority> getAuthorities() {
+    return authorities;
+  }
+
+  public void setAuthorities(Set<UserAuthority> authorities) {
+    this.authorities = authorities;
   }
 
   @Override

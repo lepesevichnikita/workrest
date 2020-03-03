@@ -1,10 +1,10 @@
 package org.klaster.domain.model.entity;
 
-import java.util.List;
 import java.util.Set;
-import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
-import org.klaster.domain.service.JobsRecommendationService;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 
 /**
  * FreelancerProfile
@@ -12,13 +12,11 @@ import org.klaster.domain.service.JobsRecommendationService;
  * @author Nikita Lepesevich
  */
 
+@Entity
 public class FreelancerProfile extends AbstractProfile {
 
+  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<Skill> skills;
-
-  public FreelancerProfile(User owner) {
-    super(owner);
-  }
 
   public Set<Skill> getSkills() {
     return skills;
@@ -26,10 +24,5 @@ public class FreelancerProfile extends AbstractProfile {
 
   public void setSkills(Set<Skill> skills) {
     this.skills = skills;
-  }
-
-  public List<Job> getRecommendedJobs(long limit) {
-    return JobsRecommendationService.getInstance()
-                                    .getRecommended(this, limit);
   }
 }

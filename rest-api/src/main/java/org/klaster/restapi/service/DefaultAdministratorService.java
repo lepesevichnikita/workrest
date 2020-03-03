@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.persistence.EntityNotFoundException;
-import org.klaster.domain.builder.UserBuilder;
-import org.klaster.domain.constant.RoleName;
+import org.klaster.domain.builder.general.UserBuilder;
+import org.klaster.domain.constant.Authority;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.RoleRepository;
 import org.klaster.domain.repository.UserRepository;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultAdministratorService {
 
-  private static String[] administratorRolesNames = {RoleName.ADMINISTRATOR, RoleName.USER};
+  private static String[] administratorAuthorities = {Authority.ADMINISTRATOR, Authority.USER};
 
   @Autowired
   private RoleRepository roleRepository;
@@ -46,26 +46,27 @@ public class DefaultAdministratorService {
   @Autowired
   private UserBuilder defaultUserBuilder;
 
+
   public User registerAdministrator(LoginInfo loginInfo) {
-    Set<Role> administratorRoles = getAdministratorRoles();
+    Set<UserAuthority> administratorUserAuthorities = getAdministratorRoles();
     User registeredAdministrator = defaultUserBuilder.setLoginInfo(loginInfo)
-                                                     .setRoles(administratorRoles)
+                                                     .setRoles(administratorUserAuthorities)
                                                      .build();
     return userRepository.save(registeredAdministrator);
   }
 
   public List<User> findAll() {
-    return new LinkedList<>(roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR)
+    return new LinkedList<>(roleRepository.findFirstOrCreateByAuthority(Authority.ADMINISTRATOR)
                                           .getUsers());
   }
 
   public User findById(long id) {
-    Role role = roleRepository.findFirstOrCreateByName(RoleName.ADMINISTRATOR);
-    return role.getUsers()
-               .stream()
-               .filter(applicationUser -> applicationUser.getId() == id)
-               .findFirst()
-               .orElse(null);
+    UserAuthority userAuthority = roleRepository.findFirstOrCreateByAuthority(Authority.ADMINISTRATOR);
+    return userAuthority.getUsers()
+                        .stream()
+                        .filter(applicationUser -> applicationUser.getId() == id)
+                        .findFirst()
+                        .orElse(null);
   }
 
   public User deleteById(long id) {
@@ -73,9 +74,9 @@ public class DefaultAdministratorService {
     if (deletedAdministrator == null) {
       throw new EntityNotFoundException();
     }
-    deletedAdministrator.getRoles()
-                        .removeIf(role -> role.getName()
-                                              .equals(RoleName.SYSTEM_ADMINISTRATOR));
+    deletedAdministrator.getAuthorities()
+                        .removeIf(role -> role.getAuthority()
+                                              .equals(Authority.SYSTEM_ADMINISTRATOR));
     userRepository.save(deletedAdministrator);
     return deletedAdministrator;
   }
@@ -86,15 +87,15 @@ public class DefaultAdministratorService {
                                                   .orElse(null);
     if (foundLoginInfo != null) {
       User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo);
-      result = foundUser.getRoles()
+      result = foundUser.getAuthorities()
                         .stream()
-                        .map(Role::getName)
-                        .anyMatch(Predicate.isEqual(RoleName.ADMINISTRATOR));
+                        .map(UserAuthority::getAuthority)
+                        .anyMatch(Predicate.isEqual(Authority.ADMINISTRATOR));
     }
     return result;
   }
 
-  private Set<Role> getAdministratorRoles() {
-    return roleRepository.findOrCreateAllByNames(administratorRolesNames);
+  private Set<UserAuthority> getAdministratorRoles() {
+    return roleRepository.findOrCreateAllByNames(administratorAuthorities);
   }
 }

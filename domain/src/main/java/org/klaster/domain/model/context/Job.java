@@ -1,13 +1,17 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 import org.klaster.domain.model.controller.EmployerProfile;
-import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.AbstractJobState;
-import org.klaster.domain.service.FreelancersRecommendationService;
 
 /**
  * Job
@@ -15,18 +19,22 @@ import org.klaster.domain.service.FreelancersRecommendationService;
  * @author Nikita Lepesevich
  */
 
+@Entity
 public class Job extends AbstractContext<AbstractJobState> {
 
-  private final EmployerProfile employerProfile;
+  @JsonBackReference
+  @ManyToOne(fetch = FetchType.EAGER)
+  private EmployerProfile employerProfile;
+
+  @NotNull
   private String description;
+
+  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<Skill> skills;
+
+  @NotNull
   private LocalDateTime endDateTime;
 
-  public Job(String description, EmployerProfile employerProfile, LocalDateTime endDateTime) {
-    this.description = description;
-    this.employerProfile = employerProfile;
-    this.endDateTime = endDateTime;
-  }
 
   public Set<Skill> getSkills() {
     return skills;
@@ -57,8 +65,11 @@ public class Job extends AbstractContext<AbstractJobState> {
     this.description = description;
   }
 
-  public List<FreelancerProfile> getRecommendedFreelancerProfiles(long limit) {
-    return FreelancersRecommendationService.getInstance()
-                                           .getRecommended(this, limit);
+  public void setEmployerProfile(EmployerProfile employerProfile) {
+    this.employerProfile = employerProfile;
+  }
+
+  public boolean belongsToEmployer(long employerId) {
+    return employerProfile.getId() == employerId;
   }
 }

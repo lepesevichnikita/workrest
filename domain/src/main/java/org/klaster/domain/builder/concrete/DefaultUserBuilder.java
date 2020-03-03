@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;
+package org.klaster.domain.builder.concrete;
 /*
  * workrest
  *
@@ -8,9 +8,10 @@ package org.klaster.domain.builder;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.Role;
+import org.klaster.domain.model.entity.UserAuthority;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class DefaultUserBuilder implements UserBuilder {
 
   private LoginInfo loginInfo;
-  private Set<Role> roles;
+  private Set<UserAuthority> userAuthorities;
   private long id;
 
   public DefaultUserBuilder() {
@@ -37,8 +38,8 @@ public class DefaultUserBuilder implements UserBuilder {
   }
 
   @Override
-  public UserBuilder setRoles(Set<Role> roles) {
-    this.roles = roles;
+  public UserBuilder setRoles(Set<UserAuthority> userAuthorities) {
+    this.userAuthorities = userAuthorities;
     return this;
   }
 
@@ -51,7 +52,7 @@ public class DefaultUserBuilder implements UserBuilder {
   @Override
   public void reset() {
     loginInfo = null;
-    roles = new LinkedHashSet<>();
+    userAuthorities = new LinkedHashSet<>();
     id = 0;
   }
 
@@ -59,7 +60,7 @@ public class DefaultUserBuilder implements UserBuilder {
   public User build() {
     User user = new User();
     user.setId(id);
-    user.setRoles(new LinkedHashSet<>(roles));
+    user.setAuthorities(new LinkedHashSet<>(userAuthorities));
     user.setLoginInfo(loginInfo);
     return user;
   }

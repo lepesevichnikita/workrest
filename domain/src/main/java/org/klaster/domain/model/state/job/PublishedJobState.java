@@ -1,8 +1,8 @@
 package org.klaster.domain.model.state.job;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-import org.klaster.domain.model.entity.Skill;
+import javax.persistence.Entity;
+import org.klaster.domain.constant.JobStateName;
+import org.klaster.domain.model.context.Job;
 
 /**
  * PublishedJobState
@@ -10,15 +10,18 @@ import org.klaster.domain.model.entity.Skill;
  * @author Nikita Lepesevich
  */
 
+@Entity
 public class PublishedJobState extends AbstractJobState {
 
   @Override
-  public void updateJob(String description, Set<Skill> skills, LocalDateTime endDateTime) {
-    getContext().setEndDateTime(endDateTime);
-    getContext().setDescription(description);
-    getContext().setSkills(skills);
-    final String message = String.format("Job #%s was updated%nDescription: %s%nSkills: %s%nEnd datetime: %s", getContext(), description, skills, endDateTime);
-    logger.info(message);
+  public void updateJob(Job job) {
+    getContext().setEndDateTime(job.getEndDateTime());
+    getContext().setDescription(job.getDescription());
+    getContext().setSkills(job.getSkills());
   }
 
+  @Override
+  public String getName() {
+    return JobStateName.PUBLISHED;
+  }
 }

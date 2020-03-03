@@ -1,4 +1,4 @@
-package org.klaster.domain.builder;
+package org.klaster.domain.builder.general;
 
 /*
  * practice
@@ -18,9 +18,13 @@ import org.klaster.domain.model.entity.Skill;
  * @author Nikita Lepesevich
  */
 
-public interface FreelancerProfileBuilder extends Builder<FreelancerProfile> {
+public interface FreelancerProfileBuilder extends ProfileBuilder<FreelancerProfile> {
+
+  @Override
+  FreelancerProfileBuilder setDescription(String description);
+
+  @Override
+  FreelancerProfileBuilder setOwner(User owner);
 
   FreelancerProfileBuilder setSkills(Set<Skill> skills);
-
-  FreelancerProfileBuilder setOwner(User owner);
 }

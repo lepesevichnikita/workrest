@@ -15,6 +15,7 @@ import org.klaster.restapi.service.DefaultFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ public class FileInfoController {
   private DefaultFileService defaultFileService;
 
   @PostMapping
+  @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<FileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
     FileInfo savedFileInfo = defaultFileService.saveFile(file.getInputStream(), file.getOriginalFilename());
     return new ResponseEntity<>(savedFileInfo, HttpStatus.CREATED);

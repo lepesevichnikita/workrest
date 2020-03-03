@@ -1,4 +1,4 @@
-package org.klaster.restapi.dto;
+package org.klaster.domain.dto;
 
 /*
  * workrest

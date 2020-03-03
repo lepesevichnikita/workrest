@@ -1,10 +1,11 @@
-package org.klaster.domain.builder;/*
+package org.klaster.domain.builder.concrete;/*
  * workrest
  *
  * 07.02.2020
  *
  */
 
+import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.stereotype.Component;
 
