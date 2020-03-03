@@ -60,7 +60,7 @@ public class RandomJobFactory extends AbstractRandomFactory<Job> {
 
   private Set<Skill> getSkills() {
     final int randomSkillsNumber = getFaker().number()
-                                             .randomDigit();
+                                             .randomDigitNotZero();
     return IntStream.range(0, randomSkillsNumber)
                     .mapToObj((skillNumber) -> randomSkillFactory.build())
                     .collect(Collectors.toSet());

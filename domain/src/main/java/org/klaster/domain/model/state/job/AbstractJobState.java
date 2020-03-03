@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Transient;
+import org.klaster.domain.constant.JobAction;
+import org.klaster.domain.exception.ActionForbiddenByStateException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.state.general.AbstractState;
 
@@ -23,5 +25,6 @@ public abstract class AbstractJobState extends AbstractState<Job> {
   }
 
   public void updateJob(Job job) {
+    throw new ActionForbiddenByStateException(JobAction.UPDATE, this);
   }
 }

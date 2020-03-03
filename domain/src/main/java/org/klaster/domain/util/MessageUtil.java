@@ -1,4 +1,4 @@
-package org.klaster.restapi.util;
+package org.klaster.domain.util;
 
 /*
  * workrest
@@ -6,6 +6,8 @@ package org.klaster.restapi.util;
  * 25.02.2020
  *
  */
+
+import org.klaster.domain.model.state.general.AbstractState;
 
 /**
  * MessageUtil
@@ -15,6 +17,7 @@ package org.klaster.restapi.util;
 
 public class MessageUtil {
 
+  private static final String ACTION_FORBIDDEN_BY_STATE_TEMPLATE = "%s is forbidden, current state - %s, context = %s";
   private static final String USER_BY_LOGIN_NOT_FOUND_TEMPLATE = "User @%s not found";
   private static final String AUTHENTICATION_CREDENTIALS_NOT_FOUND_TEMPLATE = "Credentials for @%s not found";
   private static final String USER_BY_TOKEN_NOT_FOUND_TEMPLATE = "User with token #%s not found";
@@ -34,6 +37,10 @@ public class MessageUtil {
 
   public static String getUserByTokenNotFoundMessage(String login) {
     return String.format(USER_BY_TOKEN_NOT_FOUND_TEMPLATE, login);
+  }
+
+  public static String getActionForbiddenByStateMessage(String action, AbstractState state) {
+    return String.format(ACTION_FORBIDDEN_BY_STATE_TEMPLATE, action, state.getName(), state.getContext());
   }
 
   public static <T> String getEntityByIdNotFoundMessage(Class entityClass, T id) {

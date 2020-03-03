@@ -7,7 +7,7 @@ package org.klaster.domain.model.entity;
  *
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,8 +31,7 @@ public abstract class Attachable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
-  @JsonIgnore
-  @OneToOne(fetch = FetchType.EAGER, mappedBy = "attachable", orphanRemoval = true)
+  @OneToOne(fetch = FetchType.EAGER, mappedBy = "attachable", orphanRemoval = true, cascade = {CascadeType.ALL})
   private FileInfo attachment;
 
   public long getId() {

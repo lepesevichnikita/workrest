@@ -13,7 +13,7 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.domain.repository.TokenRepository;
 import org.klaster.domain.repository.UserRepository;
-import org.klaster.restapi.util.MessageUtil;
+import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

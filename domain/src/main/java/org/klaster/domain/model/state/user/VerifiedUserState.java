@@ -3,7 +3,7 @@ package org.klaster.domain.model.state.user;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import org.klaster.domain.constant.UserStateName;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 
 /**
@@ -31,20 +31,18 @@ public class VerifiedUserState extends AbstractUserState {
   }
 
   @Override
-  public void createEmployerProfile() {
+  public void createEmployerProfile(EmployerProfile targetEmployerProfile) {
     if (!getContext().hasEmployerProfile()) {
-      EmployerProfile employerProfile = new EmployerProfile();
-      employerProfile.setOwner(getContext());
-      getContext().setEmployerProfile(employerProfile);
+      targetEmployerProfile.setOwner(getContext());
+      getContext().setEmployerProfile(targetEmployerProfile);
     }
   }
 
   @Override
-  public void createFreelancerProfile() {
+  public void createFreelancerProfile(FreelancerProfile targetFreelancerProfile) {
     if (!getContext().hasFreelancerProfile()) {
-      FreelancerProfile freelancerProfile = new FreelancerProfile();
-      freelancerProfile.setOwner(getContext());
-      getContext().setFreelancerProfile(freelancerProfile);
+      targetFreelancerProfile.setOwner(getContext());
+      getContext().setFreelancerProfile(targetFreelancerProfile);
     }
   }
 

@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -111,7 +110,10 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                  .getValue();
     InputStream inputStream = new FileInputStream(FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME));
-    MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file", INPUT_FILE_NAME, MediaType.IMAGE_JPEG.toString(), inputStream);
+    MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
+                                                                      INPUT_FILE_NAME,
+                                                                      MediaType.IMAGE_JPEG.toString(),
+                                                                      inputStream);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String expectedFilePath = FileUtil.makeChildItem(filesConfig.getOutputFolder(), INPUT_FILE_NAME)
                                             .getAbsolutePath();
@@ -131,11 +133,8 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     InputStream inputStream = new FileInputStream(FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME));
     FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, newFileName);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, savedFileInfo.getId());
-    final String expectedFilePath = FileUtil.makeChildItem(filesConfig.getOutputFolder(), INPUT_FILE_NAME)
-                                            .getPath();
     mockMvc.perform(get(uri))
-           .andExpect(status().isOk())
-           .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+           .andExpect(status().isOk());
   }
 
   private void deleteOutputFiles() throws IOException {

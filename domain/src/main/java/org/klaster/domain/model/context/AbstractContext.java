@@ -1,5 +1,6 @@
 package org.klaster.domain.model.context;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 import org.klaster.domain.model.state.general.AbstractState;
 
@@ -36,13 +38,14 @@ public abstract class AbstractContext<S extends AbstractState> {
              orphanRemoval = true,
              cascade = CascadeType.ALL,
              mappedBy = "context")
+
   @JsonManagedReference
   private Set<S> states;
-
 
   public AbstractContext() {
   }
 
+  @Transient
   public S getCurrentState() {
     return states != null
            ? states.stream()
@@ -80,4 +83,15 @@ public abstract class AbstractContext<S extends AbstractState> {
     }
     return previousState;
   }
+
+  @PrePersist
+  private void setDefaultState() {
+    if (getCurrentState() == null) {
+      setCurrentState(getDefaultState());
+    }
+  }
+
+  @Transient
+  @JsonIgnore
+  abstract protected S getDefaultState();
 }

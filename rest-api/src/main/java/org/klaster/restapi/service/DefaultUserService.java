@@ -12,6 +12,7 @@ import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.constant.Authority;
 import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.model.state.user.AbstractUserState;
@@ -21,7 +22,7 @@ import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.RoleRepository;
 import org.klaster.domain.repository.UserRepository;
-import org.klaster.restapi.util.MessageUtil;
+import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,11 +51,6 @@ public class DefaultUserService {
   @Autowired
   private RoleRepository roleRepository;
 
-  public boolean hasUniqueLogin(User user) {
-    return !loginInfoRepository.existsByLogin(user.getLoginInfo()
-                                                  .getLogin());
-  }
-
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     Set<UserAuthority> userAuthorities = roleRepository.findOrCreateAllByNames(DefaultUserService.userAuthorities);
     User user = defaultUserBuilder.setLoginInfo(loginInfo)
@@ -68,10 +64,6 @@ public class DefaultUserService {
                                      .orElseThrow(EntityNotFoundException::new);
     deletedUser.setCurrentState(new DeletedUserState());
     return userRepository.save(deletedUser);
-  }
-
-  public long count() {
-    return userRepository.count();
   }
 
   public User blockById(long id) {
@@ -96,6 +88,12 @@ public class DefaultUserService {
   public User findFirstById(long id) {
     return userRepository.findById(id)
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
+  }
+
+  public User createEmployerProfile(User user, EmployerProfile employerProfile) {
+    user.getCurrentState()
+        .createEmployerProfile(employerProfile);
+    return userRepository.save(user);
   }
 
   public User verifyById(long id) {

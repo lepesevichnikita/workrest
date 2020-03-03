@@ -10,11 +10,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.klaster.domain.builder.general.JobBuilder;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.context.User;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
-import org.klaster.domain.model.state.user.AbstractUserState;
-import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,13 +58,7 @@ public class DefaultJobBuilder implements JobBuilder {
 
   @Override
   public void reset() {
-    User user = new DefaultUserBuilder().build();
-    AbstractUserState verifiedUserState = new VerifiedUserState();
-    verifiedUserState.setContext(user);
-    user.setCurrentState(verifiedUserState);
-    user.getCurrentState()
-        .createEmployerProfile();
-    employerProfile = user.getEmployerProfile();
+    employerProfile = null;
     description = "";
     endDateTime = LocalDateTime.now();
     skills = new LinkedHashSet<>();
@@ -75,7 +66,10 @@ public class DefaultJobBuilder implements JobBuilder {
 
   @Override
   public Job build() {
-    Job newJob = new Job(description, employerProfile, endDateTime);
+    Job newJob = new Job();
+    newJob.setDescription(description);
+    newJob.setEndDateTime(endDateTime);
+    newJob.setEmployerProfile(employerProfile);
     newJob.setSkills(skills);
     return newJob;
   }

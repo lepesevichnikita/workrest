@@ -17,9 +17,9 @@ import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
+import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.configuration.FilesConfig;
 import org.klaster.restapi.util.FileUtil;
-import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

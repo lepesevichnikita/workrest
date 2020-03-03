@@ -1,5 +1,6 @@
 package org.klaster.domain.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -24,9 +25,11 @@ public class Skill {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
+  @JsonBackReference
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<Job> jobs;
 
+  @JsonBackReference
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<FreelancerProfile> freelancerProfiles;
 

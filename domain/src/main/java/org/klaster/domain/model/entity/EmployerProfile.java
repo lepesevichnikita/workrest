@@ -1,10 +1,9 @@
-package org.klaster.domain.model.controller;
+package org.klaster.domain.model.entity;
 
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.entity.AbstractProfile;
 
 /**
  * EmployerProfile

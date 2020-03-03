@@ -45,7 +45,6 @@ public class FileInfoController {
     return new ResponseEntity<>(savedFileInfo, HttpStatus.CREATED);
   }
 
-
   @GetMapping(value = "/{id}")
   public void getFile(@PathVariable("id") long id, HttpServletResponse response) throws IOException {
     InputStream foundFileInputStream = defaultFileService.findFirstById(id);

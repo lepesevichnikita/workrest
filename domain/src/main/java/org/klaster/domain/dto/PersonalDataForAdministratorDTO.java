@@ -27,7 +27,7 @@ public class PersonalDataForAdministratorDTO {
 
   private String lastName;
 
-  private FileInfo documentScan;
+  private FileInfo attachment;
 
   public PersonalDataForAdministratorDTO() {
     defaultPersonalDataBuilder = new DefaultPersonalDataBuilder();
@@ -37,16 +37,17 @@ public class PersonalDataForAdministratorDTO {
     PersonalDataForAdministratorDTO personalDataDTO = new PersonalDataForAdministratorDTO();
     personalDataDTO.setFirstName(personalData.getFirstName());
     personalDataDTO.setLastName(personalData.getLastName());
-    personalDataDTO.setDocumentScan(personalData.getDocumentScan());
+    personalDataDTO.setAttachment(personalData.getAttachment());
     personalDataDTO.setDocumentName(personalData.getDocumentName());
     personalDataDTO.setDocumentNumber(personalData.getDocumentNumber());
+    personalDataDTO.setAttachment(personalData.getAttachment());
     return personalDataDTO;
   }
 
   public PersonalData toPersonalData() {
     return defaultPersonalDataBuilder.setLastName(lastName)
                                      .setFirstName(firstName)
-                                     .setDocumentScan(documentScan)
+                                     .setAttachment(attachment)
                                      .setDocumentNumber(documentNumber)
                                      .setDocumentName(documentName)
                                      .build();
@@ -84,11 +85,11 @@ public class PersonalDataForAdministratorDTO {
     this.lastName = lastName;
   }
 
-  public FileInfo getDocumentScan() {
-    return documentScan;
+  public FileInfo getAttachment() {
+    return attachment;
   }
 
-  public void setDocumentScan(FileInfo documentScan) {
-    this.documentScan = documentScan;
+  public void setAttachment(FileInfo attachment) {
+    this.attachment = attachment;
   }
 }

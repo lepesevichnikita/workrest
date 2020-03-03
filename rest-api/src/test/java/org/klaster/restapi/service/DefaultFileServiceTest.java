@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.File;
@@ -92,14 +91,14 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void overWritesExistedFile() throws IOException {
+  public void notOverWritesExistedFile() throws IOException {
     final String newOutputFileName = INPUT_FILE_NAME.concat("3");
     InputStream inputStream = new FileInputStream(inputFilePath);
     FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
     FileTime firstSaveTime = Files.getLastModifiedTime(new File(savedFile.getPath()).toPath());
     FileInfo anotherSavedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
     FileTime overwriteTime = Files.getLastModifiedTime(new File(anotherSavedFile.getPath()).toPath());
-    assertThat(firstSaveTime, not(equalTo(overwriteTime)));
+    assertThat(firstSaveTime, equalTo(overwriteTime));
   }
 
 

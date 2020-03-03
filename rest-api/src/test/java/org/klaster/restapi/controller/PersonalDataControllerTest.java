@@ -18,6 +18,7 @@ import org.klaster.domain.dto.PersonalDataForAdministratorDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.factory.RandomPersonalDataFactory;
@@ -25,7 +26,6 @@ import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultPersonalDataService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -106,7 +106,7 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   }
 
   @Test
-  public void okWithPersonalDataAsJsonForGetWithCorrectIdAndValidToken() throws Exception {
+  public void okForGetWithPersonalDataAsJsonForGetWithCorrectIdAndValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     PersonalData personalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
@@ -118,12 +118,12 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
            .andExpect(jsonPath("$.lastName").value(personalData.getLastName()))
            .andExpect(jsonPath("$.documentName").value(personalData.getDocumentName()))
            .andExpect(jsonPath("$.documentNumber").value(personalData.getDocumentNumber()))
-           .andExpect(jsonPath("$.documentScan.id").value(personalData.getDocumentScan()
-                                                                      .getId()))
-           .andExpect(jsonPath("$.documentScan.md5").value(personalData.getDocumentScan()
-                                                                       .getMd5()))
-           .andExpect(jsonPath("$.documentScan.path").value(personalData.getDocumentScan()
-                                                                        .getPath()));
+           .andExpect(jsonPath("$.attachment.id").value(personalData.getAttachment()
+                                                                    .getId()))
+           .andExpect(jsonPath("$.attachment.md5").value(personalData.getAttachment()
+                                                                     .getMd5()))
+           .andExpect(jsonPath("$.attachment.path").value(personalData.getAttachment()
+                                                                      .getPath()));
   }
 
   @Test
@@ -165,11 +165,11 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
            .andExpect(jsonPath("$.lastName").value(randomPersonalData.getLastName()))
            .andExpect(jsonPath("$.documentName").value(randomPersonalData.getDocumentName()))
            .andExpect(jsonPath("$.documentNumber").value(randomPersonalData.getDocumentNumber()))
-           .andExpect(jsonPath("$.documentScan.id").value(notNullValue()))
-           .andExpect(jsonPath("$.documentScan.md5").value(randomPersonalData.getDocumentScan()
-                                                                             .getMd5()))
-           .andExpect(jsonPath("$.documentScan.path").value(randomPersonalData.getDocumentScan()
-                                                                              .getPath()));
+           .andExpect(jsonPath("$.attachment.id").value(notNullValue()))
+           .andExpect(jsonPath("$.attachment.md5").value(randomPersonalData.getAttachment()
+                                                                           .getMd5()))
+           .andExpect(jsonPath("$.attachment.path").value(randomPersonalData.getAttachment()
+                                                                            .getPath()));
   }
 
   @Test

@@ -50,7 +50,11 @@ public class SkillsCache {
   }
 
   public Skill add(String skillName) {
-    return skills.computeIfAbsent(skillName, Skill::new);
+    return skills.computeIfAbsent(skillName, (name) -> {
+      Skill newSkill = new Skill();
+      newSkill.setName(name);
+      return newSkill;
+    });
   }
 
 

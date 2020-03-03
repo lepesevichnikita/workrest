@@ -12,12 +12,13 @@ import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.klaster.domain.repository.PersonalDataRepository;
-import org.klaster.restapi.util.MessageUtil;
+import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultPersonalDataService {
+
   @Autowired
   private DefaultUserService defaultUserService;
 
@@ -31,9 +32,11 @@ public class DefaultPersonalDataService {
   public PersonalData findByUserId(long id) {
     User foundUser = defaultUserService.findFirstById(id);
     if (foundUser.getPersonalData() == null) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class, id));
+      throw new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id));
     }
-    return foundUser.getPersonalData();
+    return personalDataRepository.findByUser(foundUser)
+                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class,
+                                                                                                                               id)));
   }
 
   public PersonalData updateByUserId(long id, PersonalData personalData) {

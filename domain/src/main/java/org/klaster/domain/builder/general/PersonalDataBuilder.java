@@ -26,5 +26,5 @@ public interface PersonalDataBuilder extends Builder<PersonalData> {
 
   PersonalDataBuilder setDocumentNumber(String documentNumber);
 
-  PersonalDataBuilder setDocumentScan(FileInfo documentScan);
+  PersonalDataBuilder setAttachment(FileInfo attachment);
 }

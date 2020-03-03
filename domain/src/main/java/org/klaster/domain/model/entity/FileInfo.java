@@ -1,5 +1,6 @@
 package org.klaster.domain.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ public class FileInfo {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
+  @JsonBackReference
   @OneToOne
   private Attachable attachable;
 

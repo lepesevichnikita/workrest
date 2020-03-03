@@ -8,7 +8,7 @@ package org.klaster.domain.builder.general;/*
 import java.time.LocalDateTime;
 import java.util.Set;
 import org.klaster.domain.model.context.Job;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
 
 /**

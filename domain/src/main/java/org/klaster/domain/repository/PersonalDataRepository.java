@@ -10,6 +10,8 @@ package org.klaster.domain.repository;
  * Copyright(c) JazzTeam
  */
 
+import java.util.Optional;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +19,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PersonalDataRepository extends JpaRepository<PersonalData, Long> {
 
+  Optional<PersonalData> findByUser(User user);
 }

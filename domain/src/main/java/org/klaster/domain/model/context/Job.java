@@ -1,6 +1,10 @@
 package org.klaster.domain.model.context;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -8,10 +12,14 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.AbstractJobState;
+import org.klaster.domain.model.state.job.PublishedJobState;
+import org.klaster.domain.serializer.LocalDateTimeSerializer;
 
 /**
  * Job
@@ -29,10 +37,13 @@ public class Job extends AbstractContext<AbstractJobState> {
   @NotNull
   private String description;
 
+  @JsonManagedReference
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private Set<Skill> skills;
 
   @NotNull
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   private LocalDateTime endDateTime;
 
 
@@ -48,10 +59,17 @@ public class Job extends AbstractContext<AbstractJobState> {
     return employerProfile;
   }
 
+  public void setEmployerProfile(EmployerProfile employerProfile) {
+    this.employerProfile = employerProfile;
+  }
+
   public String getDescription() {
     return description;
   }
 
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
   public LocalDateTime getEndDateTime() {
     return endDateTime;
@@ -61,15 +79,14 @@ public class Job extends AbstractContext<AbstractJobState> {
     this.endDateTime = endDateTime;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public void setEmployerProfile(EmployerProfile employerProfile) {
-    this.employerProfile = employerProfile;
-  }
-
   public boolean belongsToEmployer(long employerId) {
     return employerProfile.getId() == employerId;
+  }
+
+  @Override
+  @Transient
+  @JsonIgnore
+  protected AbstractJobState getDefaultState() {
+    return new PublishedJobState();
   }
 }

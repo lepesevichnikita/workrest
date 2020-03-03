@@ -7,18 +7,22 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.JobBuilder;
 import org.klaster.domain.dto.JobDTO;
+import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.DeletedJobState;
 import org.klaster.domain.model.state.job.FinishedJobState;
 import org.klaster.domain.model.state.job.StartedJobState;
 import org.klaster.domain.repository.JobRepository;
 import org.klaster.domain.repository.SkillRepository;
-import org.klaster.restapi.util.MessageUtil;
+import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +44,19 @@ public class DefaultJobService {
   @Autowired
   private JobBuilder defaultJobBuilder;
 
+  public List<Job> findAllByEmployerProfile(EmployerProfile employerProfile) {
+    return jobRepository.findAllByEmployerProfile(employerProfile);
+  }
+
   public Job create(JobDTO jobDTO, User author) {
     EmployerProfile employerProfile = author.getCurrentState()
                                             .getEmployerProfile();
+    if (employerProfile == null) {
+      throw new EmployerProfileNotFoundException();
+    }
+    Set<Skill> skills = skillRepository.findAllByNamesOrCreate(jobDTO.getSkills());
     Job savedJob = defaultJobBuilder.setDescription(jobDTO.getDescription())
-                                    .setSkills(skillRepository.findAllByNamesOrCreate(jobDTO.getSkills()))
+                                    .setSkills(skills)
                                     .setEndDateTime(jobDTO.getEndDateTime())
                                     .build();
     savedJob.setEmployerProfile(employerProfile);
@@ -94,7 +106,7 @@ public class DefaultJobService {
   }
 
   private void validateJobBelongsToUser(Job job, EmployerProfile employerProfile) {
-    if (!job.belongsToUser(employerProfile.getId())) {
+    if (!job.belongsToEmployer(employerProfile.getId())) {
       throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(User.class, employerProfile.getId()));
     }
   }

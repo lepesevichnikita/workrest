@@ -7,9 +7,13 @@ package org.klaster.domain.dto;
  *
  */
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
+import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.entity.Skill;
+import org.klaster.domain.serializer.LocalDateTimeSerializer;
 
 /**
  * JobDTO
@@ -21,6 +25,9 @@ public class JobDTO {
 
   private String[] skills;
   private String description;
+
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   private LocalDateTime endDateTime;
 
   public static JobDTO fromJob(Job job) {

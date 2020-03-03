@@ -5,7 +5,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import org.klaster.domain.model.context.User;
 
@@ -69,16 +68,6 @@ public class PersonalData extends Attachable {
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
-  }
-
-  @Transient
-  public FileInfo getDocumentScan() {
-    return getAttachment();
-  }
-
-  @Transient
-  public void setDocumentScan(FileInfo documentScan) {
-    setAttachment(documentScan);
   }
 
   public User getUser() {

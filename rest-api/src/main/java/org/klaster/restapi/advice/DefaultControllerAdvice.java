@@ -11,6 +11,8 @@ package org.klaster.restapi.advice;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import org.klaster.domain.exception.ActionForbiddenByStateException;
+import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +34,26 @@ public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<String> handle(DataIntegrityViolationException exception) {
-    logger.warn(exception);
+    logger.error(exception);
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<String> handle(ConstraintViolationException exception) {
-    logger.warn(exception);
+    logger.error(exception);
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
+  @ExceptionHandler(ActionForbiddenByStateException.class)
+  public ResponseEntity<String> handle(ActionForbiddenByStateException exception) {
+    logger.error(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(EmployerProfileNotFoundException.class)
+  public ResponseEntity<String> handle(EmployerProfileNotFoundException exception) {
+    logger.error(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)

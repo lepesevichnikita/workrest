@@ -63,7 +63,7 @@ public class RandomPersonalDataFactory extends AbstractRandomFactory<PersonalDat
                      .validSvSeSsn();
   }
 
-  private FileInfo getDocumentScan() {
+  private FileInfo getAttachment() {
     return randomFileInfoFactory.build();
   }
 
@@ -71,7 +71,7 @@ public class RandomPersonalDataFactory extends AbstractRandomFactory<PersonalDat
     defaultPersonalDataBuilder.reset();
     return defaultPersonalDataBuilder.setDocumentName(getDocumentName())
                                      .setDocumentNumber(getDocumentNumber())
-                                     .setDocumentScan(getDocumentScan())
+                                     .setAttachment(getAttachment())
                                      .setFirstName(getFirstName())
                                      .setLastName(getLastName())
                                      .build();

@@ -28,7 +28,7 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
   private String firstName;
 
   private String lastName;
-  private FileInfo documentScan;
+  private FileInfo attachment;
 
   public DefaultPersonalDataBuilder() {
     reset();
@@ -59,15 +59,15 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
   }
 
   @Override
-  public PersonalDataBuilder setDocumentScan(FileInfo documentScan) {
-    this.documentScan = documentScan;
+  public PersonalDataBuilder setAttachment(FileInfo attachment) {
+    this.attachment = attachment;
     return this;
   }
 
   @Override
   public void reset() {
     firstName = lastName = documentName = documentNumber = "";
-    documentScan = null;
+    attachment = null;
   }
 
   @Override
@@ -77,7 +77,7 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
     personalData.setLastName(lastName);
     personalData.setDocumentName(documentName);
     personalData.setDocumentNumber(documentNumber);
-    personalData.setDocumentScan(documentScan);
+    personalData.setAttachment(attachment);
     return personalData;
   }
 }

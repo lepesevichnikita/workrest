@@ -8,9 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Transient;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.AbstractProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
@@ -38,19 +38,19 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
   private Set<UserAuthority> authorities;
 
   @JsonManagedReference
-  @OneToOne(mappedBy = "owner")
-  private FreelancerProfile freelancerProfile;
+  @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  private AbstractProfile freelancerProfile;
 
   @JsonManagedReference
-  @OneToOne(mappedBy = "owner")
-  private EmployerProfile employerProfile;
+  @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  private AbstractProfile employerProfile;
 
   @JsonIgnore
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {
-    return employerProfile;
+    return (EmployerProfile) employerProfile;
   }
 
   public void setEmployerProfile(EmployerProfile employerProfile) {
@@ -66,7 +66,7 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
   }
 
   public FreelancerProfile getFreelancerProfile() {
-    return freelancerProfile;
+    return (FreelancerProfile) freelancerProfile;
   }
 
   public void setFreelancerProfile(FreelancerProfile freelancerProfile) {
@@ -89,18 +89,10 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
     this.personalData = personalData;
   }
 
-  public boolean hasPersonalData() {
-    return personalData != null;
-  }
-
-  @PrePersist
-  private void setDefaultState() {
-    if (getCurrentState() == null) {
-      setCurrentState(getDefaultState());
-    }
-  }
-
-  private AbstractUserState getDefaultState() {
+  @Override
+  @Transient
+  @JsonIgnore
+  protected AbstractUserState getDefaultState() {
     return new UnverifiedUserState();
   }
 

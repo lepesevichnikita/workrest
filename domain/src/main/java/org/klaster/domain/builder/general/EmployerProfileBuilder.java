@@ -10,7 +10,7 @@ package org.klaster.domain.builder.general;
 import java.util.Set;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 
 /**
  * DefaultEmployerProfileBuilder

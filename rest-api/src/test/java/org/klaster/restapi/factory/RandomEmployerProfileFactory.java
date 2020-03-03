@@ -10,7 +10,7 @@ package org.klaster.restapi.factory;
 import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.concrete.DefaultEmployerProfileBuilder;
 import org.klaster.domain.builder.general.EmployerProfileBuilder;
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 
 /**
  * RandomFreelancerProfileFactory

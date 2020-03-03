@@ -13,6 +13,7 @@ import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.service.DefaultJobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,8 +47,8 @@ public class JobController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<Job> create(JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
-    return ResponseEntity.ok(defaultJobService.create(jobDTO, currentUser));
+  public ResponseEntity<Job> create(@RequestBody JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
+    return new ResponseEntity<>(defaultJobService.create(jobDTO, currentUser), HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")

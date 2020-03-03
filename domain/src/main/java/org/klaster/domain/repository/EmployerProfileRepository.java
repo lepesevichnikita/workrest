@@ -7,7 +7,7 @@ package org.klaster.domain.repository;
  *
  */
 
-import org.klaster.domain.model.controller.EmployerProfile;
+import org.klaster.domain.model.entity.EmployerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
