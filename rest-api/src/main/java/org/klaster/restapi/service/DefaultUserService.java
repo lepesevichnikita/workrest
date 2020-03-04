@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.security.InvalidParameterException;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.UserBuilder;
@@ -19,9 +20,10 @@ import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
-import org.klaster.domain.repository.RoleRepository;
+import org.klaster.domain.repository.UserAuthorityRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
+import org.klaster.restapi.configuration.SystemAdministratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +47,20 @@ public class DefaultUserService {
   private UserBuilder defaultUserBuilder;
 
   @Autowired
-  private RoleRepository roleRepository;
+  private UserAuthorityRepository userAuthorityRepository;
+
+  @Autowired
+  private SystemAdministratorProperties systemAdministratorProperties;
 
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
-    Set<UserAuthority> userAuthorities = roleRepository.findOrCreateAllByNames(userAuthoritiesNames);
+    if (systemAdministratorProperties.getSystemAdministratorLogin()
+                                     .equals(loginInfo.getLogin())) {
+      throw new InvalidParameterException();
+    }
+    Set<UserAuthority> userAuthorities = userAuthorityRepository.findOrCreateAllByNames(userAuthoritiesNames);
     User user = defaultUserBuilder.setLoginInfo(loginInfo)
-                                  .setRoles(userAuthorities)
+                                  .setAuthorities(userAuthorities)
                                   .build();
     return userRepository.save(user);
   }

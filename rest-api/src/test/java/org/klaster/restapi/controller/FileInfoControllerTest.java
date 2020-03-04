@@ -2,7 +2,6 @@ package org.klaster.restapi.controller;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,6 +23,7 @@ import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.klaster.restapi.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
@@ -121,7 +121,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     mockMvc.perform(MockMvcRequestBuilders.multipart(uri)
                                           .file(mockMultipartUploadFile)
                                           .accept(MediaType.APPLICATION_JSON)
-                                          .header(AUTHORIZATION, tokenValue))
+                                          .header(HttpHeaders.AUTHORIZATION, tokenValue))
            .andExpect(status().isCreated())
            .andExpect(jsonPath("$.id").value(notNullValue()))
            .andExpect(jsonPath("$.path").value(endsWith(INPUT_FILE_NAME)))

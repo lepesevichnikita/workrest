@@ -1,6 +1,5 @@
 package org.klaster.restapi.controller;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,11 +18,13 @@ import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
+import org.klaster.restapi.configuration.SystemAdministratorProperties;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,8 +55,8 @@ import org.testng.annotations.Test;
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
-  public static final String VALID_ADMIN_PASSWORD = "admin";
-  public static final String VALID_ADMIN_LOGIN = "admin";
+  private static final String VALID_ADMIN_PASSWORD = "admin";
+  private static final String VALID_ADMIN_LOGIN = "admin";
   private static final String CONTROLLER_NAME = "users";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
@@ -82,6 +83,9 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
+
+  @Autowired
+  private SystemAdministratorProperties systemAdministratorProperties;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
@@ -115,6 +119,18 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
+  public void unprocessableEntityForPostWithSystemAdministratorLoginInfo() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    randomLoginInfo.setLogin(systemAdministratorProperties.getSystemAdministratorLogin());
+    randomLoginInfo.setPassword(systemAdministratorProperties.getSystemAdministratorPassword());
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .content(loginInfoDTOAsJson))
+           .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
   public void unprocessableEntityForPostWithNonUniqueLogin() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
@@ -130,7 +146,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   public void unauthorizedForDeleteWithInvalidToken() throws Exception {
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    mockMvc.perform(delete(uri).header(AUTHORIZATION, INVALID_TOKEN)
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, INVALID_TOKEN)
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON))
            .andExpect(unauthenticated());
@@ -142,7 +158,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedUser.getId());
     LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(randomLoginInfo);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(loginInfoDTO);
-    mockMvc.perform(delete(uri).header(AUTHORIZATION, administratorToken)
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON)
                                .content(loginInfoDTOAsJson))
@@ -155,7 +171,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
-    mockMvc.perform(get(uri).header(AUTHORIZATION, administratorToken)
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
                             .content(loginInfoDTOAsJson))
@@ -169,7 +185,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
       LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
                                                    .setPassword(VALID_ADMIN_PASSWORD)
                                                    .build();
-      defaultAdministratorService.registerAdministrator(loginInfo);
+      defaultAdministratorService.registerByLoginInfo(loginInfo);
     }
     administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
                                                             .getValue();

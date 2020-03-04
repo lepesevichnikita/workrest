@@ -38,7 +38,7 @@ public class DefaultUserBuilder implements UserBuilder {
   }
 
   @Override
-  public UserBuilder setRoles(Set<UserAuthority> userAuthorities) {
+  public UserBuilder setAuthorities(Set<UserAuthority> userAuthorities) {
     this.userAuthorities = userAuthorities;
     return this;
   }

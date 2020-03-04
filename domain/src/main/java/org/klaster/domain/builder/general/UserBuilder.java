@@ -22,7 +22,7 @@ public interface UserBuilder extends Builder<User> {
 
   UserBuilder setLoginInfo(LoginInfo loginInfo);
 
-  UserBuilder setRoles(Set<UserAuthority> userAuthorities);
+  UserBuilder setAuthorities(Set<UserAuthority> userAuthorities);
 
   UserBuilder setId(long id);
 }

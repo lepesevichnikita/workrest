@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/administrators")
-@PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
+@PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
 public class AdministratorController {
 
   @Autowired
@@ -53,7 +53,7 @@ public class AdministratorController {
   @PostMapping
   public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
-    User registeredAdministrator = defaultAdministratorService.registerAdministrator(loginInfo);
+    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(loginInfo);
     return new ResponseEntity<>(registeredAdministrator, HttpStatus.CREATED);
   }
 

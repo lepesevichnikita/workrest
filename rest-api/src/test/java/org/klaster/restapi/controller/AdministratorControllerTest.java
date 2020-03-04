@@ -1,29 +1,30 @@
 package org.klaster.restapi.controller;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Collections;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import org.klaster.domain.builder.general.LoginInfoBuilder;
-import org.klaster.domain.builder.general.RoleBuilder;
-import org.klaster.domain.builder.general.UserBuilder;
-import org.klaster.domain.constant.AuthorityName;
+import java.util.stream.IntStream;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.domain.model.entity.UserAuthority;
-import org.klaster.restapi.configuration.TestContext;
+import org.klaster.restapi.configuration.ApplicationContext;
+import org.klaster.restapi.configuration.SystemAdministratorProperties;
+import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.service.DefaultAdministratorService;
+import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,28 +52,20 @@ import org.testng.annotations.Test;
  */
 
 @WebAppConfiguration
-@ContextConfiguration(classes = {TestContext.class})
+@ContextConfiguration(classes = {ApplicationContext.class})
 public class AdministratorControllerTest extends AbstractTestNGSpringContextTests {
 
   private static final String CONTROLLER_NAME = "administrators";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
-  private static final String SYSTEM_ADMINISTRATOR_NAME = "admin";
-  private static final String SYSTEM_ADMINISTRATOR_PASSWORD = "admin";
 
   private MockMvc mockMvc;
+  private String systemAdministratorToken;
+  private LoginInfo randomLoginInfo;
+  private RandomLoginInfoFactory randomLoginInfoFactory;
 
   @Autowired
   private WebApplicationContext webApplicationContext;
-
-  @Autowired
-  private RoleBuilder defaultRoleBuilder;
-
-  @Autowired
-  private LoginInfoBuilder defaultLoginInfoBuilder;
-
-  @Autowired
-  private UserBuilder defaultUserBuilder;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -80,110 +73,117 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Autowired
   private DefaultAdministratorService defaultAdministratorService;
 
+  @Autowired
+  private SystemAdministratorProperties systemAdministratorProperties;
+
+  @Autowired
+  private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
+
   @BeforeClass
-  public void setup() {
+  public void initialize() throws NoSuchAlgorithmException {
+    objectMapper = new ObjectMapper();
+    objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(SecurityMockMvcConfigurers.springSecurity())
                              .build();
+    randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
+    initializeSystemAdministratorToken();
   }
 
   @BeforeMethod
-  public void reset() {
-    defaultLoginInfoBuilder.reset();
-    defaultUserBuilder.reset();
+  public void buildRandomInstances() {
+    randomLoginInfo = randomLoginInfoFactory.build();
   }
 
   @Test
-  public void createsAdministrator() throws Exception {
-    final long id = 0;
+  public void createdForPostValidLoginInfoWithSystemAdministratorToken() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(AuthorityName.ADMINISTRATOR)
-                                                    .build();
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User registeredAdministrator = defaultUserBuilder.setId(id)
-                                                     .setLoginInfo(loginInfo)
-                                                     .setRoles(Collections.singleton(userAuthority))
-                                                     .build();
-    final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(loginInfo));
-    final String registeredAdministratorAsJson = objectMapper.writeValueAsString(registeredAdministrator);
-    mockMvc.perform(post(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+    final String loginInfoAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    mockMvc.perform(post(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                              .contentType(MediaType.APPLICATION_JSON_VALUE)
                              .accept(MediaType.APPLICATION_JSON_VALUE)
                              .content(loginInfoAsJson))
            .andExpect(status().isCreated())
-           .andExpect(content().json(registeredAdministratorAsJson));
+           .andExpect(jsonPath("$.id").value(notNullValue()))
+           .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()));
   }
 
   @Test
-  public void getsUnauthenticatedIfAnonymous() throws Exception {
+  public void unauthenticatedIfAnonymous() throws Exception {
     mockMvc.perform(get(CONTROLLER_NAME).accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(unauthenticated());
   }
 
   @Test
-  public void getsUnauthenticatedWithWrongLoginAndPassword() throws Exception {
-    final String wrongLogin = "wrong login";
-    final String wrongPassword = "wrong password";
+  public void unauthenticatedForPlainAdministrator() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    final String plainAdministratorToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                           randomLoginInfo.getPassword())
+                                                                              .getValue();
     mockMvc.perform(get(uri).accept(MediaType.APPLICATION_JSON_VALUE)
-                            .with(httpBasic(wrongLogin, wrongPassword)))
+                            .header(HttpHeaders.AUTHORIZATION, plainAdministratorToken))
            .andExpect(unauthenticated());
   }
 
   @Test
-  public void getsListOfAdministrators() throws Exception {
+  public void okForGetWithValidSystemAdministratorToken() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(AuthorityName.SYSTEM_ADMINISTRATOR)
-                                                    .build();
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    defaultUserBuilder.setLoginInfo(loginInfo)
-                      .setRoles(Collections.singleton(userAuthority))
-                      .build();
-    List<User> registeredAdministrators = Arrays.asList(defaultUserBuilder.setId(0)
-                                                                          .build(),
-                                                        defaultUserBuilder.setId(1)
-                                                                          .build());
-    when(defaultAdministratorService.findAll()).thenReturn(registeredAdministrators);
-    final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(registeredAdministrators);
-    mockMvc.perform(get(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+    final int createdAdministratorsCount = 10;
+    IntStream.range(0, createdAdministratorsCount)
+             .forEach(i -> defaultAdministratorService.registerByLoginInfo(randomLoginInfoFactory.build()));
+    List<User> allAdministrators = defaultAdministratorService.findAll();
+    final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(allAdministrators);
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                             .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isOk())
            .andExpect(content().json(expectedAdministratorsAsJson));
   }
 
   @Test
-  public void deletesAdministrator() throws Exception {
-    final long id = 0;
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    UserAuthority userAuthority = new UserAuthority();
-    userAuthority.setAuthority(AuthorityName.SYSTEM_ADMINISTRATOR);
-    LoginInfo loginInfo = defaultLoginInfoBuilder.build();
-    User expectedAdministrator = defaultUserBuilder.setId(id)
-                                                   .setLoginInfo(loginInfo)
-                                                   .build();
-    final String expectedAdministratorAsJson = objectMapper.writeValueAsString(expectedAdministrator);
-    mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+  public void acceptedForDeleteWithValidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
+    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredAdministrator.getId());
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                                .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isAccepted())
-           .andExpect(content().json(expectedAdministratorAsJson));
+           .andExpect(jsonPath("$.id").value(registeredAdministrator.getId()))
+           .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()));
   }
 
   @Test
-  public void returnsNotFoundIfDeletedAdministratorDoesntExists() throws Exception {
-    final long id = 0;
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
+  public void notFoundForDeleteWithInvalidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
+    final long invalidId = 1000000L;
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, invalidId);
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                                .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isNotFound());
   }
 
 
   @Test
-  public void returnsNotFoundIfRequiredAdministratorNotFound() throws Exception {
-    final long id = 0;
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    mockMvc.perform(delete(uri).with(httpBasic(SYSTEM_ADMINISTRATOR_NAME, SYSTEM_ADMINISTRATOR_PASSWORD))
-                               .accept(MediaType.APPLICATION_JSON_VALUE))
+  public void notFoundForGetWithInvalidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
+    final long invalidId = 1000000L;
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, invalidId);
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
+                            .accept(MediaType.APPLICATION_JSON_VALUE))
            .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void okForGetWithValidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
+    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredAdministrator.getId());
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
+                            .accept(MediaType.APPLICATION_JSON_VALUE))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.id").value(registeredAdministrator.getId()))
+           .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()));
+  }
+
+  private void initializeSystemAdministratorToken() {
+    systemAdministratorToken = defaultTokenBasedUserDetailsService.createToken(systemAdministratorProperties.getSystemAdministratorLogin(),
+                                                                               systemAdministratorProperties.getSystemAdministratorPassword())
+                                                                  .getValue();
   }
 }

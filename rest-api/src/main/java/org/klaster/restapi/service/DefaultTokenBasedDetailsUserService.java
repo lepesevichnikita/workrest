@@ -37,6 +37,9 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private DefaultSystemAdministratorService defaultSystemAdministratorService;
+
   @Override
   public User loadUserByUsername(String login) {
     LoginInfo loginInfo = defaultLoginInfoService.findFirstByLogin(login);
@@ -47,6 +50,10 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   @Override
   public Token createToken(String login, String password) {
     LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
+    if (foundLoginInfo == null && defaultSystemAdministratorService.isSystemAdministrator(login, password)) {
+      foundLoginInfo = defaultSystemAdministratorService.createSystemAdministrator()
+                                                        .getLoginInfo();
+    }
     Token newToken = new Token();
     foundLoginInfo.addToken(newToken);
     return tokenRepository.save(newToken);
@@ -67,7 +74,9 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   @Override
   public Token deleteTokenByValue(String token) {
     Token foundToken = tokenRepository.findFirstByValue(token)
-                                      .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class, "value", token)));
+                                      .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class,
+                                                                                                                          "value",
+                                                                                                                          token)));
     tokenRepository.delete(foundToken);
     return foundToken;
   }

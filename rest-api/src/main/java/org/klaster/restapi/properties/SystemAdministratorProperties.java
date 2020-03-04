@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(PropertyClassPath.APPLICATION)
-public class AdministratorConfig {
+public class SystemAdministratorProperties {
+
   @Value("${spring.security.user.name}")
   private String systemAdministratorLogin;
   @Value("${spring.security.user.password}")

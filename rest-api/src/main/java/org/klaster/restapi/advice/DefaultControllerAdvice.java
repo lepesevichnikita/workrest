@@ -9,6 +9,7 @@ package org.klaster.restapi.advice;
  * Copyright(c) JazzTeam
  */
 
+import java.security.InvalidParameterException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
@@ -20,7 +21,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -56,15 +56,21 @@ public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
   }
 
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(BadCredentialsException.class)
-  public void handle(BadCredentialsException exception) {
+  public ResponseEntity<String> handle(BadCredentialsException exception) {
     logger.error(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
   }
 
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-  public void handle(AuthenticationCredentialsNotFoundException exception) {
+  public ResponseEntity<String> handle(AuthenticationCredentialsNotFoundException exception) {
     logger.error(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(InvalidParameterException.class)
+  public ResponseEntity<String> handle(InvalidParameterException exception) {
+    logger.error(exception);
+    return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
   }
 }

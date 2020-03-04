@@ -18,13 +18,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * RoleRepository
+ * UserAuthorityRepository
  *
  * @author Nikita Lepesevich
  */
 
 @Repository
-public interface RoleRepository extends JpaRepository<UserAuthority, Long> {
+public interface UserAuthorityRepository extends JpaRepository<UserAuthority, Long> {
 
   Optional<UserAuthority> findFirstByAuthority(String authority);
 
