@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class PersistenceJPAConfig {
 
   public static final String JPA_PERSISTENCE_UNIT_NAME = "myJpaPersistenceUnit";
+
   @Autowired
   private Environment environment;
 

@@ -16,4 +16,7 @@ package org.klaster.restapi.constant;
 public class PropertyClassPath {
 
   public static final String APPLICATION = "classpath:application.properties";
+
+  private PropertyClassPath() {
+  }
 }

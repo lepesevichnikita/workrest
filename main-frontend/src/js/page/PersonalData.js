@@ -1,12 +1,14 @@
-import Page from "./Page.js";
-import {FileService, PersonalDataService} from "../api";
-import {Action} from "../constant";
+import { FileService, PersonalDataService } from "../api";
+import { Action } from "../constant";
+import { checkIsAuthorized, redirectToPage } from "../main.js";
+import { Page } from "./Page.js";
 
 export class PersonalData extends Page {
   constructor(props) {
-    super(props);
-    this._fileService = new FileService();
-    this._personalDataService = new PersonalDataService();
+    super();
+    this._authorizationService = props.authorizationService;
+    this._fileService = new FileService(props);
+    this._personalDataService = new PersonalDataService(props);
     this._requestBody = {};
     this.addListener("#fileChooseButton", ["click", this._onChooseFileButtonClick.bind(this), false])
         .addListener("input[name=file]", ["change", this._onChangeFileInput.bind(this), false])
@@ -20,13 +22,14 @@ export class PersonalData extends Page {
 
   process() {
     checkIsAuthorized()
-    .then(() => replacePage("personal_data"))
+    .then(() => this.replacePage("personal_data"))
     .then(() => super.process())
     .catch(() => redirectToPage("login"));
   }
 
   _onFileLoadingProgress(event) {
-    console.dir(event.percent);
+    $("#fileProgressBar")
+    .progress("set percent", event.percent);
   }
 
   _onChooseFileButtonClick(event) {
@@ -38,14 +41,20 @@ export class PersonalData extends Page {
   _onChangeFileInput(event) {
     event.preventDefault();
     const file = event.target.files[0];
-    const form = document.querySelector("#personalDataForm");
-    form.className += "loading";
+    const label = document.querySelector("label[for=fileChooseButton]");
+    const progressBar = $("#fileProgressBar");
+    progressBar.css("visibility", "visible");
+    progressBar.progress("remove error");
     this._fileService.uploadFile(file)
         .then(response => {
-          this._requestBody.fileInfo = response.body;
-          const label = document.querySelector("label[for=fileChooseButton]");
+          this._requestBody.attachment = response.body;
+          progressBar.progress("complete");
+          progressBar.css("visibility", "hidden");
           label.textContent = file.name;
-          form.className = form.className.replace("loading", "");
+        })
+        .catch(() => {
+          $("#fileProgressBar")
+          .progress("set error");
         });
   }
 

@@ -1,1 +1,1 @@
-export {TemplateHelper} from './TemplateHelper.js';
+export { TemplateHelper } from "./TemplateHelper.js";

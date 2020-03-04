@@ -15,8 +15,10 @@ import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.dto.PersonalDataForAdministratorDTO;
 import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
@@ -87,6 +89,9 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   @Autowired
   private DefaultPersonalDataService defaultPersonalDataService;
 
+  @Autowired
+  private FileInfoRepository fileInfoRepository;
+
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
     objectMapper = new ObjectMapper();
@@ -108,6 +113,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   @Test
   public void okForGetWithPersonalDataAsJsonForGetWithCorrectIdAndValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    FileInfo persistentAttachment = fileInfoRepository.save(randomPersonalData.getAttachment());
+    randomPersonalData.setAttachment(persistentAttachment);
     PersonalData personalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
@@ -153,6 +160,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                 .getValue();
+    FileInfo persistedFileInfo = fileInfoRepository.save(randomPersonalData.getAttachment());
+    randomPersonalData.setAttachment(persistedFileInfo);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String personalDataDTOAsJson = objectMapper.writeValueAsString(
         PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));

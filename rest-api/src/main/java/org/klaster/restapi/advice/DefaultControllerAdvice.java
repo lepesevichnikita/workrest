@@ -59,12 +59,12 @@ public class DefaultControllerAdvice extends ResponseEntityExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(BadCredentialsException.class)
   public void handle(BadCredentialsException exception) {
-    logger.warn(exception);
+    logger.error(exception);
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
   public void handle(AuthenticationCredentialsNotFoundException exception) {
-    logger.warn(exception);
+    logger.error(exception);
   }
 }

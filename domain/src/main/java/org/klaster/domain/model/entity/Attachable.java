@@ -15,7 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 /**
  * Attachable
@@ -31,7 +31,7 @@ public abstract class Attachable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
-  @OneToOne(fetch = FetchType.EAGER, mappedBy = "attachable", orphanRemoval = true, cascade = {CascadeType.ALL})
+  @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
   private FileInfo attachment;
 
   public long getId() {

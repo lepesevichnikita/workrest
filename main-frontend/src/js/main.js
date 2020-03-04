@@ -1,28 +1,20 @@
-import {AuthorizationService, FreelancerService, JobService, UserService} from "./api";
-import {TemplateHelper} from "./helper";
-import {Freelancers, Home, Jobs, Login, PersonalData, SignUp, User} from "./page";
+import { AuthorizationService, FreelancerService, JobService, UserService } from "./api";
 
-import {Action} from "./constant";
+import { Action } from "./constant";
+import { TemplateHelper } from "./helper";
+import { Freelancers, Home, Jobs, Login, PersonalData, SignUp, User } from "./page";
 
 const menuContainerId = "#menu";
+const authorizationService = new AuthorizationService();
 
 const pages = {
   home: new Home(),
-  user: new User(),
-  freelancers: new Freelancers(),
-  jobs: new Jobs(),
-  login: new Login(),
-  signup: new SignUp(),
-  personal_data: new PersonalData()
-};
-
-const formToObject = form => {
-  const formData = new FormData(form);
-  const formDataAsObject = {};
-  formData.forEach((value, key) => {
-    formDataAsObject[key] = value;
-  });
-  return formDataAsObject;
+  user: new User({authorizationService: authorizationService}),
+  freelancers: new Freelancers({authorizationService: authorizationService}),
+  jobs: new Jobs({authorizationService: authorizationService}),
+  login: new Login({authorizationService: authorizationService}),
+  signup: new SignUp({authorizationService: authorizationService}),
+  personal_data: new PersonalData({authorizationService: authorizationService})
 };
 
 const capitalizeFirstLetter = string => {
@@ -33,19 +25,23 @@ const loadMenu = menuName => {
   $(menuContainerId)
   .dimmer("show");
   $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
-   .done(
-       menuTemplate => {
-         $(menuContainerId)
-         .dimmer("hide");
-         $(menuContainerId)
-         .html($.tmpl(menuTemplate, {}));
-         $("#signout")
-         .click(function (event) {
-           event.preventDefault();
-           authorizationService.signOut();
-         });
-       }
-   );
+   .done(menuTemplate => {
+     $(menuContainerId)
+     .dimmer("hide");
+     $(menuContainerId)
+     .html($.tmpl(menuTemplate, {}));
+     $(".ui.link")
+     .click(function(event) {
+       event.preventDefault();
+       redirectToPage($(this)
+                      .attr("name"));
+     });
+     $("#signout")
+     .click(function(event) {
+       event.preventDefault();
+       authorizationService.signOut();
+     });
+   });
 };
 
 export const checkIsAuthorized = () => {
@@ -63,50 +59,28 @@ export const checkIsAuthorized = () => {
   });
 };
 
-export const defineFormSubmitCallback = (form, submitCallback) => {
-  $(form).submit(function(event) {
-    event.preventDefault();
-    $(form)
-    .dimmer("show");
-    submitCallback(formToObject(form));
-  });
-};
-
 export const redirectToPage = pageName => {
   pages[pageName].process();
 };
 
-export const loadTemplate = (selector, link, templateData) =>
-    new Promise((resolve, reject) => {
-      $.get(link)
-       .done(pageTemplate => {
-         const pageHtml = $.tmpl(pageTemplate, templateData);
-         $(selector)
-         .html(pageHtml);
-         resolve(pageHtml);
-       })
-       .fail(reject);
-    });
-
-export const replacePage = pageName =>
-    new Promise((resolve, reject) => {
-      document.title = `WorkRest | ${capitalizeFirstLetter(pageName)}`;
-      loadTemplate(
-          "#page",
-          templateHelper.getPagePath(pageName.toLowerCase()),
-          {}
-      )
-      .then(resolve)
+export const loadTemplate = (selector, link, templateData) => new Promise((resolve, reject) => {
+  superagent
+  .get(link)
+  .then(response => {
+    const pageHtml = $.tmpl(response.text, templateData);
+    $(selector)
+    .html(pageHtml);
+    resolve(response);
+  })
       .catch(reject);
-    });
+});
 
 export const limitContentText = (contentSelector, maxTextLength) => {
   $(contentSelector).each(function(i) {
     const len = $(this).text().length;
     if (len > maxTextLength) {
       $(this)
-      .text(
-          $(this)
+      .text($(this)
           .text()
           .substr(0, maxTextLength) + "..."
       );
@@ -114,14 +88,11 @@ export const limitContentText = (contentSelector, maxTextLength) => {
   });
 };
 
-window.replacePage = replacePage;
-window.authorizationService = new AuthorizationService();
-window.freelancerService = new FreelancerService();
-window.templateHelper = new TemplateHelper();
-window.userService = new UserService();
-window.jobService = new JobService();
-window.redirectToPage = redirectToPage;
-window.defineFormSubmitCallback = defineFormSubmitCallback;
+window.authorizationService = authorizationService;
+window.freelancerService = new FreelancerService(authorizationService);
+window.templateHelper = new TemplateHelper(authorizationService);
+window.userService = new UserService(authorizationService);
+window.jobService = new JobService(authorizationService);
 window.checkIsAuthorized = checkIsAuthorized;
 window.limitContentText = limitContentText;
 
@@ -135,7 +106,7 @@ authorizationService
   redirectToPage("login");
 })
 .subscribe(Action.SIGNED_UP, () => {
-  redirectToPage("personal_data");
+  redirectToPage("user");
 })
 .subscribe(Action.TOKEN_CORRECT, () => {
   loadMenu("authorized");
@@ -148,3 +119,4 @@ checkIsAuthorized()
 .then(() => loadMenu("authorized"))
 .catch(() => loadMenu("main"))
 .finally(() => redirectToPage("home"));
+

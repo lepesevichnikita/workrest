@@ -1,10 +1,15 @@
-import Page from './Page.js';
+import Page from "./Page.js";
 
 export class Home extends Page {
+  constructor() {
+    super();
+  }
+
   process() {
-    document.title = 'Home';
-    replacePage('home')
-    .then(() => super.process());
+    this.replacePage("home")
+        .then(() => {
+          super.process();
+        });
   }
 }
 

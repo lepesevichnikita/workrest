@@ -112,7 +112,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                  .getValue();
-    InputStream inputStream = new FileInputStream(FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME));
+    InputStream inputStream = new FileInputStream(inputFile);
     MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
                                                                       INPUT_FILE_NAME,
                                                                       MediaType.IMAGE_JPEG.toString(),
@@ -138,7 +138,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(status().isOk());
   }
 
-  private void deleteOutputFiles() throws IOException {
+  private void deleteOutputFiles() {
     try {
       FileUtils.deleteDirectory(filesProperties.getOutputFolder());
     } catch (IOException exception) {

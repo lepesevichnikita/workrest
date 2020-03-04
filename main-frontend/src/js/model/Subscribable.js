@@ -1,5 +1,5 @@
 export class Subscribable {
-  constructor(props) {
+  constructor() {
     this._subscribers = {};
   }
 

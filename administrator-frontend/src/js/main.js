@@ -1,8 +1,8 @@
-import {AuthorizationService} from "./api";
-import {TemplateHelper} from "./helper";
-import {Home, Login, Requests, Users} from "./page";
+import { AuthorizationService } from "./api";
 
-import {Action} from "./constant";
+import { Action } from "./constant";
+import { TemplateHelper } from "./helper";
+import { Home, Login, Requests, Users } from "./page";
 
 const menuContainerId = "#menu";
 
@@ -118,7 +118,6 @@ export const limitContentText = (contentSelector, maxTextLength) => {
 window.replacePage = replacePage;
 window.authorizationService = new AuthorizationService();
 window.redirectToPage = redirectToPage;
-window.defineFormSubmitCallback = defineFormSubmitCallback;
 window.checkIsAuthorized = checkIsAuthorized;
 window.limitContentText = limitContentText;
 window.templateHelper = new TemplateHelper();

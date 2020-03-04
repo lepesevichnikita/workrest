@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
@@ -29,8 +31,8 @@ public class FileInfo {
   private long id;
 
   @JsonBackReference
-  @OneToOne
-  private Attachable attachable;
+  @OneToMany(mappedBy = "attachment", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  private Set<Attachable> attachables;
 
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -73,12 +75,12 @@ public class FileInfo {
     this.id = id;
   }
 
-  public Attachable getAttachable() {
-    return attachable;
+  public Set<Attachable> getAttachables() {
+    return attachables;
   }
 
-  public void setAttachable(Attachable attachable) {
-    this.attachable = attachable;
+  public void setAttachables(Set<Attachable> attachable) {
+    this.attachables = attachable;
   }
 
   @Transient

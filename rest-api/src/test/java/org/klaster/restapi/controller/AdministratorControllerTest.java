@@ -3,7 +3,6 @@ package org.klaster.restapi.controller;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,6 +25,7 @@ import org.klaster.restapi.configuration.TestContext;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -83,7 +83,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @BeforeClass
   public void setup() {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                             .apply(springSecurity())
+                             .apply(SecurityMockMvcConfigurers.springSecurity())
                              .build();
   }
 

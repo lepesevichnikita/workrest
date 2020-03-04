@@ -1,8 +1,12 @@
-import {Page} from "./Page.js";
+import { JobService } from "../api";
+import { limitContentText } from "../main.js";
+import { Page } from "./Page.js";
 
 export class Jobs extends Page {
   constructor(props) {
-    super(props);
+    super();
+    this._authorizationService = props.authorizationService;
+    this._jobService = new JobService(props);
     this._cardTemplateName = "job/card";
     this._popupTemplateName = "job/popup";
     this._containerSelector = "#job-cards";
@@ -17,47 +21,40 @@ export class Jobs extends Page {
   }
 
   _loadData() {
-    jobService.getJobs().then(response => {
-      const jobs = response.body;
-      $.get(
-          templateHelper.getTemplatePath(this._cardTemplateName),
-          cardBody => {
+    this._jobService.getJobs()
+        .then(response => {
+          const jobs = response.body;
+          $.get(this.templateHelper.getTemplatePath(this._cardTemplateName), cardBody => {
             $.tmpl(cardBody, jobs)
              .appendTo(this._containerSelector);
-            limitContentText(
-                this._cardDescriptionSelector,
-                this._maxDescriptionLength
-            );
-            $.get(
-                templateHelper.getTemplatePath(this._popupTemplateName),
-                popupBody => {
-                  $(this._modalsSelector)
-                  .remove();
-                  $.tmpl(popupBody, jobs)
-                   .appendTo(this._containerSelector);
-                  $(this._containerSelector)
-                  .dimmer("hide");
-                  $(this._cardSelector)
-                  .unbind();
-                  $(this._cardSelector)
-                  .click(function (event) {
-                    event.preventDefault();
-                    const id = $(this)
-                    .attr("id");
-                    $(this._getModalSelectorById(id))
-                    .modal("show");
-                  });
-                }
-            );
+            limitContentText(this._cardDescriptionSelector, this._maxDescriptionLength);
+            $.get(this.templateHelper.getTemplatePath(this._popupTemplateName), popupBody => {
+              $(this._modalsSelector)
+              .remove();
+              $.tmpl(popupBody, jobs)
+               .appendTo(this._containerSelector);
+              $(this._containerSelector)
+              .dimmer("hide");
+              $(this._cardSelector)
+              .unbind();
+              $(this._cardSelector)
+              .click(event => {
+                event.preventDefault();
+                const item = $(event.currentTarget);
+                const id = item.attr("id");
+                $(this._getModalSelectorById(id))
+                .modal("show");
+              });
+            });
           }
       );
     });
   }
 
   process() {
-    replacePage("jobs")
-    .then(this._loadData())
-    .then(() => super.process());
+    this.replacePage("jobs")
+        .then(() => this._loadData())
+        .then(() => super.process());
   }
 }
 

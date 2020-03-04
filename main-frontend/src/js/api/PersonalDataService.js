@@ -1,10 +1,9 @@
-import AuthorizationService from "./AuthorizationService.js";
+import { ContentType } from "../constant";
 import RestClient from "./RestClient.js";
-import {ContentType} from "../constant";
 
 export class PersonalDataService {
-  constructor() {
-    this._authorizationService = new AuthorizationService();
+  constructor(props) {
+    this._authorizationService = props.authorizationService;
     this._restClient = new RestClient();
   }
 
