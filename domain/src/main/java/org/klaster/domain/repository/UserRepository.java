@@ -11,6 +11,7 @@ import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ApplicationUserRepository
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
+@Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
 
   User findFirstByLoginInfo(LoginInfo loginInfo);

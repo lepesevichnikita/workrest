@@ -33,8 +33,4 @@ public class DefaultLoginInfoService {
     return loginInfoRepository.findFirstByLoginAndPassword(login, password)
                               .orElse(null);
   }
-
-  public LoginInfo save(LoginInfo loginInfo) {
-    return loginInfoRepository.save(loginInfo);
-  }
 }

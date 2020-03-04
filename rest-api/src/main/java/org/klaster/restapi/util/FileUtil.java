@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -23,6 +24,14 @@ public class FileUtil {
 
   private FileUtil() {
 
+  }
+
+  public static File createSubFolderIfNotExists(File sourceFolder, String subFolderName) throws IOException {
+    File targetFolder = makeChildItem(sourceFolder, subFolderName);
+    if (!(targetFolder.isDirectory() || targetFolder.exists())) {
+      Files.createDirectory(targetFolder.toPath());
+    }
+    return targetFolder;
   }
 
   public static File makeChildItem(File sourceFolder, String child) {

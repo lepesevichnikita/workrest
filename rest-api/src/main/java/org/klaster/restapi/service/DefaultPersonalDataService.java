@@ -15,8 +15,10 @@ import org.klaster.domain.repository.PersonalDataRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class DefaultPersonalDataService {
 
   @Autowired
@@ -24,10 +26,6 @@ public class DefaultPersonalDataService {
 
   @Autowired
   private PersonalDataRepository personalDataRepository;
-
-  public PersonalData save(PersonalData personalData) {
-    return personalDataRepository.save(personalData);
-  }
 
   public PersonalData findByUserId(long id) {
     User foundUser = defaultUserService.findFirstById(id);
@@ -39,6 +37,7 @@ public class DefaultPersonalDataService {
                                                                                                                                id)));
   }
 
+  @Transactional
   public PersonalData updateByUserId(long id, PersonalData personalData) {
     User foundUser = defaultUserService.findFirstById(id);
     foundUser.getCurrentState()
@@ -46,6 +45,7 @@ public class DefaultPersonalDataService {
     return personalDataRepository.save(personalData);
   }
 
+  @Transactional
   public PersonalData verifyByUserId(long id) {
     PersonalData foundPersonalData = findByUserId(id);
     defaultUserService.verifyById(id);

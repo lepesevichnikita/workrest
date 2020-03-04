@@ -73,6 +73,7 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
   @Override
   public PersonalData build() {
     PersonalData personalData = new PersonalData();
+    attachment.setAttachable(personalData);
     personalData.setFirstName(firstName);
     personalData.setLastName(lastName);
     personalData.setDocumentName(documentName);

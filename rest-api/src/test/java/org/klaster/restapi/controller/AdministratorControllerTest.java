@@ -17,7 +17,7 @@ import java.util.List;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.builder.general.RoleBuilder;
 import org.klaster.domain.builder.general.UserBuilder;
-import org.klaster.domain.constant.Authority;
+import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -97,7 +97,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   public void createsAdministrator() throws Exception {
     final long id = 0;
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(Authority.ADMINISTRATOR)
+    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(AuthorityName.ADMINISTRATOR)
                                                     .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     User registeredAdministrator = defaultUserBuilder.setId(id)
@@ -133,7 +133,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void getsListOfAdministrators() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(Authority.SYSTEM_ADMINISTRATOR)
+    UserAuthority userAuthority = defaultRoleBuilder.setAuhtority(AuthorityName.SYSTEM_ADMINISTRATOR)
                                                     .build();
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     defaultUserBuilder.setLoginInfo(loginInfo)
@@ -156,7 +156,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
     UserAuthority userAuthority = new UserAuthority();
-    userAuthority.setAuthority(Authority.SYSTEM_ADMINISTRATOR);
+    userAuthority.setAuthority(AuthorityName.SYSTEM_ADMINISTRATOR);
     LoginInfo loginInfo = defaultLoginInfoBuilder.build();
     User expectedAdministrator = defaultUserBuilder.setId(id)
                                                    .setLoginInfo(loginInfo)

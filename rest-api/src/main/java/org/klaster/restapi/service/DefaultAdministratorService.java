@@ -9,17 +9,19 @@ package org.klaster.restapi.service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.UserBuilder;
-import org.klaster.domain.constant.Authority;
+import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.RoleRepository;
 import org.klaster.domain.repository.UserRepository;
+import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultAdministratorService {
 
-  private static String[] administratorAuthorities = {Authority.ADMINISTRATOR, Authority.USER};
+  private static String[] administratorAuthorities = {AuthorityName.ADMINISTRATOR, AuthorityName.USER};
 
   @Autowired
   private RoleRepository roleRepository;
@@ -56,12 +58,12 @@ public class DefaultAdministratorService {
   }
 
   public List<User> findAll() {
-    return new LinkedList<>(roleRepository.findFirstOrCreateByAuthority(Authority.ADMINISTRATOR)
+    return new LinkedList<>(roleRepository.findFirstOrCreateByAuthority(AuthorityName.ADMINISTRATOR)
                                           .getUsers());
   }
 
   public User findById(long id) {
-    UserAuthority userAuthority = roleRepository.findFirstOrCreateByAuthority(Authority.ADMINISTRATOR);
+    UserAuthority userAuthority = roleRepository.findFirstOrCreateByAuthority(AuthorityName.ADMINISTRATOR);
     return userAuthority.getUsers()
                         .stream()
                         .filter(applicationUser -> applicationUser.getId() == id)
@@ -72,25 +74,24 @@ public class DefaultAdministratorService {
   public User deleteById(long id) {
     User deletedAdministrator = findById(id);
     if (deletedAdministrator == null) {
-      throw new EntityNotFoundException();
+      throw new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id));
     }
     deletedAdministrator.getAuthorities()
                         .removeIf(role -> role.getAuthority()
-                                              .equals(Authority.SYSTEM_ADMINISTRATOR));
+                                              .equals(AuthorityName.SYSTEM_ADMINISTRATOR));
     userRepository.save(deletedAdministrator);
     return deletedAdministrator;
   }
 
   public boolean existsByLoginAndPassword(String login, String password) {
     boolean result = false;
-    LoginInfo foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password)
-                                                  .orElse(null);
-    if (foundLoginInfo != null) {
-      User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo);
+    Optional<LoginInfo> foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password);
+    if (foundLoginInfo.isPresent()) {
+      User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo.get());
       result = foundUser.getAuthorities()
                         .stream()
                         .map(UserAuthority::getAuthority)
-                        .anyMatch(Predicate.isEqual(Authority.ADMINISTRATOR));
+                        .anyMatch(Predicate.isEqual(AuthorityName.ADMINISTRATOR));
     }
     return result;
   }

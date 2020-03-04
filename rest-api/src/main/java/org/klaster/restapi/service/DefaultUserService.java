@@ -10,7 +10,7 @@ package org.klaster.restapi.service;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.UserBuilder;
-import org.klaster.domain.constant.Authority;
+import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -19,7 +19,6 @@ import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
-import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.RoleRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
@@ -37,10 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultUserService {
 
-  private static String[] userAuthorities = {Authority.USER};
-
-  @Autowired
-  private LoginInfoRepository loginInfoRepository;
+  private static String[] userAuthoritiesNames = {AuthorityName.USER};
 
   @Autowired
   private UserRepository userRepository;
@@ -51,8 +47,9 @@ public class DefaultUserService {
   @Autowired
   private RoleRepository roleRepository;
 
+  @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
-    Set<UserAuthority> userAuthorities = roleRepository.findOrCreateAllByNames(DefaultUserService.userAuthorities);
+    Set<UserAuthority> userAuthorities = roleRepository.findOrCreateAllByNames(userAuthoritiesNames);
     User user = defaultUserBuilder.setLoginInfo(loginInfo)
                                   .setRoles(userAuthorities)
                                   .build();

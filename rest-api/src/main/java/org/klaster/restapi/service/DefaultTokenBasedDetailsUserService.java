@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -52,12 +53,12 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   }
 
   @Override
-  public User findByTokenValue(String token) {
+  public User findByTokenValue(String tokenValue) {
     User foundUser = null;
-    Token foundToken = tokenRepository.findFirstByValue(token)
-                                      .orElse(null);
-    if (foundToken != null) {
-      foundUser = userRepository.findFirstByLoginInfo(foundToken.getLoginInfo());
+    Optional<Token> foundToken = tokenRepository.findFirstByValue(tokenValue);
+    if (foundToken.isPresent()) {
+      foundUser = userRepository.findFirstByLoginInfo(foundToken.get()
+                                                                .getLoginInfo());
     }
     return foundUser;
   }

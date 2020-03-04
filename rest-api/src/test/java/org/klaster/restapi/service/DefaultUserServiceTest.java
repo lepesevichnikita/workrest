@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.builder.general.UserBuilder;
-import org.klaster.domain.constant.Authority;
+import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.state.user.AbstractUserState;
@@ -99,7 +99,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   @Test
   public void registeredUserHasRoleUser() {
     user = defaultUserService.registerUserByLoginInfo(loginInfo);
-    assertThat(new ArrayList<>(user.getAuthorities()), contains(hasProperty("authority", equalTo(Authority.USER))));
+    assertThat(new ArrayList<>(user.getAuthorities()), contains(hasProperty("authority", equalTo(AuthorityName.USER))));
   }
 
   @Test

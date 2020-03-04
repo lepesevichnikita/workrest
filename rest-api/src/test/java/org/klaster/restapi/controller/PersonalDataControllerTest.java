@@ -2,7 +2,6 @@ package org.klaster.restapi.controller;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -29,6 +28,7 @@ import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -94,7 +94,7 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     randomPersonalDataFactory = RandomPersonalDataFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                             .apply(springSecurity())
+                             .apply(SecurityMockMvcConfigurers.springSecurity())
                              .build();
     registerAdministrator();
   }

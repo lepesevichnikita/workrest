@@ -7,6 +7,7 @@ package org.klaster.restapi.configuration;
  *
  */
 
+import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,8 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-@PropertySource("classpath:application.properties")
+@PropertySource(PropertyClassPath.APPLICATION)
 public class AdministratorConfig {
-
   @Value("${spring.security.user.name}")
   private String systemAdministratorLogin;
   @Value("${spring.security.user.password}")

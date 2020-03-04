@@ -55,7 +55,8 @@ public class PersonalDataController {
   public ResponseEntity<PersonalDataForAdministratorDTO> updateForCurrentUser(@RequestBody PersonalDataForAdministratorDTO personalDataDTO,
                                                                               @AuthenticationPrincipal User currentUser) {
     PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(currentUser.getId(), personalDataDTO.toPersonalData());
+    PersonalDataForAdministratorDTO personalDataForAdministratorDTO = PersonalDataForAdministratorDTO.fromPersonalData(updatedPersonalData);
     return ResponseEntity.accepted()
-                         .body(PersonalDataForAdministratorDTO.fromPersonalData(updatedPersonalData));
+                         .body(personalDataForAdministratorDTO);
   }
 }

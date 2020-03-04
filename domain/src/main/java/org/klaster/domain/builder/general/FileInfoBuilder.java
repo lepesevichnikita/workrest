@@ -7,6 +7,7 @@ package org.klaster.domain.builder.general;
  *
  */
 
+import java.time.LocalDateTime;
 import org.klaster.domain.model.entity.FileInfo;
 
 /**
@@ -21,4 +22,5 @@ public interface FileInfoBuilder extends Builder<FileInfo> {
 
   FileInfoBuilder setPath(String path);
 
+  FileInfoBuilder setCreatedAt(LocalDateTime createdAt);
 }

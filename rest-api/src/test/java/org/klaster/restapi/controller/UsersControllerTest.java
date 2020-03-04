@@ -2,7 +2,6 @@ package org.klaster.restapi.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,9 +13,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
-import org.klaster.domain.constant.Authority;
+import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -27,6 +25,7 @@ import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -60,6 +59,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   private static final String CONTROLLER_NAME = "users";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
+  private static final String INVALID_TOKEN = "invalid token";
 
   private ObjectMapper objectMapper;
   private MockMvc mockMvc;
@@ -89,7 +89,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                             .apply(springSecurity())
+                             .apply(SecurityMockMvcConfigurers.springSecurity())
                              .build();
     registerAdministrator();
   }
@@ -101,7 +101,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void registersUniqueUser() throws Exception {
+  public void createdForPostWithValidLoginInfo() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
@@ -111,11 +111,11 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").isNotEmpty())
            .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()))
-           .andExpect(jsonPath("$.authorities[0].authority").value(Authority.USER));
+           .andExpect(jsonPath("$.authorities[0].authority").value(AuthorityName.USER));
   }
 
   @Test
-  public void returnsUnprocessableEntityWithError() throws Exception {
+  public void unprocessableEntityForPostWithNonUniqueLogin() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
@@ -127,12 +127,10 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
 
   @Test
-  public void returnsUnauthorizedForAnonymousUserDeletingUser() throws Exception {
+  public void unauthorizedForDeleteWithInvalidToken() throws Exception {
     final long id = 0;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
-    final String wrongToken = UUID.randomUUID()
-                                  .toString();
-    mockMvc.perform(delete(uri).header(AUTHORIZATION, wrongToken)
+    mockMvc.perform(delete(uri).header(AUTHORIZATION, INVALID_TOKEN)
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON))
            .andExpect(unauthenticated());

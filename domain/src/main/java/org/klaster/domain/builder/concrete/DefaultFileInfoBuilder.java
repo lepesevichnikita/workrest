@@ -7,6 +7,7 @@ package org.klaster.domain.builder.concrete;
  *
  */
 
+import java.time.LocalDateTime;
 import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ public class DefaultFileInfoBuilder implements FileInfoBuilder {
 
   private String md5;
   private String path;
+  private LocalDateTime createdAt;
 
   public DefaultFileInfoBuilder() {
     reset();
@@ -40,9 +42,16 @@ public class DefaultFileInfoBuilder implements FileInfoBuilder {
   }
 
   @Override
+  public FileInfoBuilder setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+    return this;
+  }
+
+  @Override
   public void reset() {
     md5 = "";
     path = "";
+    createdAt = LocalDateTime.now();
   }
 
   @Override
@@ -50,6 +59,7 @@ public class DefaultFileInfoBuilder implements FileInfoBuilder {
     FileInfo fileInfo = new FileInfo();
     fileInfo.setMd5(md5);
     fileInfo.setPath(path);
+    fileInfo.setCreatedAt(createdAt);
     return fileInfo;
   }
 }

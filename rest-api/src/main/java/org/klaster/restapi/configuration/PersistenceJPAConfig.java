@@ -9,6 +9,10 @@ package org.klaster.restapi.configuration;
 
 import java.util.Properties;
 import javax.sql.DataSource;
+import org.klaster.restapi.constant.HibernatePropertyKey;
+import org.klaster.restapi.constant.JdbcPropertyKey;
+import org.klaster.restapi.constant.PackageName;
+import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,10 +35,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"org.klaster.domain.repository"})
-@PropertySource(value = {"classpath:application.properties"})
+@EnableJpaRepositories(basePackages = {PackageName.DOMAIN_REPOSITORY})
+@PropertySource(value = {PropertyClassPath.APPLICATION})
 public class PersistenceJPAConfig {
 
+  public static final String JPA_PERSISTENCE_UNIT_NAME = "myJpaPersistenceUnit";
   @Autowired
   private Environment environment;
 
@@ -43,8 +48,8 @@ public class PersistenceJPAConfig {
     LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
     entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());
     entityManagerFactoryBean.setDataSource(dataSource());
-    entityManagerFactoryBean.setPersistenceUnitName("myJpaPersistenceUnit");
-    entityManagerFactoryBean.setPackagesToScan("org.klaster.domain");
+    entityManagerFactoryBean.setPersistenceUnitName(JPA_PERSISTENCE_UNIT_NAME);
+    entityManagerFactoryBean.setPackagesToScan(PackageName.DOMAIN);
     entityManagerFactoryBean.setJpaProperties(hibernateProperties());
     return entityManagerFactoryBean;
   }
@@ -62,19 +67,19 @@ public class PersistenceJPAConfig {
   @Bean
   public DataSource dataSource() {
     DriverManagerDataSource dataSource = new DriverManagerDataSource();
-    dataSource.setDriverClassName(environment.getRequiredProperty("jdbc.driver"));
-    dataSource.setUrl(environment.getRequiredProperty("jdbc.url"));
-    dataSource.setUsername(environment.getRequiredProperty("jdbc.username"));
-    dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
+    dataSource.setDriverClassName(environment.getRequiredProperty(JdbcPropertyKey.JDBC_DRIVER));
+    dataSource.setUrl(environment.getRequiredProperty(JdbcPropertyKey.JDBC_URL));
+    dataSource.setUsername(environment.getRequiredProperty(JdbcPropertyKey.JDBC_USERNAME));
+    dataSource.setPassword(environment.getRequiredProperty(JdbcPropertyKey.JDBC_PASSWORD));
     return dataSource;
   }
 
   private Properties hibernateProperties() {
     Properties properties = new Properties();
-    properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-    properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-    properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
-    properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+    properties.put(HibernatePropertyKey.HIBERNATE_DIALECT, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_DIALECT));
+    properties.put(HibernatePropertyKey.HIBERNATE_SHOW_SQL, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_SHOW_SQL));
+    properties.put(HibernatePropertyKey.HIBERNATE_FORMAT_SQL, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_FORMAT_SQL));
+    properties.put(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO));
     return properties;
   }
 

@@ -1,4 +1,4 @@
-package org.klaster.restapi.configuration;
+package org.klaster.restapi.properties;
 
 /*
  * workrest
@@ -8,6 +8,7 @@ package org.klaster.restapi.configuration;
  */
 
 import java.io.File;
+import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -19,14 +20,14 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-@PropertySource("classpath:application.properties")
-public class FilesConfig {
+@PropertySource(PropertyClassPath.APPLICATION)
+public class FilesProperties {
 
   @Value("${files.output.folder}")
   private String outputFolder;
 
   public File getOutputFolder() {
-    return new File(outputFolder);
+    return new File(outputFolder.replace("~", System.getProperty("user.home")));
   }
 
 }

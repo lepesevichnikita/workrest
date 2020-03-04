@@ -1,5 +1,6 @@
 package org.klaster.restapi.controller;
 
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -11,13 +12,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
+import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.LoginInfo;
-import org.klaster.restapi.configuration.FilesConfig;
-import org.klaster.restapi.configuration.TestContext;
+import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
+import org.klaster.restapi.properties.FilesProperties;
 import org.klaster.restapi.service.DefaultFileService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
@@ -52,18 +53,18 @@ import org.testng.annotations.Test;
  */
 
 @WebAppConfiguration
-@ContextConfiguration(classes = {TestContext.class})
+@ContextConfiguration(classes = {ApplicationContext.class})
 public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
 
   private static final String CONTROLLER_NAME = "file";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
   private static final String INPUT_FILE_NAME = "image.jpg";
-  private static final String INPUT_FOLDER_PATH = "input";
+  private static final String INPUT_FOLDER_NAME = "input";
 
   private MockMvc mockMvc;
-  private ClassLoader classloader;
   private File inputFolder;
+  private File inputFile;
   private RandomLoginInfoFactory randomLoginInfoFactory;
   private LoginInfo randomLoginInfo;
 
@@ -71,7 +72,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   private WebApplicationContext webApplicationContext;
 
   @Autowired
-  private FilesConfig filesConfig;
+  private FilesProperties filesProperties;
 
   @Autowired
   private DefaultUserService defaultUserService;
@@ -87,10 +88,12 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
-    classloader = Thread.currentThread()
-                        .getContextClassLoader();
-    inputFolder = new File(classloader.getResource(INPUT_FOLDER_PATH)
-                                      .getPath());
+    ClassLoader classloader = Thread.currentThread()
+                                    .getContextClassLoader();
+    final String inputFolderPath = classloader.getResource(INPUT_FOLDER_NAME)
+                                              .getPath();
+    inputFolder = new File(inputFolderPath);
+    inputFile = FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
   }
 
@@ -115,15 +118,13 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
                                                                       MediaType.IMAGE_JPEG.toString(),
                                                                       inputStream);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String expectedFilePath = FileUtil.makeChildItem(filesConfig.getOutputFolder(), INPUT_FILE_NAME)
-                                            .getAbsolutePath();
     mockMvc.perform(MockMvcRequestBuilders.multipart(uri)
                                           .file(mockMultipartUploadFile)
                                           .accept(MediaType.APPLICATION_JSON)
                                           .header(AUTHORIZATION, tokenValue))
            .andExpect(status().isCreated())
            .andExpect(jsonPath("$.id").value(notNullValue()))
-           .andExpect(jsonPath("$.path").value(expectedFilePath))
+           .andExpect(jsonPath("$.path").value(endsWith(INPUT_FILE_NAME)))
            .andExpect(jsonPath("$.md5").value(notNullValue()));
   }
 
@@ -138,15 +139,11 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   private void deleteOutputFiles() throws IOException {
-    Files.walk(filesConfig.getOutputFolder()
-                          .toPath())
-         .forEach(path -> {
-           try {
-             Files.delete(path);
-           } catch (IOException e) {
-             logger.error(e);
-           }
-         });
+    try {
+      FileUtils.deleteDirectory(filesProperties.getOutputFolder());
+    } catch (IOException exception) {
+      logger.error(exception);
+    }
   }
 
 }

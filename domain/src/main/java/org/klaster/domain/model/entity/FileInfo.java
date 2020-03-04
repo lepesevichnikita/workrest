@@ -1,12 +1,19 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Transient;
+import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
+import org.klaster.domain.serializer.LocalDateTimeSerializer;
 
 /**
  * FileInfo
@@ -24,6 +31,18 @@ public class FileInfo {
   @JsonBackReference
   @OneToOne
   private Attachable attachable;
+
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+  private LocalDateTime createdAt;
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
 
   @Column(updatable = false)
   private String md5;
@@ -61,4 +80,17 @@ public class FileInfo {
   public void setAttachable(Attachable attachable) {
     this.attachable = attachable;
   }
+
+  @Transient
+  public String getTimeStamp() {
+    return String.valueOf(createdAt.getNano());
+  }
+
+  @PrePersist
+  private void onCreate() {
+    if (createdAt == null) {
+      createdAt = LocalDateTime.now();
+    }
+  }
+
 }

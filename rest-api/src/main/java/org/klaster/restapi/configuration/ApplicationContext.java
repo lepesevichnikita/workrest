@@ -8,6 +8,7 @@ package org.klaster.restapi.configuration;
  */
 
 import java.util.List;
+import org.klaster.restapi.constant.PackageName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(value = {"org.klaster.domain", "org.klaster.restapi"})
+@ComponentScan(value = {PackageName.DOMAIN, PackageName.REST_API})
 public class ApplicationContext implements WebMvcConfigurer {
 
   @Bean
