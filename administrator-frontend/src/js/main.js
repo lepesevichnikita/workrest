@@ -1,45 +1,148 @@
-let menuContainerId = '#menu';
-let homePage = 'src/template/page/home.html';
+import {AuthorizationService} from "./api";
+import {TemplateHelper} from "./helper";
+import {Home, Login, Requests, Users} from "./page";
 
-const cachedScript = (url, options) => {
-  options = $.extend(options || {}, {
-    dataType: "script",
-    cache: true,
-    url: url
+import {Action} from "./constant";
+
+const menuContainerId = "#menu";
+
+const pages = {
+  home: new Home(),
+  requests: new Requests(),
+  login: new Login(),
+  users: new Users()
+};
+
+const formToObject = form => {
+  const formData = new FormData(form);
+  const formDataAsObject = {};
+  formData.forEach((value, key) => {
+    formDataAsObject[key] = value;
   });
-  return $.ajax(options);
+  return formDataAsObject;
 };
 
-const replacePage = (link, pageName) => {
-  document.title = `WorkRest | ${pageName}`;
-  $.get(link)
-   .done((pageTemplate) => {
-     const templateData = {};
-     const pageHtml = $.tmpl(pageTemplate, templateData);
-     $('#page')
-     .html(pageHtml);
-     cachedScript(`src/js/${pageName.toLowerCase()}.js`);
-   })
-   .fail((xhr) => console.warn(link, xhr.statusText));
+const capitalizeFirstLetter = string => {
+  return string.charAt(0)
+               .toUpperCase() + string.slice(1);
 };
 
-$(menuContainerId)
-.dimmer('show');
-$.get('src/template/main/main.html')
- .done((menuTemplate) => {
-   $(menuContainerId)
-   .dimmer('hide');
-   $(menuContainerId)
-   .replaceWith($.tmpl(menuTemplate, {}));
-   $('.ui.menu a.item')
-   .click(function (event) {
-     event.preventDefault();
-     const item = $(this);
-     const link = item.attr('href');
-     const pageName = item.text()
-                          .trim();
-     replacePage(link, pageName);
-   });
- });
+const loadMenu = menuName => {
+  $(menuContainerId)
+  .dimmer("show");
+  $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
+   .done(
+       menuTemplate => {
+         $(menuContainerId)
+         .dimmer("hide");
+         $(menuContainerId)
+         .html($.tmpl(menuTemplate, {}));
+         $("#signout")
+         .click(function (event) {
+           event.preventDefault();
+           authorizationService.signOut();
+         });
+       }
+   );
+};
 
-replacePage(homePage, 'Home');
+export const checkIsAuthorized = () => {
+  return new Promise((resolve, reject) => {
+    if (authorizationService.hasToken()) {
+      authorizationService
+      .verifyToken()
+      .then(response => {
+        resolve();
+      })
+      .catch(reject);
+    } else {
+      reject();
+    }
+  });
+};
+
+export const defineFormSubmitCallback = (form, submitCallback) => {
+  $(form)
+  .submit(function (event) {
+    event.preventDefault();
+    $(form)
+    .dimmer("show");
+    submitCallback(formToObject(form));
+  });
+};
+
+export const redirectToPage = pageName => {
+  pages[pageName].process();
+};
+
+export const loadTemplate = (selector, link, templateData) =>
+    new Promise((resolve, reject) => {
+      $.get(link)
+       .done(pageTemplate => {
+         const pageHtml = $.tmpl(pageTemplate, templateData);
+         $(selector)
+         .html(pageHtml);
+         resolve(pageHtml);
+       })
+       .fail(reject);
+    });
+
+export const replacePage = pageName =>
+    new Promise((resolve, reject) => {
+      document.title = `WorkRest | ${capitalizeFirstLetter(pageName)}`;
+      loadTemplate(
+          "#page",
+          templateHelper.getPagePath(pageName.toLowerCase()),
+          {}
+      )
+      .then(resolve)
+      .catch(reject);
+    });
+
+export const limitContentText = (contentSelector, maxTextLength) => {
+  $(contentSelector)
+  .each(function (i) {
+    const len = $(this)
+    .text().length;
+    if (len > maxTextLength) {
+      $(this)
+      .text(
+          $(this)
+          .text()
+          .substr(0, maxTextLength) + "..."
+      );
+    }
+  });
+};
+
+window.replacePage = replacePage;
+window.authorizationService = new AuthorizationService();
+window.redirectToPage = redirectToPage;
+window.defineFormSubmitCallback = defineFormSubmitCallback;
+window.checkIsAuthorized = checkIsAuthorized;
+window.limitContentText = limitContentText;
+window.templateHelper = new TemplateHelper();
+
+authorizationService
+.subscribe(Action.SIGNED_IN, () => {
+  loadMenu("authorized");
+  redirectToPage("user");
+})
+.subscribe(Action.LOGGED_OUT, () => {
+  loadMenu("main");
+  redirectToPage("login");
+})
+.subscribe(Action.SIGNED_UP, () => {
+  redirectToPage("home");
+})
+.subscribe(Action.TOKEN_CORRECT, () => {
+  loadMenu("home");
+})
+.subscribe(Action.TOKEN_INCORRECT, () => {
+  authorizationService.signOut();
+});
+
+checkIsAuthorized()
+.then(() => loadMenu("authorized"))
+.catch(() => loadMenu("main"))
+.finally(() => redirectToPage("login"));
