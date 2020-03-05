@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
@@ -21,7 +23,6 @@ import org.klaster.restapi.properties.FilesProperties;
 import org.klaster.restapi.service.DefaultFileService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
-import org.klaster.restapi.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -64,7 +65,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
 
   private MockMvc mockMvc;
   private File inputFolder;
-  private File inputFile;
+  private Path inputFilePath;
   private RandomLoginInfoFactory randomLoginInfoFactory;
   private LoginInfo randomLoginInfo;
 
@@ -84,7 +85,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   private DefaultFileService defaultFileService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() throws NoSuchAlgorithmException, IOException {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
@@ -93,12 +94,12 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     final String inputFolderPath = classloader.getResource(INPUT_FOLDER_NAME)
                                               .getPath();
     inputFolder = new File(inputFolderPath);
-    inputFile = FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME);
+    inputFilePath = Paths.get(inputFolder.getCanonicalPath(), INPUT_FILE_NAME);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
   }
 
   @AfterClass
-  public void clean() throws IOException {
+  public void clean() {
     deleteOutputFiles();
   }
 
@@ -112,7 +113,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                  .getValue();
-    InputStream inputStream = new FileInputStream(inputFile);
+    InputStream inputStream = new FileInputStream(inputFilePath.toString());
     MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
                                                                       INPUT_FILE_NAME,
                                                                       MediaType.IMAGE_JPEG.toString(),
@@ -131,7 +132,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void okWithInputStreamForGetWithValidFileId() throws Exception {
     final String newFileName = INPUT_FILE_NAME + "2";
-    InputStream inputStream = new FileInputStream(FileUtil.makeChildItem(inputFolder, INPUT_FILE_NAME));
+    InputStream inputStream = new FileInputStream(inputFilePath.toString());
     FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, newFileName);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, savedFileInfo.getId());
     mockMvc.perform(get(uri))

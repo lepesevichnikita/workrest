@@ -21,7 +21,6 @@ import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomEmployerProfileFactory;
 import org.klaster.restapi.factory.RandomJobFactory;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
-import org.klaster.restapi.factory.RandomPersonalDataFactory;
 import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultJobService;
 import org.klaster.restapi.service.DefaultUserService;
@@ -61,7 +60,6 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   private static final String CONTROLLER_NAME = "jobs";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
-  private static final String INVALID_TOKEN = "faketoken";
 
   private ObjectMapper objectMapper;
   private MockMvc mockMvc;
@@ -70,7 +68,6 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   private Job randomJob;
 
   private RandomLoginInfoFactory randomLoginInfoFactory;
-  private RandomPersonalDataFactory randomPersonalDataFactory;
   private RandomJobFactory randomJobFactory;
   private RandomEmployerProfileFactory randomEmployerProfileFactory;
 
@@ -95,7 +92,6 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
-    randomPersonalDataFactory = RandomPersonalDataFactory.getInstance();
     randomJobFactory = RandomJobFactory.getInstance();
     randomEmployerProfileFactory = RandomEmployerProfileFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
