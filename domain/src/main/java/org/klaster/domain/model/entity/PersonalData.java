@@ -1,11 +1,15 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.context.User;
 
 /**
@@ -33,6 +37,10 @@ public class PersonalData extends Attachable {
   @Column(nullable = false)
   @NotNull
   private String lastName;
+
+  @Enumerated(EnumType.STRING)
+  @JsonSerialize
+  private PersonalDataState state;
 
   @JsonIgnore
   @OneToOne(optional = false, fetch = FetchType.EAGER)
@@ -76,5 +84,13 @@ public class PersonalData extends Attachable {
 
   public void setUser(User user) {
     this.user = user;
+  }
+
+  public PersonalDataState getState() {
+    return state;
+  }
+
+  public void setState(PersonalDataState state) {
+    this.state = state;
   }
 }

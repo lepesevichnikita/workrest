@@ -3,6 +3,7 @@ package org.klaster.restapi.controller;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,12 +14,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
-import org.klaster.domain.dto.PersonalDataForAdministratorDTO;
+import org.klaster.domain.constant.PersonalDataState;
+import org.klaster.domain.dto.FullPersonalDataDTO;
 import org.klaster.domain.model.context.User;
-import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
@@ -60,6 +60,8 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
   private static final String INVALID_TOKEN = "faketoken";
+  private static final String APPROVE_ACTION_TEMPLATE = "%s/approve";
+  private static final String REJECT_ACTION_TEMPLATE = "%s/reject";
 
   private String administratorToken;
 
@@ -89,9 +91,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   @Autowired
   private DefaultPersonalDataService defaultPersonalDataService;
 
-  @Autowired
-  private FileInfoRepository fileInfoRepository;
-
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
     objectMapper = new ObjectMapper();
@@ -113,8 +112,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   @Test
   public void okForGetWithPersonalDataAsJsonForGetWithCorrectIdAndValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    FileInfo persistentAttachment = fileInfoRepository.save(randomPersonalData.getAttachment());
-    randomPersonalData.setAttachment(persistentAttachment);
     PersonalData personalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
@@ -156,15 +153,13 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   }
 
   @Test
-  public void acceptedForPutWithCorrectUserIdAndPersonalDataWithValidAdminToken() throws Exception {
+  public void acceptedForPutWithCorrectUserIdAndPersonalDataWithValidUserToken() throws Exception {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                 .getValue();
-    FileInfo persistedFileInfo = fileInfoRepository.save(randomPersonalData.getAttachment());
-    randomPersonalData.setAttachment(persistedFileInfo);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String personalDataDTOAsJson = objectMapper.writeValueAsString(
-        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -182,11 +177,60 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   }
 
   @Test
+  public void unauthenticatedForPutByBlockedUser() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.blockById(registeredUser.getId());
+    final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                .getValue();
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
+    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(personalDataDTOAsJson))
+           .andExpect(unauthenticated());
+  }
+
+  @Test
+  public void forbiddenForPutByVerifiedUser() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.verifyById(registeredUser.getId());
+    final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                .getValue();
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
+    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(personalDataDTOAsJson))
+           .andExpect(status().isForbidden());
+  }
+
+
+  @Test
+  public void unauthenticatedForPutByDeletedUser() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.deleteById(registeredUser.getId());
+    final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                .getValue();
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
+    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(personalDataDTOAsJson))
+           .andExpect(unauthenticated());
+  }
+
+  @Test
   public void unauthenticatedForPutWithInvalidToken() throws Exception {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final String personalDataDTOAsJson = objectMapper.writeValueAsString(
-        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, INVALID_TOKEN)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -199,7 +243,7 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     final String personalDataDTOAsJson = objectMapper.writeValueAsString(
-        PersonalDataForAdministratorDTO.fromPersonalData(randomPersonalData));
+        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -217,12 +261,57 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
            .andExpect(status().isNotFound());
   }
 
+  @Test
+  public void acceptedForApprovePostByUnverifiedUserWithValidPersonalDataIdAndValidAdministratorToken() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
+    final String approveAction = String.format(APPROVE_ACTION_TEMPLATE, updatedPersonalData.getId());
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, approveAction);
+    mockMvc.perform(post(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isAccepted())
+           .andExpect(jsonPath("$.firstName").value(randomPersonalData.getFirstName()))
+           .andExpect(jsonPath("$.lastName").value(randomPersonalData.getLastName()))
+           .andExpect(jsonPath("$.documentName").value(randomPersonalData.getDocumentName()))
+           .andExpect(jsonPath("$.documentNumber").value(randomPersonalData.getDocumentNumber()))
+           .andExpect(jsonPath("$.state").value(PersonalDataState.APPROVED.name()))
+           .andExpect(jsonPath("$.attachment.id").value(notNullValue()))
+           .andExpect(jsonPath("$.attachment.md5").value(randomPersonalData.getAttachment()
+                                                                           .getMd5()))
+           .andExpect(jsonPath("$.attachment.path").value(randomPersonalData.getAttachment()
+                                                                            .getPath()));
+  }
+
+
+  @Test
+  public void acceptedForRejectPostByUnverifiedUserWithValidPersonalDataIdAndValidAdministratorToken() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
+    final String rejectAction = String.format(REJECT_ACTION_TEMPLATE, updatedPersonalData.getId());
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, rejectAction);
+    mockMvc.perform(post(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isAccepted())
+           .andExpect(jsonPath("$.firstName").value(randomPersonalData.getFirstName()))
+           .andExpect(jsonPath("$.lastName").value(randomPersonalData.getLastName()))
+           .andExpect(jsonPath("$.documentName").value(randomPersonalData.getDocumentName()))
+           .andExpect(jsonPath("$.documentNumber").value(randomPersonalData.getDocumentNumber()))
+           .andExpect(jsonPath("$.state").value(PersonalDataState.REJECTED.name()))
+           .andExpect(jsonPath("$.attachment.id").value(notNullValue()))
+           .andExpect(jsonPath("$.attachment.md5").value(randomPersonalData.getAttachment()
+                                                                           .getMd5()))
+           .andExpect(jsonPath("$.attachment.path").value(randomPersonalData.getAttachment()
+                                                                            .getPath()));
+  }
+
   private void registerAdministrator() {
-    if (!defaultAdministratorService.existsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
+    if (defaultAdministratorService.notExistsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
       LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
                                                    .setPassword(VALID_ADMIN_PASSWORD)
                                                    .build();
-      defaultAdministratorService.registerByLoginInfo(loginInfo);
+      defaultAdministratorService.makeAdministrator(loginInfo);
     }
     administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
                                                             .getValue();

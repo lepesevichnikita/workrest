@@ -8,6 +8,7 @@ package org.klaster.restapi.service;
  */
 
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.UserBuilder;
@@ -109,5 +110,13 @@ public class DefaultUserService {
       foundUser.setCurrentState(new VerifiedUserState());
     }
     return userRepository.save(foundUser);
+  }
+
+  public List<User> findAll() {
+    return userRepository.findAllByAuthorities(getPlainUserAuthority());
+  }
+
+  private UserAuthority getPlainUserAuthority() {
+    return userAuthorityRepository.findFirstOrCreateByAuthority(AuthorityName.USER);
   }
 }

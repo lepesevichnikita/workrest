@@ -9,8 +9,10 @@ package org.klaster.restapi.service;/*
  */
 
 import javax.persistence.EntityNotFoundException;
+import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.domain.repository.PersonalDataRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class DefaultPersonalDataService {
+public class
+DefaultPersonalDataService {
 
   @Autowired
   private DefaultUserService defaultUserService;
@@ -27,28 +30,49 @@ public class DefaultPersonalDataService {
   @Autowired
   private PersonalDataRepository personalDataRepository;
 
-  public PersonalData findByUserId(long id) {
-    User foundUser = defaultUserService.findFirstById(id);
+  @Autowired
+  private FileInfoRepository fileInfoRepository;
+
+  public PersonalData findById(long id) {
+    return personalDataRepository.findById(id)
+                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(PersonalData.class, id)));
+  }
+
+  public PersonalData findByUserId(long userId) {
+    User foundUser = defaultUserService.findFirstById(userId);
     if (foundUser.getPersonalData() == null) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id));
+      throw new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, userId));
     }
     return personalDataRepository.findByUser(foundUser)
                                  .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class,
-                                                                                                                               id)));
+                                                                                                                               userId)));
   }
 
   @Transactional
-  public PersonalData updateByUserId(long id, PersonalData personalData) {
-    User foundUser = defaultUserService.findFirstById(id);
+  public PersonalData updateByUserId(long userId, PersonalData personalData) {
+    if (personalData.getAttachment()
+                    .getId() == 0) {
+      personalData.setAttachment(fileInfoRepository.save(personalData.getAttachment()));
+    }
+    User foundUser = defaultUserService.findFirstById(userId);
     foundUser.getCurrentState()
              .updatePersonalData(personalData);
     return personalDataRepository.save(personalData);
   }
 
   @Transactional
-  public PersonalData verifyByUserId(long id) {
-    PersonalData foundPersonalData = findByUserId(id);
-    defaultUserService.verifyById(id);
-    return foundPersonalData;
+  public PersonalData approveById(long id) {
+    PersonalData foundPersonalData = findById(id);
+    foundPersonalData.setState(PersonalDataState.APPROVED);
+    defaultUserService.verifyById(foundPersonalData.getUser()
+                                                   .getId());
+    return personalDataRepository.save(foundPersonalData);
+  }
+
+  @Transactional
+  public PersonalData rejectById(long id) {
+    PersonalData foundPersonalData = findById(id);
+    foundPersonalData.setState(PersonalDataState.REJECTED);
+    return personalDataRepository.save(foundPersonalData);
   }
 }

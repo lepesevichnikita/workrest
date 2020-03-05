@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
 
-  Optional<LoginInfo> findFirstByLogin(String login);
+  LoginInfo findFirstByLogin(String login);
 
   Optional<LoginInfo> findFirstByLoginAndPassword(String login, String password);
 

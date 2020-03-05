@@ -9,7 +9,6 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
-import org.klaster.domain.model.entity.AbstractProfile;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -39,18 +38,18 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
 
   @JsonManagedReference
   @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
-  private AbstractProfile freelancerProfile;
+  private FreelancerProfile freelancerProfile;
 
   @JsonManagedReference
   @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
-  private AbstractProfile employerProfile;
+  private EmployerProfile employerProfile;
 
   @JsonIgnore
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
   private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {
-    return (EmployerProfile) employerProfile;
+    return employerProfile;
   }
 
   public void setEmployerProfile(EmployerProfile employerProfile) {
@@ -66,7 +65,7 @@ public class User extends AbstractContext<AbstractUserState> implements UserDeta
   }
 
   public FreelancerProfile getFreelancerProfile() {
-    return (FreelancerProfile) freelancerProfile;
+    return freelancerProfile;
   }
 
   public void setFreelancerProfile(FreelancerProfile freelancerProfile) {

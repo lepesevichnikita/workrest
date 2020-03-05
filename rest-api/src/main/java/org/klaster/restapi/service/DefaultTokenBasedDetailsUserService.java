@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.Objects;
 import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
@@ -49,13 +50,16 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
   @Transactional
   @Override
   public Token createToken(String login, String password) {
-    LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
-    if (foundLoginInfo == null && defaultSystemAdministratorService.isSystemAdministrator(login, password)) {
-      foundLoginInfo = defaultSystemAdministratorService.createSystemAdministrator()
-                                                        .getLoginInfo();
-    }
     Token newToken = new Token();
-    foundLoginInfo.addToken(newToken);
+    if (defaultSystemAdministratorService.isSystemAdministrator(login, password)) {
+      defaultSystemAdministratorService.getSystemAdministrator()
+                                       .getLoginInfo()
+                                       .addToken(newToken);
+    } else {
+      LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
+      Objects.requireNonNull(foundLoginInfo)
+             .addToken(newToken);
+    }
     return tokenRepository.save(newToken);
   }
 

@@ -25,8 +25,7 @@ public class DefaultLoginInfoService {
   private LoginInfoRepository loginInfoRepository;
 
   public LoginInfo findFirstByLogin(String login) {
-    return loginInfoRepository.findFirstByLogin(login)
-                              .orElse(null);
+    return loginInfoRepository.findFirstByLogin(login);
   }
 
   public LoginInfo findFirstByLoginAndPassword(String login, String password) {

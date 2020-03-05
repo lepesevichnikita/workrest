@@ -10,7 +10,9 @@ package org.klaster.domain.repository;
  * Copyright(c) JazzTeam
  */
 
+import java.util.List;
 import java.util.Optional;
+import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface PersonalDataRepository extends JpaRepository<PersonalData, Long> {
 
   Optional<PersonalData> findByUser(User user);
+
+  List<PersonalData> findAllByState(PersonalDataState personalDataState);
 }

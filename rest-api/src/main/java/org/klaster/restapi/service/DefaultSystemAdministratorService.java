@@ -11,6 +11,7 @@ package org.klaster.restapi.service;
  */
 
 import java.util.Set;
+import java.util.function.Predicate;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.constant.AuthorityName;
@@ -44,23 +45,49 @@ public class DefaultSystemAdministratorService {
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
   @Autowired
+  private DefaultLoginInfoService defaultLoginInfoService;
+
+  @Autowired
   private UserAuthorityRepository userAuthorityRepository;
 
-  public User createSystemAdministrator() {
-    Set<UserAuthority> authorities = getSystemAdministratorAuthorities();
-    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
-                                                                    .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
-                                                                    .build();
-    User systemAdministrator = defaultUserBuilder.setLoginInfo(systemAdministratorLoginInfo)
-                                                 .setAuthorities(authorities)
-                                                 .build();
-    return userRepository.save(systemAdministrator);
+  public User getSystemAdministrator() {
+    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(systemAdministratorProperties.getSystemAdministratorLogin(),
+                                                                                                 systemAdministratorProperties.getSystemAdministratorPassword());
+    User systemAdministrator = systemAdministratorLoginInfo == null
+                               ? createSystemAdministrator()
+                               : userRepository.findFirstByLoginInfo(systemAdministratorLoginInfo);
+    if (isInvalidSystemAdministrator(systemAdministrator)) {
+      userRepository.delete(systemAdministrator);
+      systemAdministrator = createSystemAdministrator();
+    }
+    return systemAdministrator;
   }
 
   public boolean isSystemAdministrator(String login, String password) {
     return
         login.equals(systemAdministratorProperties.getSystemAdministratorLogin()) &&
         password.equals(systemAdministratorProperties.getSystemAdministratorPassword());
+  }
+
+
+  private User createSystemAdministrator() {
+    LoginInfo systemAdministratorLoginInfo;
+    User systemAdministrator;
+    systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
+                                                          .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
+                                                          .build();
+    Set<UserAuthority> authorities = getSystemAdministratorAuthorities();
+    systemAdministrator = defaultUserBuilder.setLoginInfo(systemAdministratorLoginInfo)
+                                            .setAuthorities(authorities)
+                                            .build();
+    return userRepository.save(systemAdministrator);
+  }
+
+  private boolean isInvalidSystemAdministrator(User systemAdministrator) {
+    return systemAdministrator.getAuthorities()
+                              .stream()
+                              .map(UserAuthority::getAuthority)
+                              .noneMatch(Predicate.isEqual(AuthorityName.SYSTEM_ADMINISTRATOR));
   }
 
   private Set<UserAuthority> getSystemAdministratorAuthorities() {

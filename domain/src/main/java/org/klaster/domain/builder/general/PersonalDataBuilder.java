@@ -7,6 +7,7 @@ package org.klaster.domain.builder.general;
  *
  */
 
+import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
 
@@ -27,4 +28,6 @@ public interface PersonalDataBuilder extends Builder<PersonalData> {
   PersonalDataBuilder setDocumentNumber(String documentNumber);
 
   PersonalDataBuilder setAttachment(FileInfo attachment);
+
+  PersonalDataBuilder setState(PersonalDataState state);
 }

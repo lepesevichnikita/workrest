@@ -53,7 +53,7 @@ public class AdministratorController {
   @PostMapping
   public ResponseEntity<User> create(@RequestBody LoginInfoDTO loginInfoDTO) {
     LoginInfo loginInfo = loginInfoDTO.toLoginInfo();
-    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(loginInfo);
+    User registeredAdministrator = defaultAdministratorService.makeAdministrator(loginInfo);
     return new ResponseEntity<>(registeredAdministrator, HttpStatus.CREATED);
   }
 

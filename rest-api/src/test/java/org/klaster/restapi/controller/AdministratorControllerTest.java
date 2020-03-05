@@ -117,7 +117,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   @Test
   public void unauthenticatedForPlainAdministrator() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    defaultAdministratorService.makeAdministrator(randomLoginInfo);
     final String plainAdministratorToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
                                                                                            randomLoginInfo.getPassword())
                                                                               .getValue();
@@ -131,7 +131,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     final int createdAdministratorsCount = 10;
     IntStream.range(0, createdAdministratorsCount)
-             .forEach(i -> defaultAdministratorService.registerByLoginInfo(randomLoginInfoFactory.build()));
+             .forEach(i -> defaultAdministratorService.makeAdministrator(randomLoginInfoFactory.build()));
     List<User> allAdministrators = defaultAdministratorService.findAll();
     final String expectedAdministratorsAsJson = objectMapper.writeValueAsString(allAdministrators);
     mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
@@ -142,7 +142,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
 
   @Test
   public void acceptedForDeleteWithValidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
-    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    User registeredAdministrator = defaultAdministratorService.makeAdministrator(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredAdministrator.getId());
     mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                                .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -172,7 +172,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
 
   @Test
   public void okForGetWithValidAdministratorIdAndValidSystemAdministratorToken() throws Exception {
-    User registeredAdministrator = defaultAdministratorService.registerByLoginInfo(randomLoginInfo);
+    User registeredAdministrator = defaultAdministratorService.makeAdministrator(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredAdministrator.getId());
     mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, systemAdministratorToken)
                             .accept(MediaType.APPLICATION_JSON_VALUE))

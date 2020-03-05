@@ -12,8 +12,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.constant.AuthorityName;
+import org.klaster.domain.constant.UserStateName;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -144,8 +147,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void unauthorizedForDeleteWithInvalidToken() throws Exception {
-    final long id = 0;
-    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, id);
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, INVALID_TOKEN)
                                .contentType(MediaType.APPLICATION_JSON)
                                .accept(MediaType.APPLICATION_JSON))
@@ -153,7 +156,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void deletesUserWithAdminToken() throws Exception {
+  public void acceptedForDeleteWithValidUserIdAndValidAdministratorToken() throws Exception {
     User deletedUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, deletedUser.getId());
     LoginInfoDTO loginInfoDTO = LoginInfoDTO.fromLoginInfo(randomLoginInfo);
@@ -163,11 +166,12 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
                                .accept(MediaType.APPLICATION_JSON)
                                .content(loginInfoDTOAsJson))
            .andExpect(status().isAccepted())
-           .andExpect(jsonPath("$.id").value(deletedUser.getId()));
+           .andExpect(jsonPath("$.id").value(deletedUser.getId()))
+           .andExpect(jsonPath("$.currentState.name").value(UserStateName.DELETED));
   }
 
   @Test
-  public void getsUsersByIdWithAdminToken() throws Exception {
+  public void okForGetWithValidUserByIdWithValidAdministratorToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, registeredUser.getId());
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
@@ -180,12 +184,28 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(jsonPath("$.loginInfo.login").value(randomLoginInfo.getLogin()));
   }
 
+  @Test
+  public void okForGetAllWithValidAdministratorToken() throws Exception {
+    final int createdUsersCount = 10;
+    IntStream.range(0, createdUsersCount)
+             .forEach(i -> defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build()));
+    List<User> expectedUsers = defaultUserService.findAll();
+    final String actionName = "all";
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, actionName);
+    final String expectedUsersAsJson = objectMapper.writeValueAsString(expectedUsers);
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(content().json(expectedUsersAsJson));
+  }
+
   private void registerAdministrator() {
-    if (!defaultAdministratorService.existsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
+    if (defaultAdministratorService.notExistsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
       LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
                                                    .setPassword(VALID_ADMIN_PASSWORD)
                                                    .build();
-      defaultAdministratorService.registerByLoginInfo(loginInfo);
+      defaultAdministratorService.makeAdministrator(loginInfo);
     }
     administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
                                                             .getValue();

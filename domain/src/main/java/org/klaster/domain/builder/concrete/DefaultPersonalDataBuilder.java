@@ -8,6 +8,7 @@ package org.klaster.domain.builder.concrete;
  */
 
 import org.klaster.domain.builder.general.PersonalDataBuilder;
+import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
 
   private String lastName;
   private FileInfo attachment;
+  private PersonalDataState state;
 
   public DefaultPersonalDataBuilder() {
     reset();
@@ -65,9 +67,16 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
   }
 
   @Override
+  public PersonalDataBuilder setState(PersonalDataState state) {
+    this.state = state;
+    return this;
+  }
+
+  @Override
   public void reset() {
     firstName = lastName = documentName = documentNumber = "";
     attachment = null;
+    state = null;
   }
 
   @Override
@@ -78,6 +87,7 @@ public class DefaultPersonalDataBuilder implements PersonalDataBuilder {
     personalData.setDocumentName(documentName);
     personalData.setDocumentNumber(documentNumber);
     personalData.setAttachment(attachment);
+    personalData.setState(state);
     return personalData;
   }
 }

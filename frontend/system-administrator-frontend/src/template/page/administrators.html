@@ -1,0 +1,46 @@
+<div class="ui container middle aligned center aligned grid">
+  <div class="column">
+    <h1 class="ui center aligned icon header">
+      <i class="users icon"></i>
+      Administrators
+    </h1>
+    <form class="ui equal width form" id="administratorForm">
+      <div class="fields">
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="user icon"></i>
+            <input name="login" placeholder="Enter login" type="text">
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui left icon input">
+            <i class="lock icon"></i>
+            <input name="password" placeholder="Enter password" type="password">
+          </div>
+        </div>
+        <div class="fields">
+          <div class="field">
+            <input class="ui primary submit button" type="submit" value="Create"/>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="ui four doubling stackable cards" value="user-cards">
+      {{each administrators}}
+      <div class="ui link card">
+        <div class="content">
+          <div class="header">${loginInfo.login}</div>
+        </div>
+        <div class="extra content">
+        </div>
+        <div class="ui bottom attached basic negative animated button" data-id=${id}>
+          <div class="visible content">Delete</div>
+          <div class="hidden content">
+            <i class="trash icon"></i>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

@@ -54,8 +54,8 @@ public class RandomJobFactory extends AbstractRandomFactory<Job> {
   }
 
   private String getDescription() {
-    return getFaker().lorem()
-                     .paragraph();
+    return getFaker().backToTheFuture()
+                     .quote();
   }
 
   private Set<Skill> getSkills() {

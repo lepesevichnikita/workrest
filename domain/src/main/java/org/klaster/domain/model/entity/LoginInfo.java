@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,7 +39,7 @@ public class LoginInfo {
   private String password;
 
   @JsonIgnore
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo", orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<Token> tokens;
 
   public long getId() {

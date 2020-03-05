@@ -1,0 +1,17 @@
+<div class="ui modal" id="freelancer${id}">
+  <i class="close icon"></i>
+  <div class="header">
+    ${personalData.firstName} ${personalData.lastName}
+  </div>
+  <div class="content">
+    <div class="description">
+      <div class="ui header">Description</div>
+      <p>${description}</p>
+    </div>
+  </div>
+  <div class="extra content">
+    {{each skills}}
+    <span class="ui label">${$value.name}</span>
+    {{/each}}
+  </div>
+</div>

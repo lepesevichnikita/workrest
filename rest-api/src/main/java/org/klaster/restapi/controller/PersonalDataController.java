@@ -8,7 +8,7 @@ package org.klaster.restapi.controller;/*
  * Copyright(c) JazzTeam
  */
 
-import org.klaster.domain.dto.PersonalDataForAdministratorDTO;
+import org.klaster.domain.dto.FullPersonalDataDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
 import org.klaster.restapi.service.DefaultPersonalDataService;
@@ -33,29 +33,39 @@ public class PersonalDataController {
 
   @GetMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<PersonalDataForAdministratorDTO> getByCurrentUser(@AuthenticationPrincipal User currentUser) {
-    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(currentUser.getPersonalData()));
+  public ResponseEntity<FullPersonalDataDTO> getByCurrentUser(@AuthenticationPrincipal User currentUser) {
+    return ResponseEntity.ok(FullPersonalDataDTO.fromPersonalData(currentUser.getPersonalData()));
   }
 
   @GetMapping("/{userId}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<PersonalDataForAdministratorDTO> getByUserId(@PathVariable long userId) {
+  public ResponseEntity<FullPersonalDataDTO> getByUserId(@PathVariable long userId) {
     PersonalData foundPersonalData = defaultPersonalDataService.findByUserId(userId);
-    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(foundPersonalData));
+    return ResponseEntity.ok(FullPersonalDataDTO.fromPersonalData(foundPersonalData));
   }
 
-  @PostMapping("/{userId}/verify")
+  @PostMapping("/{id}/reject")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<PersonalDataForAdministratorDTO> verifyByUserId(@PathVariable long userId) {
-    PersonalData verifiedPersonalData = defaultPersonalDataService.verifyByUserId(userId);
-    return ResponseEntity.ok(PersonalDataForAdministratorDTO.fromPersonalData(verifiedPersonalData));
+  public ResponseEntity<FullPersonalDataDTO> rejectById(@PathVariable long id) {
+    PersonalData rejectedPersonalData = defaultPersonalDataService.rejectById(id);
+    return ResponseEntity.accepted()
+                         .body(FullPersonalDataDTO.fromPersonalData(rejectedPersonalData));
+  }
+
+
+  @PostMapping("/{id}/approve")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<FullPersonalDataDTO> approveById(@PathVariable long id) {
+    PersonalData approvedPersonalData = defaultPersonalDataService.approveById(id);
+    return ResponseEntity.accepted()
+                         .body(FullPersonalDataDTO.fromPersonalData(approvedPersonalData));
   }
 
   @PutMapping
-  public ResponseEntity<PersonalDataForAdministratorDTO> updateForCurrentUser(@RequestBody PersonalDataForAdministratorDTO personalDataDTO,
-                                                                              @AuthenticationPrincipal User currentUser) {
+  public ResponseEntity<FullPersonalDataDTO> updateForCurrentUser(@RequestBody FullPersonalDataDTO personalDataDTO,
+                                                                  @AuthenticationPrincipal User currentUser) {
     PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(currentUser.getId(), personalDataDTO.toPersonalData());
-    PersonalDataForAdministratorDTO personalDataForAdministratorDTO = PersonalDataForAdministratorDTO.fromPersonalData(updatedPersonalData);
+    FullPersonalDataDTO personalDataForAdministratorDTO = FullPersonalDataDTO.fromPersonalData(updatedPersonalData);
     return ResponseEntity.accepted()
                          .body(personalDataForAdministratorDTO);
   }

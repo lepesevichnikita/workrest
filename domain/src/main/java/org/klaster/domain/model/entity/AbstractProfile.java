@@ -1,13 +1,11 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import org.klaster.domain.model.context.User;
@@ -18,10 +16,8 @@ import org.klaster.domain.model.context.User;
  * @author Nikita Lepesevich
  */
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@MappedSuperclass
 public abstract class AbstractProfile {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;

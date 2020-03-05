@@ -47,13 +47,12 @@ public class DefaultAdministratorService {
   @Autowired
   private UserBuilder defaultUserBuilder;
 
-
-  public User registerByLoginInfo(LoginInfo loginInfo) {
+  public User makeAdministrator(LoginInfo loginInfo) {
     Set<UserAuthority> administratorUserAuthorities = getAllAdministratorAuthorities();
-    User registeredAdministrator = defaultUserBuilder.setLoginInfo(loginInfo)
-                                                     .setAuthorities(administratorUserAuthorities)
-                                                     .build();
-    return userRepository.save(registeredAdministrator);
+    User administrator = defaultUserBuilder.setLoginInfo(loginInfo)
+                                           .setAuthorities(administratorUserAuthorities)
+                                           .build();
+    return userRepository.save(administrator);
   }
 
   public List<User> findAll() {
@@ -69,20 +68,17 @@ public class DefaultAdministratorService {
     User deletedAdministrator = findById(id);
     deletedAdministrator.getAuthorities()
                         .removeIf(role -> role.getAuthority()
-                                              .equals(AuthorityName.SYSTEM_ADMINISTRATOR));
+                                              .equals(AuthorityName.ADMINISTRATOR));
     userRepository.save(deletedAdministrator);
     return deletedAdministrator;
   }
 
-  public boolean existsByLoginAndPassword(String login, String password) {
+  public boolean notExistsByLoginAndPassword(String login, String password) {
     boolean result = false;
     Optional<LoginInfo> foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password);
     if (foundLoginInfo.isPresent()) {
       User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo.get());
-      result = foundUser.getAuthorities()
-                        .stream()
-                        .map(UserAuthority::getAuthority)
-                        .anyMatch(Predicate.isEqual(AuthorityName.ADMINISTRATOR));
+      result = isNotAdministrator(foundUser);
     }
     return result;
   }
@@ -90,6 +86,14 @@ public class DefaultAdministratorService {
   private UserAuthority getAdministratorAuthority() {
     return userAuthorityRepository.findFirstOrCreateByAuthority(AuthorityName.ADMINISTRATOR);
   }
+
+  private boolean isNotAdministrator(User foundUser) {
+    return foundUser.getAuthorities()
+                    .stream()
+                    .map(UserAuthority::getAuthority)
+                    .noneMatch(Predicate.isEqual(AuthorityName.ADMINISTRATOR));
+  }
+
 
   private Set<UserAuthority> getAllAdministratorAuthorities() {
     return userAuthorityRepository.findOrCreateAllByNames(administratorAuthorityNames);

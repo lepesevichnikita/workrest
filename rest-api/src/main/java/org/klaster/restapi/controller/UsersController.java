@@ -7,6 +7,7 @@ package org.klaster.restapi.controller;
  *
  */
 
+import java.util.List;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.service.DefaultUserService;
@@ -61,5 +62,13 @@ public class UsersController {
   public ResponseEntity<User> findFirstById(@PathVariable long id) {
     User foundUser = defaultUserService.findFirstById(id);
     return ResponseEntity.ok(foundUser);
+  }
+
+
+  @GetMapping("/all")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<List<User>> findAll() {
+    List<User> foundUsers = defaultUserService.findAll();
+    return ResponseEntity.ok(foundUsers);
   }
 }
