@@ -2,13 +2,7 @@
   <div class="content">
     <div class="header center aligned">Customer profile</div>
     <div class="description">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris id odio ac erat gravida accumsan at nec ex. Nam ornare facilisis
-      mauris, eu lobortis ante vestibulum in. Aenean elit lectus, feugiat in efficitur in, lobortis eget dolor. Integer porttitor
-      metus
-      quis neque condimentum, et consectetur ipsum varius. Vestibulum volutpat, est at convallis aliquam, tortor nisl sodales erat, a
-      convallis massa augue ac nisi. Phasellus vel dolor metus. Cras venenatis augue sapien, sed varius nulla vulputate et. Sed in
-      tortor
-      ligula.
+      ${description}
     </div>
   </div>
   <div class="ui basic attached bottom primary button">Update</div>
@@ -17,7 +11,9 @@
       Published jobs
     </div>
     <div class="ui four doubling stackable cards" id="job-cards">
-      <a class="ui link card">
+      {{if jobs}}
+      {{each jobs}}
+      <div class="ui link card">
         <div class="content">
           <div class="header">Create Twitter</div>
           <div class="meta"></div>
@@ -28,67 +24,31 @@
           </div>
         </div>
         <div class="extra content">
-          <span class="ui label">HTML</span>
+          {{each $value.skills}}
+          <span class="ui label"></span>
+          {{/each}}
           <span class="ui label">JS</span>
           <span class="ui label">CSS</span>
           <span class="ui label">PHP</span>
         </div>
         <div class="ui basic attached bottom primary button">Update</div>
-      </a>
-      <a class="ui link card">
-        <div class="content">
-          <div class="header">Create Instagram</div>
-          <div class="meta"></div>
-          <div class="description">
-            <div class="ui wireframe image">
-              <img src="src/img/paragraph.png"></img>
-            </div>
-          </div>
+      </div>
+      {{/each}}
+      {{/if}}
+    </div>
+    <div class="ui form" id="jobForm">
+      <div class="ui segment">
+        <div class="field">
+          <label>Description</label>
+          <textarea name="description"></textarea>
         </div>
-        <div class="extra content">
-          <span class="ui label">HTML</span>
-          <span class="ui label">JS</span>
-          <span class="ui label">CSS</span>
-          <span class="ui label">PHP</span>
+        <div class="field">
+          <label>Skills</label>
+          <input name="skill" placeholder="Enter required skill" type="text">
+          <div id="skills"></div>
         </div>
-        <div class="ui basic attached bottom primary button">Update</div>
-      </a>
-      <a class="ui link card">
-        <div class="content">
-          <div class="header">Create Telegram</div>
-          <div class="meta"></div>
-          <div class="description">
-            <div class="ui wireframe image">
-              <img src="src/img/paragraph.png"></img>
-            </div>
-          </div>
-        </div>
-        <div class="extra content">
-          <span class="ui label">HTML</span>
-          <span class="ui label">JS</span>
-          <span class="ui label">CSS</span>
-          <span class="ui label">PHP</span>
-        </div>
-        <div class="ui basic attached bottom primary button">Update</div>
-      </a>
-      <a class="ui link card">
-        <div class="content">
-          <div class="header">Create Facebook</div>
-          <div class="meta"></div>
-          <div class="description">
-            <div class="ui wireframe image">
-              <img src="src/img/paragraph.png"></img>
-            </div>
-          </div>
-        </div>
-        <div class="extra content">
-          <span class="ui label">HTML</span>
-          <span class="ui label">JS</span>
-          <span class="ui label">CSS</span>
-          <span class="ui label">PHP</span>
-        </div>
-        <div class="ui basic attached bottom primary button">Update</div>
-      </a>
+        <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+      </div>
     </div>
   </div>
 </div>

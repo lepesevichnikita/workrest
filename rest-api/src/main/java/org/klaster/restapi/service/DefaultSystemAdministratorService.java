@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DefaultSystemAdministratorService {
 
+  private static String[] systemAdministratorAuthorityNames = {AuthorityName.ADMINISTRATOR, AuthorityName.SYSTEM_ADMINISTRATOR};
+
   @Autowired
   private UserRepository userRepository;
 
@@ -45,7 +47,7 @@ public class DefaultSystemAdministratorService {
   private UserAuthorityRepository userAuthorityRepository;
 
   public User createSystemAdministrator() {
-    Set<UserAuthority> authorities = userAuthorityRepository.findOrCreateAllByNames(AuthorityName.SYSTEM_ADMINISTRATOR);
+    Set<UserAuthority> authorities = getSystemAdministratorAuthorities();
     LoginInfo systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
                                                                     .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
                                                                     .build();
@@ -59,5 +61,9 @@ public class DefaultSystemAdministratorService {
     return
         login.equals(systemAdministratorProperties.getSystemAdministratorLogin()) &&
         password.equals(systemAdministratorProperties.getSystemAdministratorPassword());
+  }
+
+  private Set<UserAuthority> getSystemAdministratorAuthorities() {
+    return userAuthorityRepository.findOrCreateAllByNames(systemAdministratorAuthorityNames);
   }
 }

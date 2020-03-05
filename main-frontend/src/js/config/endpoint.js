@@ -5,6 +5,9 @@ export const endpoint = {
     root: "file"
   }, users: {
     root: "users"
+  },
+  jobs: {
+    root: "jobs"
   }
 };
 

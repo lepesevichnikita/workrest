@@ -1,13 +1,14 @@
-import { UserService } from "../api";
-import { TemplateHelper } from "../helper";
-import { checkIsAuthorized, loadTemplate, redirectToPage } from "../main.js";
-import { Page } from "./Page.js";
+import {JobService, UserService} from "../api";
+import {TemplateHelper} from "../helper";
+import {checkIsAuthorized, loadTemplate, redirectToPage} from "../main.js";
+import {Page} from "./Page.js";
 
 export class User extends Page {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
     this._userService = new UserService(props);
+    this._jobService = new JobService(props);
     this._templateHelper = new TemplateHelper();
   }
 
@@ -28,8 +29,11 @@ export class User extends Page {
   _renderPage() {
     this.replacePage("user", this._user)
         .then(() => {
-          this._renderProfile("freelancer");
-          this._renderProfile("employer");
+          if (this._user.currentState.name == 'Verified') {
+            this._renderProfile("freelancer");
+            this._renderProfile("employer");
+            this._addJobFormCallbacks();
+          }
         })
         .then(() => {
           super.process();
@@ -44,6 +48,13 @@ export class User extends Page {
                  this._user[profilePropertyPath])
     .catch(console.error);
   }
+
+  _addJobFormCallbacks() {
+    const jobForm = document.getElementById("jobForm");
+    const sendForm = formData => this._jobService.createJob(formData);
+    this.defineFormSubmitCallback(jobForm, sendForm);
+  }
+
 }
 
 export default User;
