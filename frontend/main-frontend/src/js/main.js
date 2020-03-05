@@ -1,24 +1,25 @@
-import { AuthorizationService, FreelancerService, JobService, UserService } from "./api";
+import {AuthorizationService, FreelancerService, JobService, UserService} from "./api";
 
-import { Action } from "./constant";
-import { TemplateHelper } from "./helper";
-import { Freelancers, Home, Jobs, Login, PersonalData, SignUp, User } from "./page";
+import {Action} from "./constant";
+import {TemplateHelper} from "./helper";
+import {Freelancers, Home, Jobs, Login, PersonalData, SignUp, User} from "./page";
 
 const menuContainerId = "#menu";
 const authorizationService = new AuthorizationService();
 
 const pages = {
   home: new Home(),
-  user: new User({authorizationService: authorizationService}),
-  freelancers: new Freelancers({authorizationService: authorizationService}),
-  jobs: new Jobs({authorizationService: authorizationService}),
-  login: new Login({authorizationService: authorizationService}),
-  signup: new SignUp({authorizationService: authorizationService}),
-  personal_data: new PersonalData({authorizationService: authorizationService})
+  user: new User({authorizationService}),
+  freelancers: new Freelancers({authorizationService}),
+  jobs: new Jobs({authorizationService}),
+  login: new Login({authorizationService}),
+  signup: new SignUp({authorizationService}),
+  personal_data: new PersonalData({authorizationService})
 };
 
 const capitalizeFirstLetter = string => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0)
+               .toUpperCase() + string.slice(1);
 };
 
 const loadMenu = menuName => {
@@ -31,13 +32,13 @@ const loadMenu = menuName => {
      $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
      $(".ui.link")
-     .click(function(event) {
+     .click(function (event) {
        event.preventDefault();
        redirectToPage($(this)
                       .attr("name"));
      });
      $("#signout")
-     .click(function(event) {
+     .click(function (event) {
        event.preventDefault();
        authorizationService.signOut();
      });
@@ -72,17 +73,19 @@ export const loadTemplate = (selector, link, templateData) => new Promise((resol
     .html(pageHtml);
     resolve(response);
   })
-      .catch(reject);
+  .catch(reject);
 });
 
 export const limitContentText = (contentSelector, maxTextLength) => {
-  $(contentSelector).each(function(i) {
-    const len = $(this).text().length;
+  $(contentSelector)
+  .each(function (i) {
+    const len = $(this)
+    .text().length;
     if (len > maxTextLength) {
       $(this)
       .text($(this)
-          .text()
-          .substr(0, maxTextLength) + "..."
+            .text()
+            .substr(0, maxTextLength) + "..."
       );
     }
   });

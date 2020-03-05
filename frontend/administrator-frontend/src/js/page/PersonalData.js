@@ -37,7 +37,7 @@ export class PersonalData extends Page {
     this._personalDataService.getPersonalData()
         .then(response => this.replacePage("personal_data", {
           fileUrl: this._personalDataService,
-          personal_data: response.body
+          personalData: response.body
         })
                               .finally(() => super.process()));
   }

@@ -1,10 +1,8 @@
-import { TemplateHelper } from "../helper";
-import { loadTemplate, redirectToPage } from "../main.js";
-import { Component } from "./Component.js";
+import {TemplateHelper} from "../helper";
+import {loadTemplate, redirectToPage} from "../main.js";
 
-export class Page extends Component {
+export class Page {
   constructor() {
-    super();
     this._eventsListeners = {};
     this._templateHelper = new TemplateHelper();
     this.addListener(".ui.link", ["click", this._onLinkClick.bind(this), false]);

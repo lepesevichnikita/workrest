@@ -1,7 +1,7 @@
-import { endpoint } from "../config";
-import { Action, ContentType, Header } from "../constant";
-import { Subscribable } from "../model";
-import { RestClient } from "./RestClient.js";
+import {endpoint} from "../config";
+import {Action, ContentType, Header} from "../constant";
+import {Subscribable} from "../model";
+import {RestClient} from "./RestClient.js";
 
 export class AuthorizationService extends Subscribable {
   constructor() {
@@ -12,6 +12,18 @@ export class AuthorizationService extends Subscribable {
   hasToken() {
     return localStorage.getItem(AuthorizationService.TOKEN) !== null;
   }
+
+  checkIsAuthorized() {
+    return new Promise((resolve, reject) => {
+      if (this.hasToken()) {
+        this.verifyToken()
+            .then(resolve)
+            .catch(reject);
+      } else {
+        reject();
+      }
+    });
+  };
 
   verifyToken() {
     return new Promise((resolve, reject) => {
@@ -67,7 +79,7 @@ export class AuthorizationService extends Subscribable {
   signUp(loginInfo) {
     return new Promise((resolve, reject) => {
       this._restClient
-          .post("AdministratorService")
+          .post("users")
           .accept(ContentType.APPLICATION_JSON)
           .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(loginInfo)

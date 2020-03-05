@@ -20,6 +20,8 @@ public class FullPersonalDataDTO {
   @JsonIgnore
   private PersonalDataBuilder defaultPersonalDataBuilder;
 
+  private long id;
+
   private String documentNumber;
 
   private String documentName;
@@ -38,6 +40,7 @@ public class FullPersonalDataDTO {
 
   public static FullPersonalDataDTO fromPersonalData(PersonalData personalData) {
     FullPersonalDataDTO personalDataDTO = new FullPersonalDataDTO();
+    personalDataDTO.setId(personalData.getId());
     personalDataDTO.setFirstName(personalData.getFirstName());
     personalDataDTO.setLastName(personalData.getLastName());
     personalDataDTO.setAttachment(personalData.getAttachment());
@@ -103,5 +106,13 @@ public class FullPersonalDataDTO {
 
   public void setState(PersonalDataState state) {
     this.state = state;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 }

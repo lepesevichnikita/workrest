@@ -1,7 +1,11 @@
 export const endpoint = {
   token: {
     verify: "token/verify", root: "token"
-  }, file: {
+  },
+  users: {
+    root: "users"
+  },
+  file: {
     root: "file"
   }, AdministratorService: {
     root: "AdministratorService"
