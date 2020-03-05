@@ -58,8 +58,8 @@ export class Users extends Page {
   _loadData() {
     this._userService.getUsers()
         .then(response => this.replacePage("users", {kek: 'kek', users: response.body})
-                              .then(() => super.process()))
-        .catch(console.error);
+                              .catch(console.error)
+                              .finally(() => super.process()));
   }
 }
 

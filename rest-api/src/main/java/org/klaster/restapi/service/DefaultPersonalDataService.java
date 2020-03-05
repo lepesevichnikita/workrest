@@ -8,6 +8,7 @@ package org.klaster.restapi.service;/*
  * Copyright(c) JazzTeam
  */
 
+import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.context.User;
@@ -35,7 +36,8 @@ DefaultPersonalDataService {
 
   public PersonalData findById(long id) {
     return personalDataRepository.findById(id)
-                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(PersonalData.class, id)));
+                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(PersonalData.class,
+                                                                                                                         id)));
   }
 
   public PersonalData findByUserId(long userId) {
@@ -43,9 +45,7 @@ DefaultPersonalDataService {
     if (foundUser.getPersonalData() == null) {
       throw new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, userId));
     }
-    return personalDataRepository.findByUser(foundUser)
-                                 .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(PersonalData.class,
-                                                                                                                               userId)));
+    return foundUser.getPersonalData();
   }
 
   @Transactional
@@ -74,5 +74,9 @@ DefaultPersonalDataService {
     PersonalData foundPersonalData = findById(id);
     foundPersonalData.setState(PersonalDataState.REJECTED);
     return personalDataRepository.save(foundPersonalData);
+  }
+
+  public List<PersonalData> findAllUnconsideredPersonlData() {
+    return personalDataRepository.findAllByState(null);
   }
 }

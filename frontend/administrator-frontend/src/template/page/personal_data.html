@@ -1,0 +1,32 @@
+<div class="ui container middle aligned center aligned grid">
+  <div class="column">
+    <h1 class="ui center aligned icon header">
+      <i class="users icon"></i>
+      Personal data verification request
+    </h1>
+    <div class="ui four doubling stackable cards" id="personal-data-cards">
+      {{each personalData}}
+      <div class="ui card">
+        <div class="content">
+          <div class="header">${firstName} ${lastName}</div>
+          <div class="description">${user.currentState.name}</div>
+        </div>
+        <div class="ui two attached bottom buttons">
+          <div class="ui basic green animated button" data-action="approve" data-id="${id}">
+            <div class="hidden content">Approve</div>
+            <div class="visible content">
+              <i class="lock open icon"></i>
+            </div>
+          </div>
+          <div class="ui basic yellow animated button" data-action="reject" data-id="${id}">
+            <div class="hidden content">Reject</div>
+            <div class="visible content">
+              <i class="lock icon"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

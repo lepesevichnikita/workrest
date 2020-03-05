@@ -8,6 +8,8 @@ package org.klaster.restapi.controller;/*
  * Copyright(c) JazzTeam
  */
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.klaster.domain.dto.FullPersonalDataDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.PersonalData;
@@ -33,13 +35,24 @@ public class PersonalDataController {
 
   @GetMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<FullPersonalDataDTO> getByCurrentUser(@AuthenticationPrincipal User currentUser) {
+  public ResponseEntity<FullPersonalDataDTO> findByCurrentUser(@AuthenticationPrincipal User currentUser) {
     return ResponseEntity.ok(FullPersonalDataDTO.fromPersonalData(currentUser.getPersonalData()));
+  }
+
+  @GetMapping("/all")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<List<FullPersonalDataDTO>> findAll() {
+    List<FullPersonalDataDTO> foundPersonalData = defaultPersonalDataService.findAllUnconsideredPersonlData()
+                                                                            .stream()
+                                                                            .map(FullPersonalDataDTO::fromPersonalData)
+                                                                            .collect(
+                                                                                Collectors.toList());
+    return ResponseEntity.ok(foundPersonalData);
   }
 
   @GetMapping("/{userId}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<FullPersonalDataDTO> getByUserId(@PathVariable long userId) {
+  public ResponseEntity<FullPersonalDataDTO> findByUserId(@PathVariable long userId) {
     PersonalData foundPersonalData = defaultPersonalDataService.findByUserId(userId);
     return ResponseEntity.ok(FullPersonalDataDTO.fromPersonalData(foundPersonalData));
   }
