@@ -7,8 +7,9 @@ package org.klaster.restapi.service;
  *
  */
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -54,12 +55,14 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     Token newToken = new Token();
     if (defaultSystemAdministratorService.isSystemAdministrator(login, password)) {
       defaultSystemAdministratorService.getSystemAdministrator()
-                                       .getLoginInfo()
-                                       .addToken(newToken);
+                                       .getCurrentState()
+                                       .authenticateUser(newToken);
     } else {
       LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
-      Objects.requireNonNull(foundLoginInfo)
-             .addToken(newToken);
+      userRepository.findFirstByLoginInfo(foundLoginInfo)
+                    .getCurrentState()
+                    .authenticateUser(newToken);
+
     }
     return tokenRepository.save(newToken);
   }
@@ -84,6 +87,22 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
                                                                                                                           token)));
     tokenRepository.delete(foundToken);
     return foundToken;
+  }
+
+  @Override
+  public List<Token> deleteAllTokensByUserId(long userId) {
+    User foundUser = userRepository.findById(userId)
+                                   .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class,
+                                                                                                                           userId)));
+    List<Token> deletedTokens = foundUser.getLoginInfo()
+                                         .getTokens()
+                                         .stream()
+                                         .collect(Collectors.toList());
+    foundUser.getLoginInfo()
+             .getTokens()
+             .clear();
+    userRepository.save(foundUser);
+    return deletedTokens;
   }
 
   @Override

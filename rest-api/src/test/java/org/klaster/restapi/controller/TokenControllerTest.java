@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.dto.TokenDTO;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
 import org.klaster.restapi.configuration.ApplicationContext;
@@ -94,6 +95,32 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
                              .content(loginInfoDTOAsJson))
            .andExpect(status().isCreated())
            .andExpect(jsonPath("$.token").value(not(empty())));
+  }
+
+
+  @Test
+  public void forbiddenForPostByBlockedUserWithCorrectCredentials() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.blockById(registeredUser.getId());
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(loginInfoDTOAsJson))
+           .andExpect(status().isForbidden());
+  }
+
+
+  @Test
+  public void forbiddenForPostByDeletedUserWithCorrectCredentials() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.deleteById(registeredUser.getId());
+    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .content(loginInfoDTOAsJson))
+           .andExpect(status().isForbidden());
   }
 
   @Test

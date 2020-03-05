@@ -1,9 +1,9 @@
 package org.klaster.domain.model.state.user;
 
-import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import org.klaster.domain.constant.UserStateName;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.model.entity.Token;
 
 /**
  * UnverifiedUserState
@@ -20,9 +20,8 @@ public class UnverifiedUserState extends AbstractUserState {
   }
 
   @Override
-  public void authorizeUser(LocalDateTime authorizedAt) {
-    getContext().getLoginInfo()
-                .setLastAuthorizedAt(authorizedAt);
+  public void authenticateUser(Token token) {
+    this.successfulAuthenticateUser(token);
   }
 
   @Override

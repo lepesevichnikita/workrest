@@ -177,22 +177,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   }
 
   @Test
-  public void unauthenticatedForPutByBlockedUser() throws Exception {
-    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    defaultUserService.blockById(registeredUser.getId());
-    final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
-                                                                .getValue();
-    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
-        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
-    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(personalDataDTOAsJson))
-           .andExpect(unauthenticated());
-  }
-
-  @Test
   public void forbiddenForPutByVerifiedUser() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     defaultUserService.verifyById(registeredUser.getId());
@@ -208,22 +192,6 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
            .andExpect(status().isForbidden());
   }
 
-
-  @Test
-  public void unauthenticatedForPutByDeletedUser() throws Exception {
-    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    defaultUserService.deleteById(registeredUser.getId());
-    final String userToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
-                                                                .getValue();
-    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String personalDataDTOAsJson = objectMapper.writeValueAsString(
-        FullPersonalDataDTO.fromPersonalData(randomPersonalData));
-    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, userToken)
-                            .accept(MediaType.APPLICATION_JSON)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(personalDataDTOAsJson))
-           .andExpect(unauthenticated());
-  }
 
   @Test
   public void unauthenticatedForPutWithInvalidToken() throws Exception {

@@ -1,6 +1,6 @@
-import { AdministratorService } from "../api";
-import { redirectToPage } from "../main.js";
-import { Page } from "./Page.js";
+import {AdministratorService} from "../api";
+import {redirectToPage} from "../main.js";
+import {Page} from "./Page.js";
 
 export class Administrators extends Page {
   constructor(props) {
@@ -11,7 +11,7 @@ export class Administrators extends Page {
     this.addListener("input[name=login]", ["change", this._onLoginChange.bind(this), false])
         .addListener("input[name=password]", ["change", this._onPasswordChange.bind(this), false])
         .addListener("#administratorForm", ["submit", this._onFormSubmit.bind(this), false])
-        .addListener(".ui.link.card > div.ui.bottom.attached.button", ["click", this._onDeleteClick.bind(this), false]);
+        .addListener(".ui.card > div.ui.bottom.attached.button", ["click", this._onDeleteClick.bind(this), false]);
   }
 
   process() {

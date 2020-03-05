@@ -53,6 +53,9 @@ public class DefaultUserService {
   @Autowired
   private SystemAdministratorProperties systemAdministratorProperties;
 
+  @Autowired
+  private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
+
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     if (systemAdministratorProperties.getSystemAdministratorLogin()
@@ -70,6 +73,7 @@ public class DefaultUserService {
     User deletedUser = userRepository.findById(id)
                                      .orElseThrow(EntityNotFoundException::new);
     deletedUser.setCurrentState(new DeletedUserState());
+    defaultTokenBasedUserDetailsService.deleteAllTokensByUserId(deletedUser.getId());
     return userRepository.save(deletedUser);
   }
 

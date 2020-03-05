@@ -7,6 +7,7 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.List;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.Token;
 
@@ -23,6 +24,8 @@ public interface TokenService {
   User findByTokenValue(String token);
 
   Token deleteTokenByValue(String token);
+
+  List<Token> deleteAllTokensByUserId(long userId);
 
   boolean hasTokenWithValue(String generatedTokenValue);
 }

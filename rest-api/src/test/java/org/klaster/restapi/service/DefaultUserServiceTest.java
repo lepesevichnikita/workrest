@@ -3,16 +3,13 @@ package org.klaster.restapi.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.isA;
 
-import com.github.javafaker.Faker;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
-import org.klaster.domain.builder.general.LoginInfoBuilder;
-import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -21,8 +18,8 @@ import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
-import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.configuration.ApplicationContext;
+import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -49,76 +46,63 @@ import org.testng.annotations.Test;
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
 
-  private LoginInfo loginInfo;
+  private LoginInfo randomLoginInfo;
   private User user;
-  private Faker faker;
 
-  @Autowired
-  private UserBuilder defaultUserBuilder;
-
-  @Autowired
-  private LoginInfoBuilder defaultLoginInfoBuilder;
+  private RandomLoginInfoFactory randomLoginInfoFactory;
 
   @Autowired
   private DefaultUserService defaultUserService;
 
   @Autowired
-  private UserRepository userRepository;
+  private TokenBasedUserDetailsService defaultTokenBasedDetailsUserService;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+    randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
   }
 
   @BeforeMethod
   public void initialize() {
-    String login = faker.name()
-                        .username();
-    String password = faker.internet()
-                           .password();
-    defaultUserBuilder.reset();
-    defaultLoginInfoBuilder.reset();
-    loginInfo = defaultLoginInfoBuilder.setLogin(login)
-                                       .setPassword(password)
-                                       .build();
+    randomLoginInfo = randomLoginInfoFactory.build();
   }
 
   @Test
   public void registersUserWithUniqueLoginInfo() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
 
-    assertThat(user, hasProperty("loginInfo", equalTo(loginInfo)));
+    assertThat(user, hasProperty("loginInfo", equalTo(randomLoginInfo)));
   }
 
   @Test
   public void registeredUserHasUnverifiedState() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     assertThat(user.getCurrentState(), isA(UnverifiedUserState.class));
   }
 
   @Test
   public void registeredUserHasRoleUser() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     assertThat(new ArrayList<>(user.getAuthorities()), contains(hasProperty("authority", equalTo(AuthorityName.USER))));
   }
 
   @Test
   public void deletesUsers() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     user = defaultUserService.deleteById(user.getId());
     assertThat(user.getCurrentState(), isA(DeletedUserState.class));
   }
 
   @Test
   public void blocksUser() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     user = defaultUserService.blockById(user.getId());
     assertThat(user.getCurrentState(), isA(BlockedUserState.class));
   }
 
   @Test
   public void unblocksUser() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     user = defaultUserService.blockById(user.getId());
     AbstractUserState previousState = user.getPreviousState();
     user = defaultUserService.unblockById(user.getId());
@@ -130,14 +114,14 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void verifiesUserById() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     user = defaultUserService.verifyById(user.getId());
     assertThat(user.getCurrentState(), isA(VerifiedUserState.class));
   }
 
   @Test
   public void notVerifiesUserIfIsVerified() {
-    user = defaultUserService.registerUserByLoginInfo(loginInfo);
+    user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     AbstractUserState previousState = defaultUserService.verifyById(user.getId())
                                                         .getCurrentState();
     AbstractUserState currentState = defaultUserService.verifyById(user.getId())
@@ -146,5 +130,14 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
         isA(previousState.getClass()),
         hasProperty("id", equalTo(previousState.getId()))
     ));
+  }
+
+  @Test
+  public void deletedUserHasNoTokens() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultTokenBasedDetailsUserService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
+    User deletedUser = defaultUserService.deleteById(registeredUser.getId());
+    assertThat(deletedUser.getLoginInfo()
+                          .getTokens(), empty());
   }
 }

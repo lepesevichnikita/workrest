@@ -1,5 +1,5 @@
-import { endpoint } from "../config";
-import { RestClient } from "./RestClient.js";
+import {endpoint} from "../config";
+import {RestClient} from "./RestClient.js";
 
 export class UserService {
   constructor(props) {
@@ -29,6 +29,13 @@ export class UserService {
   }
 
   unblockUser(userId) {
+    return new Promise((resolve, reject) => this._restClient.post(endpoint.users.unblock_by_id(userId))
+                                                .secured(this._authorizationService.getToken().token)
+                                                .then(resolve)
+                                                .catch(reject));
+  }
+
+  restoreUser(userId) {
     return new Promise((resolve, reject) => this._restClient.post(endpoint.users.unblock_by_id(userId))
                                                 .secured(this._authorizationService.getToken().token)
                                                 .then(resolve)

@@ -27,15 +27,15 @@
     </form>
     <div class="ui four doubling stackable cards" id="user-cards">
       {{each administrators}}
-      <div class="ui link card">
+      <div class="ui card">
         <div class="content">
-          <div class="header">${loginInfo.login}</div>
+          <div class="header">@${loginInfo.login}</div>
         </div>
         <div class="extra content">
         </div>
         <div class="ui bottom attached basic negative animated button" data-id=${id}>
-          <div class="visible content">Delete</div>
-          <div class="hidden content">
+          <div class="hidden content">Delete</div>
+          <div class="visible content">
             <i class="trash icon"></i>
           </div>
         </div>

@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.exception.ActionForbiddenByStateException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
@@ -73,8 +74,21 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
     ));
   }
 
-  @Test
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void blockedUserCantGetToken() {
+    User user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.blockById(user.getId());
+    defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
+  }
 
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void deletedUserCantGetToken() {
+    User user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    defaultUserService.blockById(user.getId());
+    defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
+  }
+
+  @Test
   public void returnsTrueIfHasToken() {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     Token createdToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());

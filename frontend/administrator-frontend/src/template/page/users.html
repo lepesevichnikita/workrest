@@ -6,23 +6,36 @@
     </h1>
     <div class="ui four doubling stackable cards" id="user-cards">
       {{each users}}
-      <div class="ui link card">
+      <div class="ui card">
         <div class="content">
-          <div class="header">${loginInfo.login}</div>
+          <div class="header">@${loginInfo.login}</div>
           <div class="description">${currentState.name}</div>
         </div>
-        <div class="extra content">
-          <div class="ui two buttons">
-            {{if currentState.name == 'Blocked' && currentState.name != 'Deleted'}}
-            <a class="ui basic green button" data-action="unblock" data-id="${$value.id}">Unblock</a>
-            {{/if}}
-            {{if currentState.name != 'Blocked' && currentState.name != 'Deleted'}}
-            <a class="ui basic yellow button" data-action="block" data-id="${$value.id}">Block</a>
-            {{/if}}
-            {{if currentState.name != 'Deleted'}}
-            <a class="ui basic red button" data-action="delete" data-id="${$value.id}">Delete</a>
-            {{/if}}
+        <div class="ui two attached bottom buttons">
+          {{if currentState.name != 'Deleted'}}
+          {{if currentState.name == 'Blocked'}}
+          <div class="ui basic green animated button" data-action="unblock" data-id="${id}">
+            <div class="hidden content">Unblock</div>
+            <div class="visible content">
+              <i class="lock open icon"></i>
+            </div>
           </div>
+          {{/if}}
+          {{if currentState.name != 'Blocked'}}
+          <div class="ui basic yellow animated button" data-action="block" data-id="${id}">
+            <div class="hidden content">Block</div>
+            <div class="visible content">
+              <i class="lock icon"></i>
+            </div>
+          </div>
+          {{/if}}
+          <div class="ui basic negative animated button" data-action="delete" data-id="${id}">
+            <div class="hidden content">Delete</div>
+            <div class="visible content">
+              <i class="trash icon"></i>
+            </div>
+          </div>
+          {{/if}}
         </div>
       </div>
       {{/each}}

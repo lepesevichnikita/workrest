@@ -1,7 +1,6 @@
 package org.klaster.domain.model.state.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -12,6 +11,7 @@ import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.model.entity.Token;
 import org.klaster.domain.model.state.general.AbstractState;
 
 /**
@@ -36,7 +36,7 @@ public abstract class AbstractUserState extends AbstractState<User> {
     throw new ActionForbiddenByStateException(UserAction.ACCESS_TO_EMPLOYER_PROFILE, this);
   }
 
-  public void authorizeUser(LocalDateTime authorizedAt) {
+  public void authenticateUser(Token token) {
     throw new ActionForbiddenByStateException(UserAction.AUTHORIZATION, this);
   }
 
@@ -50,6 +50,11 @@ public abstract class AbstractUserState extends AbstractState<User> {
 
   public void updatePersonalData(PersonalData personalData) {
     throw new ActionForbiddenByStateException(UserAction.PERSONAL_DATA_UPDATING, this);
+  }
+
+  protected void successfulAuthenticateUser(Token token) {
+    getContext().getLoginInfo()
+                .addToken(token);
   }
 
 }
