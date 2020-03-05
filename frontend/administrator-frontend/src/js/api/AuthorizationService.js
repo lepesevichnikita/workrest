@@ -1,5 +1,5 @@
-import { ContentType } from "../constant";
-import { Action } from "../constant/Action.js";
+import { endpoint } from "../config";
+import { Action, ContentType, Header } from "../constant";
 import { Subscribable } from "../model";
 import { RestClient } from "./RestClient.js";
 
@@ -13,12 +13,24 @@ export class AuthorizationService extends Subscribable {
     return localStorage.getItem(AuthorizationService.TOKEN) !== null;
   }
 
+  checkIsAuthorized() {
+    return new Promise((resolve, reject) => {
+      if (this.hasToken()) {
+        this.verifyToken()
+            .then(resolve)
+            .catch(reject);
+      } else {
+        reject();
+      }
+    });
+  };
+
   verifyToken() {
     return new Promise((resolve, reject) => {
       this._restClient
-          .post("token/verify")
+          .post(endpoint.token.verify)
           .accept(ContentType.APPLICATION_JSON)
-          .set("Content-Type", ContentType.APPLICATION_JSON)
+          .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(this.getToken())
           .then(response => {
             this.notifyAllSubscribers(Action.TOKEN_CORRECT);
@@ -38,9 +50,9 @@ export class AuthorizationService extends Subscribable {
   signIn(loginInfo) {
     return new Promise((resolve, reject) => {
       this._restClient
-          .post("token")
+          .post(endpoint.token.root)
           .accept(ContentType.APPLICATION_JSON)
-          .set("Content-Type", ContentType.APPLICATION_JSON)
+          .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(loginInfo)
           .then(response => {
             localStorage.setItem(AuthorizationService.TOKEN, response.text);
@@ -53,9 +65,9 @@ export class AuthorizationService extends Subscribable {
 
   signOut() {
     this._restClient
-        .delete("token")
+        .delete(endpoint.token.root)
         .accept(ContentType.APPLICATION_JSON)
-        .set("Content-Type", ContentType.APPLICATION_JSON)
+        .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
         .send(this.getToken())
         .then()
         .finally(() => {
@@ -69,7 +81,7 @@ export class AuthorizationService extends Subscribable {
       this._restClient
           .post("AdministratorService")
           .accept(ContentType.APPLICATION_JSON)
-          .set("Content-Type", ContentType.APPLICATION_JSON)
+          .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(loginInfo)
           .then(response => {
             resolve(response);

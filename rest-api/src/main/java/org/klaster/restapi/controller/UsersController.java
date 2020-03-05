@@ -50,12 +50,27 @@ public class UsersController {
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
-  public ResponseEntity<User> delete(@PathVariable long id) {
+  public ResponseEntity<User> deleteById(@PathVariable long id) {
     User deletedUser = defaultUserService.deleteById(id);
     return ResponseEntity.accepted()
                          .body(deletedUser);
   }
 
+  @PostMapping("/{id}/block")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<User> blockById(@PathVariable long id) {
+    User deletedUser = defaultUserService.blockById(id);
+    return ResponseEntity.accepted()
+                         .body(deletedUser);
+  }
+
+  @PostMapping("/{id}/block")
+  @PreAuthorize("hasAuthority('ADMINISTRATOR')")
+  public ResponseEntity<User> unblockById(@PathVariable long id) {
+    User deletedUser = defaultUserService.unblockById(id);
+    return ResponseEntity.accepted()
+                         .body(deletedUser);
+  }
 
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")

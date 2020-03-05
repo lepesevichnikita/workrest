@@ -20,7 +20,8 @@ export class Administrators extends Page {
           this.showDimmer();
           this._loadData();
         })
-        .catch(() => redirectToPage("login"));
+        .catch(() => redirectToPage("login"))
+        .finally(() => this.hideDimmer());
   }
 
   _onLoginChange(event) {
@@ -37,7 +38,8 @@ export class Administrators extends Page {
     event.preventDefault();
     this.showDimmer();
     this._administratorService.createAdministrator(this._loginInfo)
-        .then(() => this._loadData());
+        .then(() => this._loadData())
+        .finally(() => this.hideDimmer());
   }
 
   _loadData() {
