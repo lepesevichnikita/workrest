@@ -9,6 +9,7 @@ package org.klaster.domain.repository;
 
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * EmployerProfileRepository
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Nikita Lepesevich
  */
 
+@Repository
 public interface EmployerProfileRepository extends JpaRepository<EmployerProfile, Long> {
 
 }

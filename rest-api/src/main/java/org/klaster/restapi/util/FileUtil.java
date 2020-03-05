@@ -29,7 +29,7 @@ public class FileUtil {
   public static File createSubFolderIfNotExists(File sourceFolder, String subFolderName) throws IOException {
     File targetFolder = makeChildItem(sourceFolder, subFolderName);
     if (!(targetFolder.isDirectory() || targetFolder.exists())) {
-      Files.createDirectory(targetFolder.toPath());
+      Files.createDirectories(targetFolder.toPath());
     }
     return targetFolder;
   }

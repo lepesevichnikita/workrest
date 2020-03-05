@@ -34,8 +34,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @Configuration
-@EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {PackageName.DOMAIN_REPOSITORY})
+@EnableTransactionManagement
 @PropertySource(value = {PropertyClassPath.APPLICATION})
 public class PersistenceJPAConfig {
 
@@ -50,7 +50,7 @@ public class PersistenceJPAConfig {
     entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());
     entityManagerFactoryBean.setDataSource(dataSource());
     entityManagerFactoryBean.setPersistenceUnitName(JPA_PERSISTENCE_UNIT_NAME);
-    entityManagerFactoryBean.setPackagesToScan(PackageName.DOMAIN);
+    entityManagerFactoryBean.setPackagesToScan(PackageName.DOMAIN, PackageName.REST_API);
     entityManagerFactoryBean.setJpaProperties(hibernateProperties());
     return entityManagerFactoryBean;
   }
@@ -75,13 +75,14 @@ public class PersistenceJPAConfig {
     return dataSource;
   }
 
-  private Properties hibernateProperties() {
+  @Bean
+  public Properties hibernateProperties() {
     Properties properties = new Properties();
     properties.put(HibernatePropertyKey.HIBERNATE_DIALECT, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_DIALECT));
     properties.put(HibernatePropertyKey.HIBERNATE_SHOW_SQL, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_SHOW_SQL));
     properties.put(HibernatePropertyKey.HIBERNATE_FORMAT_SQL, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_FORMAT_SQL));
-    properties.put(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO, environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO));
+    properties.put(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO,
+                   environment.getRequiredProperty(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO));
     return properties;
   }
-
 }

@@ -39,7 +39,7 @@ public class LoginInfo {
   private String password;
 
   @JsonIgnore
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo", orphanRemoval = true, cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "loginInfo", orphanRemoval = true, cascade = CascadeType.MERGE)
   private Set<Token> tokens;
 
   public long getId() {

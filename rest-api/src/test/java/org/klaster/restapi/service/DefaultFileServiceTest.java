@@ -12,8 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
 import javax.persistence.EntityNotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
@@ -76,7 +74,6 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
     final String expectedPathEnd = FileUtil.makeChildItem(outputFolder, INPUT_FILE_NAME)
                                            .getCanonicalPath();
     final String expectedMd5 = FileUtil.getHexMd5OfInputStream(inputStream);
-    inputStream.close();
     assertThat(savedFile, allOf(
         hasProperty("id", notNullValue()),
         hasProperty("md5", equalTo(expectedMd5)),
@@ -89,20 +86,16 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
     final String newOutputFilePath = INPUT_FILE_NAME.concat("2");
     InputStream inputStream = new FileInputStream(inputFile);
     FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFilePath);
-    inputStream.close();
     assertThat(defaultFileService.findFirstById(savedFile.getId()), notNullValue());
   }
 
   @Test
-  public void notOverWritesExistedFile() throws IOException {
+  public void writesSameFileInDifferentPathDependOnTimeStamp() throws IOException {
     final String newOutputFileName = INPUT_FILE_NAME.concat("3");
     InputStream inputStream = new FileInputStream(inputFile);
     FileInfo savedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
-    FileTime firstSaveTime = Files.getLastModifiedTime(new File(savedFile.getPath()).toPath());
     FileInfo anotherSavedFile = defaultFileService.saveFile(inputStream, newOutputFileName);
-    FileTime secondSaveTime = Files.getLastModifiedTime(new File(anotherSavedFile.getPath()).toPath());
-    inputStream.close();
-    assertThat(firstSaveTime, not(equalTo(secondSaveTime)));
+    assertThat(savedFile.getPath(), not(equalTo(anotherSavedFile.getPath())));
   }
 
 

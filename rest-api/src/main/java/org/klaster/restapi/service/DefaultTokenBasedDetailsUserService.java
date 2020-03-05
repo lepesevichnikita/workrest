@@ -18,6 +18,7 @@ import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -74,8 +75,8 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     return foundUser;
   }
 
-  @Transactional
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Token deleteTokenByValue(String token) {
     Token foundToken = tokenRepository.findFirstByValue(token)
                                       .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByFieldNotFound(Token.class,

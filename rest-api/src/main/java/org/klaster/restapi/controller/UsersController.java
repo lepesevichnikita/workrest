@@ -64,7 +64,7 @@ public class UsersController {
                          .body(deletedUser);
   }
 
-  @PostMapping("/{id}/block")
+  @PostMapping("/{id}/unblock")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")
   public ResponseEntity<User> unblockById(@PathVariable long id) {
     User deletedUser = defaultUserService.unblockById(id);

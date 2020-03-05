@@ -84,9 +84,10 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
   @Test
   public void deletesToken() {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    Token createdToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
-    defaultTokenBasedUserDetailsService.deleteTokenByValue(createdToken.getValue());
-    assertThat(defaultTokenBasedUserDetailsService.hasTokenWithValue(createdToken.getValue()), is(false));
+    String createdTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                  .getValue();
+    defaultTokenBasedUserDetailsService.deleteTokenByValue(createdTokenValue);
+    assertThat(defaultTokenBasedUserDetailsService.hasTokenWithValue(createdTokenValue), is(false));
   }
 
 }

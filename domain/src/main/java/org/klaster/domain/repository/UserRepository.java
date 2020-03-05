@@ -14,7 +14,6 @@ import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.UserAuthority;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ApplicationUserRepository
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Repository
-@Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
 
   Optional<User> findFirstByAuthoritiesAndId(UserAuthority authority, long id);
