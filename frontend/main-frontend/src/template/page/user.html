@@ -11,8 +11,105 @@
       </div>
       <div class="ui link basic attached bottom button" name="personal_data">Edit</div>
     </div>
-    <div id="freelancerProfile"></div>
-    <div id="employerProfile"></div>
+    <div id="freelancerProfile">
+      {{if freelancerProfile}}
+      <a class="ui link card" id="${freelancerProfile.id}">
+        <div class="content">
+          <div class="header">Freelancer profile</div>
+          <div class="description">
+            ${freelancerProfile.description}
+          </div>
+        </div>
+        <div class="extra content">
+          {{each freelancerProfile.skills}}
+          <span class="ui label">${name}</span>
+          {{/each}}
+        </div>
+      </a>
+      {{/if}}
+      {{if !freelancerProfile}}
+      <form class="ui form" id="freelancerProfileForm">
+        <div class="ui segment">
+          <div class="field">
+            <label>Description</label>
+            <textarea name="description"></textarea>
+          </div>
+          <div class="field">
+            <label>Skills</label>
+            <input name="skill" placeholder="enter your skill" type="text">
+            <div id="skills"></div>
+          </div>
+          <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+        </div>
+      </form>
+      {{/if}}
+    </div>
+    <div id="employerProfile">
+      {{if employerProfile}}
+      <div class="ui fluid card">
+        <div class="content">
+          <div class="header center aligned">Employer profile</div>
+          <div class="description">
+            ${employerProfile.description}
+          </div>
+        </div>
+        <div class="ui basic attached bottom primary button">Update</div>
+        <div class="extra content">
+          <div class="meta">
+            Published jobs
+          </div>
+          <div class="ui four doubling stackable cards" id="job-cards">
+            {{if employerProfile.jobs}}
+            {{each employerProfile.jobs}}
+            <div class="ui link card">
+              <div class="content">
+                <div class="header">Create Twitter</div>
+                <div class="meta"></div>
+                <div class="description">
+                  <div class="ui wireframe image">
+                    <img src="src/img/paragraph.png"></img>
+                  </div>
+                </div>
+              </div>
+              <div class="extra content">
+                {{each $skills}}
+                <span class="ui label">${skill.name}</span>
+                {{/each}}
+              </div>
+              <div class="ui basic attached bottom primary button">Update</div>
+            </div>
+            {{/each}}
+            {{/if}}
+          </div>
+          <div class="ui form" id="jobForm">
+            <div class="ui segment">
+              <div class="field">
+                <label>Description</label>
+                <textarea name="description"></textarea>
+              </div>
+              <div class="field">
+                <label>Skills</label>
+                <input name="skill" placeholder="Enter required skill" type="text">
+                <div id="skills"></div>
+              </div>
+              <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      {{if !employerProfile}}
+      <div class="ui form" id="employerProfileForm">
+        <div class="ui segment">
+          <div class="field">
+            <label>Description</label>
+            <textarea name="description"></textarea>
+          </div>
+          <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+        </div>
+      </div>
+      {{/if}}
     </div>
   </div>
+</div>
 </div>

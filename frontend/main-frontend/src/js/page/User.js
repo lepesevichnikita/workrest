@@ -1,7 +1,7 @@
-import { JobService, UserService } from "../api";
-import { TemplateHelper } from "../helper";
-import { checkIsAuthorized, loadTemplate, redirectToPage } from "../main.js";
-import { Page } from "./Page.js";
+import {JobService, UserService} from "../api";
+import {TemplateHelper} from "../helper";
+import {checkIsAuthorized, redirectToPage} from "../main.js";
+import {Page} from "./Page.js";
 
 export class User extends Page {
   constructor(props) {
@@ -10,6 +10,18 @@ export class User extends Page {
     this._userService = new UserService(props);
     this._jobService = new JobService(props);
     this._templateHelper = new TemplateHelper();
+    this.addListener('#freelancerProfileForm > input[name=description]',
+                     ['change', this._freelancerDescriptionChange.bind(this), false])
+        .addListener('#freelancerProfileForm > input[name=skillAdd]',
+                     ['skill', this._freelancerSkillAddClick.bind(this), false])
+        .addListener('#freelncerProfileForm', ['submit', this._freelancerFormSubmit.bind(this), false])
+        .addListener('#employerProfileForm > input[name=description]',
+                     ['change', this._employerDescriptionChange.bind(this), false])
+        .addListener('#employerProfileForm', ['submit', this._employerFormSubmit.bind(this), false])
+        .addListener('#jobProfileForm > input[name=description]',
+                     ['change', this._jobDescriptionChange.bind(this), false])
+        .addListener('#jobProfileForm > input[name=skillAdd]', ['skill', this._jobSkillAddClick.bind(this), false])
+        .addListener('#freelncerProfileForm', ['submit', this._jobFormSubmit.bind(this), false])
   }
 
   process() {
@@ -30,8 +42,6 @@ export class User extends Page {
     this.replacePage("user", this._user)
         .then(() => {
           if (this._user.currentState.name == 'Verified') {
-            this._renderProfile("freelancer");
-            this._renderProfile("employer");
             this._addJobFormCallbacks();
           }
         })
@@ -39,22 +49,6 @@ export class User extends Page {
           super.process();
         });
   }
-
-  _renderProfile(profileType) {
-    const profilePropertyPath = `${profileType}Profile`;
-    const templateName = this._user[profilePropertyPath] ? `${profileType}/personal_card` : `${profileType}/form`;
-    loadTemplate("#freelancerProfile",
-                 this._templateHelper.getTemplatePath(templateName),
-                 this._user[profilePropertyPath])
-    .catch(console.error);
-  }
-
-  _addJobFormCallbacks() {
-    const jobForm = document.getElementById("jobForm");
-    const sendForm = formData => this._jobService.createJob(formData);
-    this.defineFormSubmitCallback(jobForm, sendForm);
-  }
-
 }
 
 export default User;
