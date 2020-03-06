@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.constant.JobStateName;
+import org.klaster.domain.dto.EmployerProfileDTO;
 import org.klaster.domain.dto.JobDTO;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
@@ -110,7 +111,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   public void createdForPostByVerifiedUserWithEmployerProfileWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     registeredUser = defaultUserService.verifyById(registeredUser.getId());
-    defaultUserService.createEmployerProfile(registeredUser, randomEmployerProfile);
+    defaultUserService.createEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     JobDTO jobDTO = JobDTO.fromJob(randomJob);
     final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
                                                                                    randomLoginInfo.getPassword())

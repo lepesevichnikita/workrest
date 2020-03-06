@@ -17,6 +17,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Transient;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.state.general.AbstractState;
 
 /**
@@ -26,7 +28,7 @@ import org.klaster.domain.model.state.general.AbstractState;
  */
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractContext<S extends AbstractState> {
 
   @Id
@@ -38,7 +40,7 @@ public abstract class AbstractContext<S extends AbstractState> {
              orphanRemoval = true,
              cascade = CascadeType.ALL,
              mappedBy = "context")
-
+  @Fetch(FetchMode.SELECT)
   @JsonManagedReference
   private Set<S> states;
 

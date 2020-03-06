@@ -9,6 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.model.context.User;
 
@@ -44,6 +46,7 @@ public class PersonalData extends Attachable {
 
   @JsonIgnore
   @OneToOne(optional = false, fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SELECT)
   private User user;
 
   public String getDocumentNumber() {

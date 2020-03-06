@@ -14,6 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.Skill;
@@ -32,6 +34,7 @@ public class Job extends AbstractContext<AbstractJobState> {
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SELECT)
   private EmployerProfile employerProfile;
 
   @NotNull
@@ -39,6 +42,7 @@ public class Job extends AbstractContext<AbstractJobState> {
 
   @JsonManagedReference
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private Set<Skill> skills;
 
   @NotNull

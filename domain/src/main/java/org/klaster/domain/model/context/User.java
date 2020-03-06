@@ -2,6 +2,7 @@ package org.klaster.domain.model.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -29,23 +32,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 public class User extends AbstractContext<AbstractUserState> implements UserDetails {
 
-  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.MERGE, orphanRemoval = true)
+  @Fetch(FetchMode.SELECT)
   private LoginInfo loginInfo;
 
-  @JsonManagedReference
+  @JsonIgnore
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-  private Set<UserAuthority> authorities;
+  @Fetch(FetchMode.SELECT)
+  private Set<UserAuthority> authorities = new LinkedHashSet<>();
 
   @JsonManagedReference
-  @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private FreelancerProfile freelancerProfile;
 
   @JsonManagedReference
-  @OneToOne(mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  @OneToOne(fetch = FetchType.LAZY, mappedBy = "owner", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private EmployerProfile employerProfile;
 
-  @JsonIgnore
-  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+  @JsonManagedReference
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "user", orphanRemoval = true)
+  @Fetch(FetchMode.SELECT)
   private PersonalData personalData;
 
   public EmployerProfile getEmployerProfile() {

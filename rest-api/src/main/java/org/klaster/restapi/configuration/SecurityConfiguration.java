@@ -39,7 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(WebSecurity web) {
     web.ignoring()
-       .antMatchers("/token/**")
+       .antMatchers(HttpMethod.POST, "/token")
        .antMatchers(HttpMethod.POST, "/users")
        .antMatchers(HttpMethod.GET, "/file/*");
   }

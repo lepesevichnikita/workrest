@@ -25,7 +25,7 @@ import org.springframework.data.annotation.CreatedDate;
  */
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractState<C extends AbstractContext> {
 
   @Id

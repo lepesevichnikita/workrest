@@ -1,5 +1,5 @@
-import {redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
+import { redirectToPage } from "../main.js";
+import { Page } from "./Page.js";
 
 export class SignUp extends Page {
   constructor(props) {
@@ -15,10 +15,11 @@ export class SignUp extends Page {
   }
 
   process() {
+    this.showDimmer();
     return this._authorizationService.checkIsAuthorized()
                .then(() => redirectToPage("home"))
                .catch((error) => this.replacePage("signup")
-                                     .then(() => super.process()));
+                                     .finally(() => super.process()));
   }
 
   _onLoginChange(event) {

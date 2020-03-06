@@ -11,16 +11,24 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityNotFoundException;
+import org.klaster.domain.builder.general.EmployerProfileBuilder;
+import org.klaster.domain.builder.general.FreelancerProfileBuilder;
 import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.constant.AuthorityName;
+import org.klaster.domain.dto.EmployerProfileDTO;
+import org.klaster.domain.dto.FreelancerProfileDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
+import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
+import org.klaster.domain.repository.LoginInfoRepository;
+import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.repository.UserAuthorityRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
@@ -56,14 +64,27 @@ public class DefaultUserService {
   @Autowired
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
+  @Autowired
+  private LoginInfoRepository loginInfoRepository;
+
+  @Autowired
+  private EmployerProfileBuilder defaultEmployerProfileBuilder;
+
+  @Autowired
+  private FreelancerProfileBuilder defaultFreelancerProfileBuilder;
+
+  @Autowired
+  private SkillRepository skillRepository;
+
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     if (systemAdministratorProperties.getSystemAdministratorLogin()
                                      .equals(loginInfo.getLogin())) {
       throw new InvalidParameterException();
     }
+    LoginInfo savedLoginInfo = loginInfoRepository.save(loginInfo);
     Set<UserAuthority> userAuthorities = userAuthorityRepository.findOrCreateAllByNames(userAuthoritiesNames);
-    User user = defaultUserBuilder.setLoginInfo(loginInfo)
+    User user = defaultUserBuilder.setLoginInfo(savedLoginInfo)
                                   .setAuthorities(userAuthorities)
                                   .build();
     return userRepository.save(user);
@@ -101,9 +122,21 @@ public class DefaultUserService {
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
-  public User createEmployerProfile(User user, EmployerProfile employerProfile) {
+  public User createEmployerProfile(User user, EmployerProfileDTO employerProfileDTO) {
+    EmployerProfile employerProfile = defaultEmployerProfileBuilder.setDescription(employerProfileDTO.getDescription())
+                                                                   .build();
     user.getCurrentState()
-        .createEmployerProfile(employerProfile);
+        .updateEmployer(employerProfile);
+    return userRepository.save(user);
+  }
+
+  public User createFreelancerProfile(User user, FreelancerProfileDTO freelancerProfileDTO) {
+    Set<Skill> skills = skillRepository.findAllByNamesOrCreate(freelancerProfileDTO.getSkills());
+    FreelancerProfile freelancerProfile = defaultFreelancerProfileBuilder.setDescription(freelancerProfileDTO.getDescription())
+                                                                         .setSkills(skills)
+                                                                         .build();
+    user.getCurrentState()
+        .updateFreelancerProfile(freelancerProfile);
     return userRepository.save(user);
   }
 

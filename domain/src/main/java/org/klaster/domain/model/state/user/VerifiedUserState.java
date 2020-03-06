@@ -31,7 +31,7 @@ public class VerifiedUserState extends AbstractUserState {
   }
 
   @Override
-  public void createEmployerProfile(EmployerProfile targetEmployerProfile) {
+  public void updateEmployer(EmployerProfile targetEmployerProfile) {
     if (!getContext().hasEmployerProfile()) {
       targetEmployerProfile.setOwner(getContext());
       getContext().setEmployerProfile(targetEmployerProfile);
@@ -39,7 +39,7 @@ public class VerifiedUserState extends AbstractUserState {
   }
 
   @Override
-  public void createFreelancerProfile(FreelancerProfile targetFreelancerProfile) {
+  public void updateFreelancerProfile(FreelancerProfile targetFreelancerProfile) {
     if (!getContext().hasFreelancerProfile()) {
       targetFreelancerProfile.setOwner(getContext());
       getContext().setFreelancerProfile(targetFreelancerProfile);

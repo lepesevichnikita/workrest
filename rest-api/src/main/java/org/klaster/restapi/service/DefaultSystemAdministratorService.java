@@ -18,6 +18,7 @@ import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.UserAuthority;
+import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.UserAuthorityRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.configuration.SystemAdministratorProperties;
@@ -50,6 +51,9 @@ public class DefaultSystemAdministratorService {
   @Autowired
   private UserAuthorityRepository userAuthorityRepository;
 
+  @Autowired
+  private LoginInfoRepository loginInfoRepository;
+
   public User getSystemAdministrator() {
     LoginInfo systemAdministratorLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(systemAdministratorProperties.getSystemAdministratorLogin(),
                                                                                                  systemAdministratorProperties.getSystemAdministratorPassword());
@@ -71,15 +75,14 @@ public class DefaultSystemAdministratorService {
 
 
   private User createSystemAdministrator() {
-    LoginInfo systemAdministratorLoginInfo;
-    User systemAdministrator;
-    systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
-                                                          .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
-                                                          .build();
+    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
+                                                                    .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
+                                                                    .build();
+    systemAdministratorLoginInfo = loginInfoRepository.save(systemAdministratorLoginInfo);
     Set<UserAuthority> authorities = getSystemAdministratorAuthorities();
-    systemAdministrator = defaultUserBuilder.setLoginInfo(systemAdministratorLoginInfo)
-                                            .setAuthorities(authorities)
-                                            .build();
+    User systemAdministrator = defaultUserBuilder.setLoginInfo(systemAdministratorLoginInfo)
+                                                 .setAuthorities(authorities)
+                                                 .build();
     return userRepository.save(systemAdministrator);
   }
 

@@ -16,7 +16,7 @@ import org.klaster.domain.model.state.general.AbstractState;
  */
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractJobState extends AbstractState<Job> {
 
   @Transient

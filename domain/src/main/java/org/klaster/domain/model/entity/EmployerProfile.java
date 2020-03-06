@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.context.Job;
 
 /**
@@ -18,6 +20,7 @@ public class EmployerProfile extends AbstractProfile {
 
   @JsonManagedReference
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "employerProfile", orphanRemoval = true)
+  @Fetch(FetchMode.SELECT)
   private Set<Job> jobs;
 
 

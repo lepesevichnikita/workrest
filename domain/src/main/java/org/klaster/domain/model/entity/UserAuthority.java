@@ -17,6 +17,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.context.User;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -35,6 +37,7 @@ public class UserAuthority implements GrantedAuthority {
 
   @JsonIgnore
   @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private Set<User> users;
 
   @Column(nullable = false, unique = true)

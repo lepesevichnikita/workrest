@@ -3,14 +3,11 @@ export const endpoint = {
     verify: "token/verify", root: "token"
   },
   users: {
-    root: "users"
+    root: "users", freelancer: "users/freelancer", employer: "users/employer"
   },
   file: {
     root: "file"
-  }, AdministratorService: {
-    root: "AdministratorService"
-  },
-  jobs: {
+  }, jobs: {
     root: "jobs"
   }
 };

@@ -21,7 +21,7 @@ import org.klaster.domain.model.state.general.AbstractState;
  */
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractUserState extends AbstractState<User> {
 
   @Transient
@@ -40,12 +40,12 @@ public abstract class AbstractUserState extends AbstractState<User> {
     throw new ActionForbiddenByStateException(UserAction.AUTHORIZATION, this);
   }
 
-  public void createEmployerProfile(EmployerProfile targetEmployerProfile) {
-    throw new ActionForbiddenByStateException(UserAction.EMPLOYER_PROFILE_CREATING, this);
+  public void updateEmployer(EmployerProfile targetEmployerProfile) {
+    throw new ActionForbiddenByStateException(UserAction.EMPLOYER_PROFILE_UPDATING, this);
   }
 
-  public void createFreelancerProfile(FreelancerProfile targetEmployerProfile) {
-    throw new ActionForbiddenByStateException(UserAction.FREELANCER_PROFILE_CREATING, this);
+  public void updateFreelancerProfile(FreelancerProfile targetEmployerProfile) {
+    throw new ActionForbiddenByStateException(UserAction.FREELANCER_PROFILE_UPDATING, this);
   }
 
   public void updatePersonalData(PersonalData personalData) {

@@ -1,6 +1,6 @@
-import {UserService} from "../api";
-import {redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
+import { UserService } from "../api";
+import { redirectToPage } from "../main.js";
+import { Page } from "./Page.js";
 
 export class Users extends Page {
   constructor(props) {
@@ -57,7 +57,7 @@ export class Users extends Page {
 
   _loadData() {
     this._userService.getUsers()
-        .then(response => this.replacePage("users", {kek: 'kek', users: response.body})
+        .then(response => this.replacePage("users", {kek: "kek", users: response.body})
                               .catch(console.error)
                               .finally(() => super.process()));
   }

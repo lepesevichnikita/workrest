@@ -7,9 +7,9 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -18,6 +18,7 @@ import org.klaster.domain.repository.TokenRepository;
 import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +60,9 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
                                        .authenticateUser(newToken);
     } else {
       LoginInfo foundLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(login, password);
+      if (foundLoginInfo == null) {
+        throw new BadCredentialsException(MessageUtil.getAuthenticationCredentialsNotFoundMessage(login));
+      }
       userRepository.findFirstByLoginInfo(foundLoginInfo)
                     .getCurrentState()
                     .authenticateUser(newToken);
@@ -67,6 +71,7 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     return tokenRepository.save(newToken);
   }
 
+  @Transactional
   @Override
   public User findByTokenValue(String tokenValue) {
     User foundUser = null;
@@ -94,10 +99,8 @@ public class DefaultTokenBasedDetailsUserService implements TokenBasedUserDetail
     User foundUser = userRepository.findById(userId)
                                    .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class,
                                                                                                                            userId)));
-    List<Token> deletedTokens = foundUser.getLoginInfo()
-                                         .getTokens()
-                                         .stream()
-                                         .collect(Collectors.toList());
+    List<Token> deletedTokens = new ArrayList<>(foundUser.getLoginInfo()
+                                                         .getTokens());
     foundUser.getLoginInfo()
              .getTokens()
              .clear();

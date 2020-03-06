@@ -11,7 +11,12 @@ import static org.hamcrest.Matchers.isA;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import org.klaster.domain.constant.AuthorityName;
+import org.klaster.domain.dto.EmployerProfileDTO;
+import org.klaster.domain.dto.FreelancerProfileDTO;
+import org.klaster.domain.exception.ActionForbiddenByStateException;
 import org.klaster.domain.model.context.User;
+import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
@@ -19,6 +24,8 @@ import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.UnverifiedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.restapi.configuration.ApplicationContext;
+import org.klaster.restapi.factory.RandomEmployerProfileFactory;
+import org.klaster.restapi.factory.RandomFreelancerProfileFactory;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,6 +57,8 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private User user;
 
   private RandomLoginInfoFactory randomLoginInfoFactory;
+  private RandomEmployerProfileFactory randomEmployerProfileFactory;
+  private RandomFreelancerProfileFactory randomFreelancerProfileFactory;
 
   @Autowired
   private DefaultUserService defaultUserService;
@@ -60,6 +69,8 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
+    randomEmployerProfileFactory = RandomEmployerProfileFactory.getInstance();
+    randomFreelancerProfileFactory = RandomFreelancerProfileFactory.getInstance();
   }
 
   @BeforeMethod
@@ -70,7 +81,6 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   @Test
   public void registersUserWithUniqueLoginInfo() {
     user = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-
     assertThat(user, hasProperty("loginInfo", equalTo(randomLoginInfo)));
   }
 
@@ -139,5 +149,80 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User deletedUser = defaultUserService.deleteById(registeredUser.getId());
     assertThat(deletedUser.getLoginInfo()
                           .getTokens(), empty());
+  }
+
+  @Test
+  public void createsEmployerProfileForVerifiedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    assertThat(userWithEmployerProfile.getEmployerProfile(), allOf(
+        hasProperty("description", equalTo(randomEmployerProfile.getDescription())),
+        hasProperty("owner", equalTo(userWithEmployerProfile))
+    ));
+  }
+
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnEmployerProfileCreateForUnverifiedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
+    defaultUserService.createEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+  }
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnEmployerProfileCreateForBlockedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User blockedUser = defaultUserService.blockById(registeredUser.getId());
+    EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
+    defaultUserService.createEmployerProfile(blockedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+  }
+
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnEmployerProfileCreateForDeletedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User deletedUser = defaultUserService.deleteById(registeredUser.getId());
+    EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
+    defaultUserService.createEmployerProfile(deletedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+  }
+
+
+  @Test
+  public void createsFreelancerProfileForVerifiedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
+    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(verifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    assertThat(userWithFreelancerProfile.getFreelancerProfile(), allOf(
+        hasProperty("description", equalTo(randomFreelancerProfile.getDescription())),
+        hasProperty("owner", equalTo(userWithFreelancerProfile))
+    ));
+  }
+
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnFreelancerProfileCreateForUnverifiedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
+    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+  }
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnFreelancerProfileCreateForBlockedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User blockedUser = defaultUserService.blockById(registeredUser.getId());
+    FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
+    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+  }
+
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByStateOnFreelancerProfileCreateForDeletedUser() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User deletedUser = defaultUserService.deleteById(registeredUser.getId());
+    FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
+    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
   }
 }

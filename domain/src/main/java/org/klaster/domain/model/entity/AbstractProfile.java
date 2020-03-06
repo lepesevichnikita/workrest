@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.context.User;
 
 /**
@@ -23,7 +25,8 @@ public abstract class AbstractProfile {
   private long id;
 
   @JsonBackReference
-  @OneToOne(fetch = FetchType.EAGER, optional = false)
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @Fetch(FetchMode.SELECT)
   private User owner;
 
   @NotNull

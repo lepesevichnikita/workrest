@@ -14,6 +14,7 @@ import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
+import org.klaster.domain.repository.UserRepository;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.factory.RandomPersonalDataFactory;
@@ -54,6 +55,9 @@ public class DefaultPersonalDataServiceTest extends AbstractTestNGSpringContextT
 
   @Autowired
   private DefaultPersonalDataService defaultPersonalDataService;
+
+  @Autowired
+  private UserRepository userRepository;
 
   @BeforeClass
   public void setup() throws NoSuchAlgorithmException {
@@ -162,8 +166,8 @@ public class DefaultPersonalDataServiceTest extends AbstractTestNGSpringContextT
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(registeredUser.getId(), randomPersonalData);
     PersonalData rejectedPersonalData = defaultPersonalDataService.rejectById(updatedPersonalData.getId());
-    assertThat(rejectedPersonalData.getUser()
-                                   .getCurrentState()
-                                   .getName(), equalTo(UserStateName.UNVERIFIED));
+    User userWithRejectedPersonalData = rejectedPersonalData.getUser();
+    assertThat(userWithRejectedPersonalData.getCurrentState()
+                                           .getName(), equalTo(UserStateName.UNVERIFIED));
   }
 }

@@ -3,17 +3,23 @@
     <div class="ui centered green fluid card">
       <div class="content center aligned">
         <div class="header">
+          {{if !personalData}}
           @${loginInfo.login}
+          {{/if}}
+          {{if personalData}}
+          ${personalData.firstName} ${personalData.lastName}
+          {{/if}}
         </div>
       </div>
       <div class="extra content">
         Current state: ${currentState.name}
       </div>
+      {{if currentState.name == 'Unverified'}}
       <div class="ui link basic attached bottom button" name="personal_data">Edit</div>
+      {{/if}}
     </div>
-    <div id="freelancerProfile">
       {{if freelancerProfile}}
-      <a class="ui link card" id="${freelancerProfile.id}">
+    <div class="ui fluid card" id="${freelancerProfile.id}">
         <div class="content">
           <div class="header">Freelancer profile</div>
           <div class="description">
@@ -25,7 +31,7 @@
           <span class="ui label">${name}</span>
           {{/each}}
         </div>
-      </a>
+    </div>
       {{/if}}
       {{if !freelancerProfile}}
       <form class="ui form" id="freelancerProfileForm">
@@ -35,16 +41,21 @@
             <textarea name="description"></textarea>
           </div>
           <div class="field">
-            <label>Skills</label>
-            <input name="skill" placeholder="enter your skill" type="text">
-            <div id="skills"></div>
+            <div class="ui right labeled left icon input">
+              <i class="tags icon"></i>
+              <input name="skill" placeholder="Enter skill" type="text">
+              <a class="ui tag label" data-action="skillAdd">
+                Add skill
+              </a>
+            </div>
+          </div>
+          <div class="field" id="freelancerSkills">
+            <div class="ui tag label">Delete</div>
           </div>
           <input class="ui fluid large primary submit button" type="submit" value="Save"/>
         </div>
       </form>
       {{/if}}
-    </div>
-    <div id="employerProfile">
       {{if employerProfile}}
       <div class="ui fluid card">
         <div class="content">
@@ -66,9 +77,7 @@
                 <div class="header">Create Twitter</div>
                 <div class="meta"></div>
                 <div class="description">
-                  <div class="ui wireframe image">
-                    <img src="src/img/paragraph.png"></img>
-                  </div>
+                  ${description}
                 </div>
               </div>
               <div class="extra content">
@@ -81,35 +90,39 @@
             {{/each}}
             {{/if}}
           </div>
-          <div class="ui form" id="jobForm">
+          <form class="ui form" id="jobForm">
             <div class="ui segment">
+              <div class="ui header">
+                Add job
+              </div>
               <div class="field">
-                <label>Description</label>
-                <textarea name="description"></textarea>
+                <label>
+                  Description
+                  <textarea name="description"></textarea>
+                </label>
               </div>
               <div class="field">
                 <label>Skills</label>
                 <input name="skill" placeholder="Enter required skill" type="text">
-                <div id="skills"></div>
+                <div id="jobSkills"></div>
               </div>
               <input class="ui fluid large primary submit button" type="submit" value="Save"/>
             </div>
-          </div>
+          </form>
         </div>
       </div>
       {{/if}}
       {{if !employerProfile}}
-      <div class="ui form" id="employerProfileForm">
-        <div class="ui segment">
-          <div class="field">
-            <label>Description</label>
-            <textarea name="description"></textarea>
-          </div>
-          <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+    <form class="ui form" id="employerProfileForm">
+      <div class="ui segment">
+        <div class="field">
+          <label>Description</label>
+          <textarea name="description"></textarea>
         </div>
+        <input class="ui fluid large primary submit button" type="submit" value="Save"/>
       </div>
+    </form>
       {{/if}}
-    </div>
   </div>
 </div>
 </div>

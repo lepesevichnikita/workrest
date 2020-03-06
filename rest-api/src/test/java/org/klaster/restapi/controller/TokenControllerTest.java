@@ -2,6 +2,7 @@ package org.klaster.restapi.controller;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.klaster.domain.dto.LoginInfoDTO;
-import org.klaster.domain.dto.TokenDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.Token;
@@ -22,6 +22,7 @@ import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
@@ -128,26 +129,22 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     Token deletedToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
-    final String tokenDTOAsJson = objectMapper.writeValueAsString(TokenDTO.fromToken(deletedToken));
-    mockMvc.perform(delete(uri).accept(MediaType.APPLICATION_JSON)
-                               .contentType(MediaType.APPLICATION_JSON)
-                               .content(tokenDTOAsJson))
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, deletedToken.getValue())
+                               .accept(MediaType.APPLICATION_JSON)
+                               .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isAccepted())
            .andExpect(jsonPath("$.token").value(deletedToken.getValue()));
   }
 
   @Test
-  public void notFoundForDeleteWithInvalidToken() throws Exception {
+  public void unauthenticatedForDeleteWithInvalidToken() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    TokenDTO invalidTokenDTO = new TokenDTO();
-    final String invalidTokenId = UUID.randomUUID()
-                                      .toString();
-    invalidTokenDTO.setToken(invalidTokenId);
-    final String invalidTokenDTOAsJson = objectMapper.writeValueAsString(invalidTokenDTO);
-    mockMvc.perform(delete(uri).accept(MediaType.APPLICATION_JSON)
-                               .contentType(MediaType.APPLICATION_JSON)
-                               .content(invalidTokenDTOAsJson))
-           .andExpect(status().isNotFound());
+    final String invalidTokenValue = UUID.randomUUID()
+                                         .toString();
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, invalidTokenValue)
+                               .accept(MediaType.APPLICATION_JSON)
+                               .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(unauthenticated());
   }
 
   @Test
@@ -155,24 +152,21 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, "verify");
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     Token createdToken = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword());
-    final String tokenDTOAsJson = objectMapper.writeValueAsString(TokenDTO.fromToken(createdToken));
-    mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .content(tokenDTOAsJson))
+    mockMvc.perform(post(uri).header(HttpHeaders.AUTHORIZATION, createdToken.getValue())
+                             .accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(jsonPath("$.token").value(createdToken.getValue()));
+           .andExpect(jsonPath("$.login").value(randomLoginInfo.getLogin()))
+           .andExpect(jsonPath("$.password").doesNotExist());
   }
 
   @Test
-  public void notFoundForVerificationPostWithInvalidToken() throws Exception {
+  public void unauthenticatedForVerificationPostWithInvalidToken() throws Exception {
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, "verify");
-    TokenDTO invalidTokenDTO = new TokenDTO();
-    invalidTokenDTO.setToken(UUID.randomUUID()
-                                 .toString());
-    final String tokenDtoAsJson = objectMapper.writeValueAsString(invalidTokenDTO);
-    mockMvc.perform(post(uri).accept(MediaType.APPLICATION_JSON)
-                             .contentType(MediaType.APPLICATION_JSON)
-                             .content(tokenDtoAsJson))
-           .andExpect(status().isNotFound());
+    final String invalidToken = "invalidToken";
+    mockMvc.perform(post(uri).header(HttpHeaders.AUTHORIZATION, invalidToken)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(unauthenticated());
   }
 }

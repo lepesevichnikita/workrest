@@ -1,4 +1,4 @@
-import {redirectToPage} from "../main.js";
+import { redirectToPage } from "../main.js";
 import Page from "./Page.js";
 
 export class Login extends Page {
@@ -12,10 +12,11 @@ export class Login extends Page {
   }
 
   process() {
+    this.showDimmer();
     return this._authorizationService.checkIsAuthorized()
                .then(() => redirectToPage("users"))
                .catch((error) => this.replacePage("login")
-                                     .then(() => super.process()));
+                                     .finally(() => super.process()));
   }
 
   _onLoginChange(event) {
@@ -31,7 +32,8 @@ export class Login extends Page {
   _onFormSubmit(event) {
     event.preventDefault();
     this.showDimmer();
-    this._authorizationService.signIn(this._loginInfo);
+    this._authorizationService.signIn(this._loginInfo)
+        .finally(() => this.hideDimmer());
   }
 }
 

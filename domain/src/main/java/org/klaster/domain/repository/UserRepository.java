@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-  Optional<User> findFirstByAuthoritiesAndId(UserAuthority authority, long id);
+  Optional<User> findByAuthoritiesAndId(UserAuthority authority, long id);
 
   List<User> findAllByAuthorities(UserAuthority authority);
 

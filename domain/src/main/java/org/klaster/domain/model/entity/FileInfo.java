@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,7 +32,7 @@ public class FileInfo {
   private long id;
 
   @JsonBackReference
-  @OneToMany(mappedBy = "attachment", orphanRemoval = true, cascade = {CascadeType.MERGE})
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "attachment", orphanRemoval = true, cascade = {CascadeType.MERGE})
   private Set<Attachable> attachables;
 
   @JsonSerialize(using = LocalDateTimeSerializer.class)

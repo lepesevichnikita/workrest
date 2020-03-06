@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,12 +27,12 @@ public class Skill {
   private long id;
 
   @JsonBackReference
-  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-  private Set<Job> jobs;
+  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+  private Set<Job> jobs = new LinkedHashSet<>();
 
   @JsonBackReference
-  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-  private Set<FreelancerProfile> freelancerProfiles;
+  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+  private Set<FreelancerProfile> freelancerProfiles = new LinkedHashSet<>();
 
   @NotNull(message = "")
   private String name;

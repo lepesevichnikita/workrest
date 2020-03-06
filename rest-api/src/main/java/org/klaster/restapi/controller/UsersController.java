@@ -8,6 +8,8 @@ package org.klaster.restapi.controller;
  */
 
 import java.util.List;
+import org.klaster.domain.dto.EmployerProfileDTO;
+import org.klaster.domain.dto.FreelancerProfileDTO;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.restapi.service.DefaultUserService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,6 +82,22 @@ public class UsersController {
     return ResponseEntity.ok(foundUser);
   }
 
+
+  @PutMapping("/freelancer")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<User> createFreelancerProfile(@RequestBody FreelancerProfileDTO freelancerProfileDTO, @AuthenticationPrincipal User currentUser) {
+    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(currentUser, freelancerProfileDTO);
+    return ResponseEntity.accepted()
+                         .body(userWithFreelancerProfile);
+  }
+
+  @PutMapping("/employer")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<User> createEmployerProfile(@RequestBody EmployerProfileDTO employerProfileDTO, @AuthenticationPrincipal User currentUser) {
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(currentUser, employerProfileDTO);
+    return ResponseEntity.accepted()
+                         .body(userWithEmployerProfile);
+  }
 
   @GetMapping("/all")
   @PreAuthorize("hasAuthority('ADMINISTRATOR')")

@@ -23,6 +23,7 @@ import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DefaultAdministratorService
@@ -47,9 +48,11 @@ public class DefaultAdministratorService {
   @Autowired
   private UserBuilder defaultUserBuilder;
 
+  @Transactional
   public User makeAdministrator(LoginInfo loginInfo) {
+    LoginInfo persistedLoginInfo = loginInfoRepository.save(loginInfo);
     Set<UserAuthority> administratorUserAuthorities = getAllAdministratorAuthorities();
-    User administrator = defaultUserBuilder.setLoginInfo(loginInfo)
+    User administrator = defaultUserBuilder.setLoginInfo(persistedLoginInfo)
                                            .setAuthorities(administratorUserAuthorities)
                                            .build();
     return userRepository.save(administrator);
@@ -60,7 +63,7 @@ public class DefaultAdministratorService {
   }
 
   public User findById(long id) {
-    return userRepository.findFirstByAuthoritiesAndId(getAdministratorAuthority(), id)
+    return userRepository.findByAuthoritiesAndId(getAdministratorAuthority(), id)
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
@@ -73,6 +76,7 @@ public class DefaultAdministratorService {
     return deletedAdministrator;
   }
 
+  @Transactional
   public boolean notExistsByLoginAndPassword(String login, String password) {
     boolean result = false;
     Optional<LoginInfo> foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password);

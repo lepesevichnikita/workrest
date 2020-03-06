@@ -29,9 +29,9 @@ export class AuthorizationService extends Subscribable {
     return new Promise((resolve, reject) => {
       this._restClient
           .post(endpoint.token.verify)
+          .secured(this.getToken().token)
           .accept(ContentType.APPLICATION_JSON)
           .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-          .send(this.getToken())
           .then(response => {
             this.notifyAllSubscribers(Action.TOKEN_CORRECT);
             resolve(response);
@@ -66,9 +66,9 @@ export class AuthorizationService extends Subscribable {
   signOut() {
     this._restClient
         .delete(endpoint.token.root)
+        .secured(this.getToken().token)
         .accept(ContentType.APPLICATION_JSON)
         .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-        .send(this.getToken())
         .then()
         .finally(() => {
           localStorage.removeItem(AuthorizationService.TOKEN);
@@ -92,6 +92,6 @@ export class AuthorizationService extends Subscribable {
   }
 }
 
-AuthorizationService.TOKEN = "token";
+AuthorizationService.TOKEN = "admin_token";
 
 export default AuthorizationService;

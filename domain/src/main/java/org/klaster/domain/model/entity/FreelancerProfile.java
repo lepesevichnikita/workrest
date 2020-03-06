@@ -5,6 +5,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 /**
  * FreelancerProfile
@@ -16,6 +18,7 @@ import javax.persistence.ManyToMany;
 public class FreelancerProfile extends AbstractProfile {
 
   @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private Set<Skill> skills;
 
   public Set<Skill> getSkills() {

@@ -1,8 +1,8 @@
-import {AuthorizationService, FreelancerService, JobService, UserService} from "./api";
+import { AuthorizationService, FreelancerService, JobService, UserService } from "./api";
 
-import {Action} from "./constant";
-import {TemplateHelper} from "./helper";
-import {Freelancers, Home, Jobs, Login, PersonalData, SignUp, User} from "./page";
+import { Action } from "./constant";
+import { TemplateHelper } from "./helper";
+import { Freelancers, Home, Jobs, Login, PersonalData, SignUp, User } from "./page";
 
 const menuContainerId = "#menu";
 const authorizationService = new AuthorizationService();
@@ -31,12 +31,12 @@ const loadMenu = menuName => {
      .dimmer("hide");
      $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
-     $(".ui.link")
-     .click(function (event) {
-       event.preventDefault();
-       redirectToPage($(this)
-                      .attr("name"));
-     });
+     // $(".ui.link")
+     // .click(function (event) {
+     //   event.preventDefault();
+     //   redirectToPage($(this)
+     //                  .attr("name"));
+     // });
      $("#signout")
      .click(function (event) {
        event.preventDefault();
