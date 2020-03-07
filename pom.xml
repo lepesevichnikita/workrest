@@ -95,7 +95,6 @@
           <version>3.0.0-M4</version>
           <configuration>
             <excludes>
-              <include>**/PersonalDataControllerTest.java</include>
               <include>**/TokenControllerTest.java</include>
               <include>**/UsersControllerTest.java</include>
               <exclude>**/service/*</exclude>
