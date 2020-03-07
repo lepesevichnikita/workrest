@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.klaster.domain.dto.LoginInfoDTO;
 import org.klaster.domain.model.context.User;
@@ -72,7 +71,7 @@ public class TokenControllerTest extends AbstractTestNGSpringContextTests {
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(SecurityMockMvcConfigurers.springSecurity())

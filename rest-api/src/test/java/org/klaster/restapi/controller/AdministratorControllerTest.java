@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.klaster.domain.dto.LoginInfoDTO;
@@ -80,7 +79,7 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   private TokenBasedUserDetailsService defaultTokenBasedUserDetailsService;
 
   @BeforeClass
-  public void initialize() throws NoSuchAlgorithmException {
+  public void initialize() {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)

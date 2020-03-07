@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -85,7 +84,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   private DefaultFileService defaultFileService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException, IOException {
+  public void setup() throws IOException {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();

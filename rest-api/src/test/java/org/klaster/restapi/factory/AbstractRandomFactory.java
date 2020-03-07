@@ -8,8 +8,7 @@ package org.klaster.restapi.factory;
  */
 
 import com.github.javafaker.Faker;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.Random;
 
 /**
  * AbstractRandomFactory
@@ -19,10 +18,12 @@ import java.security.SecureRandom;
 
 public abstract class AbstractRandomFactory<T> {
 
+  private static Random random = new Random();
+
   private Faker faker;
 
-  protected AbstractRandomFactory() throws NoSuchAlgorithmException {
-    faker = Faker.instance(SecureRandom.getInstanceStrong());
+  protected AbstractRandomFactory() {
+    faker = Faker.instance(random);
   }
 
   protected Faker getFaker() {

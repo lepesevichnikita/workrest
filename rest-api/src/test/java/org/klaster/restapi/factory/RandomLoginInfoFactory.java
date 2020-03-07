@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.concrete.DefaultLoginInfoBuilder;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -24,12 +23,12 @@ public class RandomLoginInfoFactory extends AbstractRandomFactory<LoginInfo> {
 
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
-  private RandomLoginInfoFactory() throws NoSuchAlgorithmException {
+  private RandomLoginInfoFactory() {
     super();
     defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();
   }
 
-  public static RandomLoginInfoFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomLoginInfoFactory getInstance() {
     if (instance == null) {
       synchronized (RandomLoginInfoFactory.class) {
         instance = new RandomLoginInfoFactory();

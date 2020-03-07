@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.concrete.DefaultPersonalDataBuilder;
 import org.klaster.domain.builder.general.PersonalDataBuilder;
 import org.klaster.domain.model.entity.FileInfo;
@@ -27,13 +26,13 @@ public class RandomPersonalDataFactory extends AbstractRandomFactory<PersonalDat
   private RandomFileInfoFactory randomFileInfoFactory;
 
 
-  private RandomPersonalDataFactory() throws NoSuchAlgorithmException {
+  private RandomPersonalDataFactory() {
     super();
     defaultPersonalDataBuilder = new DefaultPersonalDataBuilder();
     randomFileInfoFactory = RandomFileInfoFactory.getInstance();
   }
 
-  public static RandomPersonalDataFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomPersonalDataFactory getInstance() {
     if (instance == null) {
       synchronized (RandomPersonalDataFactory.class) {
         instance = new RandomPersonalDataFactory();

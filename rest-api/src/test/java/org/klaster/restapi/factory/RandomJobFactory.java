@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,13 +29,13 @@ public class RandomJobFactory extends AbstractRandomFactory<Job> {
   private RandomSkillFactory randomSkillFactory;
   private JobBuilder defaultJobBuilder;
 
-  private RandomJobFactory() throws NoSuchAlgorithmException {
+  private RandomJobFactory() {
     super();
     randomSkillFactory = RandomSkillFactory.getInstance();
     defaultJobBuilder = new DefaultJobBuilder();
   }
 
-  public static RandomJobFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomJobFactory getInstance() {
     if (instance == null) {
       synchronized (RandomJobFactory.class) {
         instance = new RandomJobFactory();

@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.concrete.DefaultEmployerProfileBuilder;
 import org.klaster.domain.builder.general.EmployerProfileBuilder;
 import org.klaster.domain.model.entity.EmployerProfile;
@@ -24,12 +23,12 @@ public class RandomEmployerProfileFactory extends AbstractRandomFactory<Employer
 
   private EmployerProfileBuilder defaultEmployerBuilder;
 
-  private RandomEmployerProfileFactory() throws NoSuchAlgorithmException {
+  private RandomEmployerProfileFactory() {
     super();
     defaultEmployerBuilder = new DefaultEmployerProfileBuilder();
   }
 
-  public static RandomEmployerProfileFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomEmployerProfileFactory getInstance() {
     if (instance == null) {
       synchronized (RandomEmployerProfileFactory.class) {
         instance = new RandomEmployerProfileFactory();

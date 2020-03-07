@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
@@ -104,7 +103,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
 
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
@@ -219,7 +218,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     defaultUserService.verifyById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, EMPLOYER_ACTION);
     final String employerProfileDTOAsJson = objectMapper.writeValueAsString(EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
@@ -237,7 +237,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   public void forbiddenForPutEmployerByUnverifiedUserWithValidToken() throws Exception {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, EMPLOYER_ACTION);
     final String employerProfileDTOAsJson = objectMapper.writeValueAsString(EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
@@ -251,7 +252,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void unauthenticatedForPutEmployerByBlockedUserWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     defaultUserService.blockById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
@@ -269,10 +271,12 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     defaultUserService.verifyById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, FREELANCER_ACTION);
-    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(
+        randomFreelancerProfile));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, validUserTokenValue)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
@@ -288,10 +292,12 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   public void forbiddenForPutFreelancerByUnverifiedUserWithValidToken() throws Exception {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, FREELANCER_ACTION);
-    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(
+        randomFreelancerProfile));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, validUserTokenValue)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)
@@ -302,12 +308,14 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void unauthenticatedForPutFreelancerByBlockedUserWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+    final String validUserTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                       randomLoginInfo.getPassword())
                                                                           .getValue();
     defaultUserService.blockById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, FREELANCER_ACTION);
-    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    final String freelancerProfileDTOAsJson = objectMapper.writeValueAsString(FreelancerProfileDTO.fromFreelancerProfile(
+        randomFreelancerProfile));
     mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, validUserTokenValue)
                             .contentType(MediaType.APPLICATION_JSON)
                             .accept(MediaType.APPLICATION_JSON)

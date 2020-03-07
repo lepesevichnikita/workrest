@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.isA;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.dto.EmployerProfileDTO;
@@ -67,7 +66,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   private TokenBasedUserDetailsService defaultTokenBasedDetailsUserService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     randomEmployerProfileFactory = RandomEmployerProfileFactory.getInstance();
     randomFreelancerProfileFactory = RandomFreelancerProfileFactory.getInstance();
@@ -156,7 +155,8 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     assertThat(userWithEmployerProfile.getEmployerProfile(), allOf(
         hasProperty("description", equalTo(randomEmployerProfile.getDescription())),
         hasProperty("owner", equalTo(userWithEmployerProfile))
@@ -194,7 +194,9 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(verifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(verifiedUser,
+                                                                                FreelancerProfileDTO.fromFreelancerProfile(
+                                                                                    randomFreelancerProfile));
     assertThat(userWithFreelancerProfile.getFreelancerProfile(), allOf(
         hasProperty("description", equalTo(randomFreelancerProfile.getDescription())),
         hasProperty("owner", equalTo(userWithFreelancerProfile))

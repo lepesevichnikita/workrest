@@ -1,6 +1,5 @@
 package org.klaster.restapi.service;
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.LoginInfo;
@@ -15,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 /*
  * org.klaster.restapi.service
@@ -48,7 +46,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   private DefaultJobService defaultJobService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     randomPersonalDataFactory = RandomPersonalDataFactory.getInstance();
     randomJobFactory = RandomJobFactory.getInstance();

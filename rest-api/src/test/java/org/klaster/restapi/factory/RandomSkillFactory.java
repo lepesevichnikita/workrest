@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.model.entity.Skill;
 
 /**
@@ -20,11 +19,11 @@ public class RandomSkillFactory extends AbstractRandomFactory<Skill> {
 
   private static RandomSkillFactory instance;
 
-  private RandomSkillFactory() throws NoSuchAlgorithmException {
+  private RandomSkillFactory() {
     super();
   }
 
-  public static RandomSkillFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomSkillFactory getInstance() {
     if (instance == null) {
       synchronized (RandomSkillFactory.class) {
         instance = new RandomSkillFactory();

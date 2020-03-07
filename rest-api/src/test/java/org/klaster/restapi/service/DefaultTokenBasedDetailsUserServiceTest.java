@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
 import org.klaster.domain.model.context.User;
@@ -53,7 +52,7 @@ public class DefaultTokenBasedDetailsUserServiceTest extends AbstractTestNGSprin
   private DefaultUserService defaultUserService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
   }
 

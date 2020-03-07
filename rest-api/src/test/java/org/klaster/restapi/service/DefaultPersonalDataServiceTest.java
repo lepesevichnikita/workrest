@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.notNullValue;
 
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.constant.UserStateName;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
@@ -60,7 +59,7 @@ public class DefaultPersonalDataServiceTest extends AbstractTestNGSpringContextT
   private UserRepository userRepository;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     randomPersonalDataFactory = RandomPersonalDataFactory.getInstance();
   }

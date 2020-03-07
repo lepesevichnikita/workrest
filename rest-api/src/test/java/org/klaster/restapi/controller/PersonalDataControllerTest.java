@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.constant.PersonalDataState;
 import org.klaster.domain.dto.FullPersonalDataDTO;
@@ -92,7 +91,7 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
   private DefaultPersonalDataService defaultPersonalDataService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();

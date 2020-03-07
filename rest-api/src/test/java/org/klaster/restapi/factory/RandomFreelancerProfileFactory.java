@@ -7,7 +7,6 @@ package org.klaster.restapi.factory;
  *
  */
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,13 +28,13 @@ public class RandomFreelancerProfileFactory extends AbstractRandomFactory<Freela
   private FreelancerProfileBuilder defaultFreelancerProfileBuilder;
   private RandomSkillFactory randomSkillFactory;
 
-  private RandomFreelancerProfileFactory() throws NoSuchAlgorithmException {
+  private RandomFreelancerProfileFactory() {
     super();
     defaultFreelancerProfileBuilder = new DefaultFreelancerProfileBuilder();
     randomSkillFactory = RandomSkillFactory.getInstance();
   }
 
-  public static RandomFreelancerProfileFactory getInstance() throws NoSuchAlgorithmException {
+  public static RandomFreelancerProfileFactory getInstance() {
     if (instance == null) {
       synchronized (RandomFreelancerProfileFactory.class) {
         instance = new RandomFreelancerProfileFactory();

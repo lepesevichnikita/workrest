@@ -63,7 +63,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   }
 
   @AfterClass
-  public void cleanTestsOutput() throws IOException {
+  public void cleanTestsOutput() {
     deleteOutputFiles();
   }
 

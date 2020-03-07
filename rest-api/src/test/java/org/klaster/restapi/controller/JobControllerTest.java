@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.security.NoSuchAlgorithmException;
 import org.klaster.domain.constant.JobStateName;
 import org.klaster.domain.dto.EmployerProfileDTO;
 import org.klaster.domain.dto.JobDTO;
@@ -89,7 +88,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   private DefaultJobService defaultJobService;
 
   @BeforeClass
-  public void setup() throws NoSuchAlgorithmException {
+  public void setup() {
     objectMapper = new ObjectMapper();
     objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
