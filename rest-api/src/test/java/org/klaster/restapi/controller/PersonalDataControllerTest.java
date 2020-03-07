@@ -50,7 +50,6 @@ import org.testng.annotations.Test;
  * Copyright(c) JazzTeam
  */
 
-@Test(enabled = false)
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests {

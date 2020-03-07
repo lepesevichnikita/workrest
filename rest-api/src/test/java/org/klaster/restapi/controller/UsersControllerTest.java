@@ -62,7 +62,6 @@ import org.testng.annotations.Test;
  * @author Nikita Lepesevich
  */
 
-@Test(enabled = false)
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class UsersControllerTest extends AbstractTestNGSpringContextTests {
