@@ -8,6 +8,7 @@ package org.klaster.restapi.configuration;
  */
 
 import java.util.Properties;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import org.klaster.restapi.constant.HibernatePropertyKey;
 import org.klaster.restapi.constant.JdbcPropertyKey;
@@ -15,6 +16,7 @@ import org.klaster.restapi.constant.PackageName;
 import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @Configuration
+@ComponentScan(basePackages = {PackageName.DOMAIN_REPOSITORY, PackageName.REST_SERVICES})
 @EnableJpaRepositories(basePackages = {PackageName.DOMAIN_REPOSITORY})
 @EnableTransactionManagement
 @PropertySource(value = {PropertyClassPath.APPLICATION})
@@ -61,8 +64,9 @@ public class PersistenceJPAConfig {
   }
 
   @Bean
-  public PlatformTransactionManager transactionManager() {
-    return new JpaTransactionManager(entityManagerFactory().getObject());
+  @Autowired
+  public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+    return new JpaTransactionManager(entityManagerFactory);
   }
 
   @Bean

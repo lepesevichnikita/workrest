@@ -19,6 +19,7 @@ public class PackageName {
   public static final String REST_API = "org.klaster.restapi";
   public static final String REST_API_PROPERTIES = "org.klaster.restapi.properties";
   public static final String DOMAIN_REPOSITORY = "org.klaster.domain.repository";
+  public static final String REST_SERVICES = "org.klaster.restapi.services";
 
   private PackageName() {
   }
