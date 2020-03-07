@@ -98,7 +98,6 @@
             <reuseForks>true</reuseForks>
             <excludes>
               <include>**/AdministratorControllerTest.java</include>
-              <include>**/JobControllerTest.java</include>
               <include>**/PersonalDataControllerTest.java</include>
               <include>**/TokenControllerTest.java</include>
               <include>**/UsersControllerTest.java</include>
