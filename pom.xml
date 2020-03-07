@@ -97,7 +97,6 @@
             <forkCount>3</forkCount>
             <reuseForks>true</reuseForks>
             <excludes>
-              <include>**/AdministratorControllerTest.java</include>
               <include>**/PersonalDataControllerTest.java</include>
               <include>**/TokenControllerTest.java</include>
               <include>**/UsersControllerTest.java</include>
