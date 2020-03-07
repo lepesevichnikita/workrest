@@ -39,6 +39,7 @@ import org.testng.annotations.Test;
  */
 
 
+@Test(enabled = false)
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {

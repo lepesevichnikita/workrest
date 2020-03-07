@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /*
  * org.klaster.restapi.service
@@ -26,6 +27,7 @@ import org.testng.annotations.BeforeClass;
  * Copyright(c) JazzTeam
  */
 
+@Test(enabled = false)
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
 public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
