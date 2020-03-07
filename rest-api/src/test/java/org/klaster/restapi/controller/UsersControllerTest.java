@@ -34,6 +34,7 @@ import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -324,13 +325,16 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   private void registerAdministrator() {
-    if (defaultAdministratorService.notExistsByLoginAndPassword(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)) {
+    try {
       LoginInfo loginInfo = defaultLoginInfoBuilder.setLogin(VALID_ADMIN_LOGIN)
                                                    .setPassword(VALID_ADMIN_PASSWORD)
                                                    .build();
       defaultAdministratorService.makeAdministrator(loginInfo);
+    } catch (DataIntegrityViolationException exception) {
+
+    } finally {
+      administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
+                                                              .getValue();
     }
-    administratorToken = defaultTokenBasedUserDetailsService.createToken(VALID_ADMIN_LOGIN, VALID_ADMIN_PASSWORD)
-                                                            .getValue();
   }
 }
