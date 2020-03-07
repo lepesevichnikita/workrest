@@ -88,20 +88,10 @@ public class DefaultFileService {
     return removedFileInfo;
   }
 
-
   private Path writeFileIntoFolder(InputStream inputStream, String outputFileName, Path targetFolderPath) throws IOException {
     Files.createDirectories(targetFolderPath);
     Path resultFilePath = Paths.get(targetFolderPath.toString(), outputFileName);
     Files.copy(inputStream, resultFilePath);
     return resultFilePath;
-  }
-
-
-  private void initializeOutputFolder() throws IOException {
-    File outputFolder = filesProperties.getOutputFolder();
-    if (!outputFolder.exists()) {
-      Files.createDirectory(filesProperties.getOutputFolder()
-                                           .toPath());
-    }
   }
 }

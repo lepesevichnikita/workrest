@@ -1,4 +1,4 @@
-package org.klaster.restapi.configuration;
+package org.klaster.restapi.properties;
 
 /*
  * workrest

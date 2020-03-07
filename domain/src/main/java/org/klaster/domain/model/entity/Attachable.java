@@ -8,6 +8,7 @@ package org.klaster.domain.model.entity;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,7 +29,7 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class Attachable {
+public abstract class Attachable implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

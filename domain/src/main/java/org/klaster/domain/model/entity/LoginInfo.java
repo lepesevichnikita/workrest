@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ import javax.validation.constraints.NotBlank;
  */
 
 @Entity
-public class LoginInfo {
+public class LoginInfo implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

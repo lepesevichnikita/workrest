@@ -21,7 +21,7 @@ import org.klaster.domain.model.entity.UserAuthority;
 import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.UserAuthorityRepository;
 import org.klaster.domain.repository.UserRepository;
-import org.klaster.restapi.configuration.SystemAdministratorProperties;
+import org.klaster.restapi.properties.SystemAdministratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -66,5 +66,5 @@ public abstract class AbstractState<C extends AbstractContext> {
   }
 
   @Transient
-  abstract public String getName();
+  public abstract String getName();
 }

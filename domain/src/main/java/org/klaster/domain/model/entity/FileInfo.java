@@ -3,6 +3,7 @@ package org.klaster.domain.model.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -25,7 +26,7 @@ import org.klaster.domain.serializer.LocalDateTimeSerializer;
  */
 
 @Entity
-public class FileInfo {
+public class FileInfo implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

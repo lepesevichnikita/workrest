@@ -2,6 +2,7 @@ package org.klaster.domain.model.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -29,7 +30,7 @@ import org.klaster.domain.model.state.general.AbstractState;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class AbstractContext<S extends AbstractState> {
+public abstract class AbstractContext<S extends AbstractState> implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -95,5 +96,5 @@ public abstract class AbstractContext<S extends AbstractState> {
 
   @Transient
   @JsonIgnore
-  abstract protected S getDefaultState();
+  protected abstract S getDefaultState();
 }

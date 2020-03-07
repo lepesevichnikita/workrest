@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import org.klaster.domain.builder.general.UserBuilder;
 import org.klaster.domain.constant.AuthorityName;
 import org.klaster.domain.model.context.User;
@@ -23,7 +24,6 @@ import org.klaster.domain.repository.UserRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DefaultAdministratorService
@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
+@Transactional
 public class DefaultAdministratorService {
 
   private static String[] administratorAuthorityNames = {AuthorityName.ADMINISTRATOR, AuthorityName.USER};
@@ -55,7 +56,7 @@ public class DefaultAdministratorService {
     User administrator = defaultUserBuilder.setLoginInfo(persistedLoginInfo)
                                            .setAuthorities(administratorUserAuthorities)
                                            .build();
-    return userRepository.save(administrator);
+    return userRepository.saveAndFlush(administrator);
   }
 
   public List<User> findAll() {
@@ -67,6 +68,7 @@ public class DefaultAdministratorService {
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
+  @Transactional
   public User deleteById(long id) {
     User deletedAdministrator = findById(id);
     deletedAdministrator.getAuthorities()

@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -20,7 +21,7 @@ import org.klaster.domain.model.context.Job;
  */
 
 @Entity
-public class Skill {
+public class Skill implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

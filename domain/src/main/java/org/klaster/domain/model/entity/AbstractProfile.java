@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.io.Serializable;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,7 +20,8 @@ import org.klaster.domain.model.context.User;
  */
 
 @MappedSuperclass
-public abstract class AbstractProfile {
+public abstract class AbstractProfile implements Serializable {
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;

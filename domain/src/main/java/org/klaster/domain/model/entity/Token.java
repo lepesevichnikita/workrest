@@ -8,6 +8,7 @@ package org.klaster.domain.model.entity;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -26,7 +27,7 @@ import org.springframework.data.annotation.CreatedDate;
  */
 
 @Entity
-public class Token {
+public class Token implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
