@@ -78,7 +78,7 @@ public class DefaultUserService {
 
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
-    if (systemAdministratorProperties.getSystemAdministratorLogin()
+    if (systemAdministratorProperties.getLogin()
                                      .equals(loginInfo.getLogin())) {
       throw new InvalidParameterException();
     }

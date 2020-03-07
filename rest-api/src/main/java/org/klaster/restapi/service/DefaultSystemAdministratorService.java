@@ -55,8 +55,8 @@ public class DefaultSystemAdministratorService {
   private LoginInfoRepository loginInfoRepository;
 
   public User getSystemAdministrator() {
-    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(systemAdministratorProperties.getSystemAdministratorLogin(),
-                                                                                                 systemAdministratorProperties.getSystemAdministratorPassword());
+    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(systemAdministratorProperties.getLogin(),
+                                                                                                 systemAdministratorProperties.getPassword());
     User systemAdministrator = systemAdministratorLoginInfo == null
                                ? createSystemAdministrator()
                                : userRepository.findFirstByLoginInfo(systemAdministratorLoginInfo);
@@ -69,14 +69,14 @@ public class DefaultSystemAdministratorService {
 
   public boolean isSystemAdministrator(String login, String password) {
     return
-        login.equals(systemAdministratorProperties.getSystemAdministratorLogin()) &&
-        password.equals(systemAdministratorProperties.getSystemAdministratorPassword());
+        login.equals(systemAdministratorProperties.getLogin()) &&
+        password.equals(systemAdministratorProperties.getPassword());
   }
 
 
   private User createSystemAdministrator() {
-    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getSystemAdministratorLogin())
-                                                                    .setPassword(systemAdministratorProperties.getSystemAdministratorPassword())
+    LoginInfo systemAdministratorLoginInfo = defaultLoginInfoBuilder.setLogin(systemAdministratorProperties.getLogin())
+                                                                    .setPassword(systemAdministratorProperties.getPassword())
                                                                     .build();
     systemAdministratorLoginInfo = loginInfoRepository.save(systemAdministratorLoginInfo);
     Set<UserAuthority> authorities = getSystemAdministratorAuthorities();

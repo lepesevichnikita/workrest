@@ -7,9 +7,8 @@ package org.klaster.restapi.util;
  *
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.springframework.util.DigestUtils;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * FileUtil
@@ -23,7 +22,9 @@ public class FileUtil {
 
   }
 
-  public static String getHexMd5OfInputStream(InputStream inputStream) throws IOException {
-    return DigestUtils.md5DigestAsHex(inputStream);
+  public static long getTimeStampFromLocalDateTime(LocalDateTime localDateTime) {
+    return localDateTime.atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli();
   }
 }

@@ -7,7 +7,7 @@ package org.klaster.restapi.properties;
  *
  */
 
-import org.klaster.restapi.constant.JdbcPropertyKey;
+import org.klaster.restapi.constant.HibernateConnectionPropertyKey;
 import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -21,18 +21,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(PropertyClassPath.APPLICATION)
-public class JdbcProperties {
+public class DataSourceProperties {
 
-  @Value(JdbcPropertyKey.JDBC_DRIVER)
+  @Value(HibernateConnectionPropertyKey.DRIVER)
   private String driverClassName;
 
-  @Value(JdbcPropertyKey.JDBC_URL)
+  @Value(HibernateConnectionPropertyKey.URL)
   private String url;
 
-  @Value(JdbcPropertyKey.JDBC_USERNAME)
+  @Value(HibernateConnectionPropertyKey.USERNAME)
   private String username;
 
-  @Value(JdbcPropertyKey.JDBC_PASSWORD)
+  @Value(HibernateConnectionPropertyKey.PASSWORD)
   private String password;
 
   public String getDriverClassName() {

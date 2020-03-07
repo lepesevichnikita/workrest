@@ -138,8 +138,8 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void unprocessableEntityForPostWithSystemAdministratorLoginInfo() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    randomLoginInfo.setLogin(systemAdministratorProperties.getSystemAdministratorLogin());
-    randomLoginInfo.setPassword(systemAdministratorProperties.getSystemAdministratorPassword());
+    randomLoginInfo.setLogin(systemAdministratorProperties.getLogin());
+    randomLoginInfo.setPassword(systemAdministratorProperties.getPassword());
     final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)

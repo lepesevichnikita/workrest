@@ -8,9 +8,7 @@ package org.klaster.restapi.service;
  */
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import org.klaster.domain.builder.general.UserBuilder;
@@ -78,28 +76,9 @@ public class DefaultAdministratorService {
     return deletedAdministrator;
   }
 
-  @Transactional
-  public boolean notExistsByLoginAndPassword(String login, String password) {
-    boolean result = false;
-    Optional<LoginInfo> foundLoginInfo = loginInfoRepository.findFirstByLoginAndPassword(login, password);
-    if (foundLoginInfo.isPresent()) {
-      User foundUser = userRepository.findFirstByLoginInfo(foundLoginInfo.get());
-      result = isNotAdministrator(foundUser);
-    }
-    return result;
-  }
-
   private UserAuthority getAdministratorAuthority() {
     return userAuthorityRepository.findFirstOrCreateByAuthority(AuthorityName.ADMINISTRATOR);
   }
-
-  private boolean isNotAdministrator(User foundUser) {
-    return foundUser.getAuthorities()
-                    .stream()
-                    .map(UserAuthority::getAuthority)
-                    .noneMatch(Predicate.isEqual(AuthorityName.ADMINISTRATOR));
-  }
-
 
   private Set<UserAuthority> getAllAdministratorAuthorities() {
     return userAuthorityRepository.findOrCreateAllByNames(administratorAuthorityNames);

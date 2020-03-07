@@ -7,6 +7,9 @@ package org.klaster.restapi.properties;
  *
  */
 
+import java.util.Properties;
+import javax.annotation.PostConstruct;
+import org.hibernate.cfg.AvailableSettings;
 import org.klaster.restapi.constant.HibernatePropertyKey;
 import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(PropertyClassPath.APPLICATION)
-public class HibernateProperties {
+public class HibernateProperties extends Properties {
 
   @Value(HibernatePropertyKey.HIBERNATE_DIALECT)
   private String dialect;
@@ -35,20 +38,11 @@ public class HibernateProperties {
   @Value(HibernatePropertyKey.HIBERNATE_HBM_2_DDL_AUTO)
   private String hbm2ddlAuto;
 
-  public String getDialect() {
-    return dialect;
+  @PostConstruct
+  public void initialize() {
+    put(AvailableSettings.DIALECT, dialect);
+    put(AvailableSettings.FORMAT_SQL, formatSql);
+    put(AvailableSettings.SHOW_SQL, showSql);
+    put(AvailableSettings.HBM2DDL_AUTO, hbm2ddlAuto);
   }
-
-  public String getShowSql() {
-    return showSql;
-  }
-
-  public String getFormatSql() {
-    return formatSql;
-  }
-
-  public String getHbm2ddlAuto() {
-    return hbm2ddlAuto;
-  }
-
 }

@@ -181,8 +181,8 @@ public class AdministratorControllerTest extends AbstractTestNGSpringContextTest
   }
 
   private void initializeSystemAdministratorToken() {
-    systemAdministratorToken = defaultTokenBasedUserDetailsService.createToken(systemAdministratorProperties.getSystemAdministratorLogin(),
-                                                                               systemAdministratorProperties.getSystemAdministratorPassword())
+    systemAdministratorToken = defaultTokenBasedUserDetailsService.createToken(systemAdministratorProperties.getLogin(),
+                                                                               systemAdministratorProperties.getPassword())
                                                                   .getValue();
   }
 }

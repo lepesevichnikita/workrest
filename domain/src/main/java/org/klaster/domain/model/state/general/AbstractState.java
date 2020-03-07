@@ -3,6 +3,7 @@ package org.klaster.domain.model.state.general;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,7 +27,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class AbstractState<C extends AbstractContext> {
+public abstract class AbstractState<C extends AbstractContext> implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

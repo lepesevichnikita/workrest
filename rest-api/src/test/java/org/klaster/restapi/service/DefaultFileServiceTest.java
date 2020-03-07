@@ -19,7 +19,6 @@ import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.properties.FilesProperties;
-import org.klaster.restapi.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -75,7 +74,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
                                                      .getCanonicalPath(), savedFile.getTimeStamp());
     final String expectedPathEnd = Paths.get(outputFolderPath.toString(), INPUT_FILE_NAME)
                                         .toString();
-    final String expectedMd5 = FileUtil.getHexMd5OfInputStream(new FileInputStream(inputFilePath.toString()));
+    final String expectedMd5 = DigestUtils.md5DigestAsHex(new FileInputStream(inputFilePath.toString()));
     assertThat(savedFile, allOf(
         hasProperty("id", notNullValue()),
         hasProperty("md5", equalTo(expectedMd5)),

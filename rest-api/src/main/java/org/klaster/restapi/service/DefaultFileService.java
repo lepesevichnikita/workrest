@@ -18,11 +18,13 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import org.apache.commons.io.FileExistsException;
 import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.properties.FilesProperties;
+import org.klaster.restapi.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -56,9 +58,10 @@ public class DefaultFileService {
   @Transactional
   public FileInfo saveFile(InputStream inputStream, String outputFileName) throws IOException {
     LocalDateTime createdAt = LocalDateTime.now();
+    final long timeStamp = FileUtil.getTimeStampFromLocalDateTime(createdAt);
     String md5DigestAsHex = DigestUtils.md5DigestAsHex(inputStream);
     Path targetFolderPath = Paths.get(filesProperties.getOutputFolder()
-                                                     .getCanonicalPath(), String.valueOf(createdAt.getNano()));
+                                                     .getCanonicalPath(), String.valueOf(timeStamp));
     Path resultFilePath = writeFileIntoFolder(inputStream, outputFileName, targetFolderPath);
     defaultFileInfoBuilder.setMd5(md5DigestAsHex)
                           .setPath(resultFilePath.toFile()
@@ -91,6 +94,9 @@ public class DefaultFileService {
   private Path writeFileIntoFolder(InputStream inputStream, String outputFileName, Path targetFolderPath) throws IOException {
     Files.createDirectories(targetFolderPath);
     Path resultFilePath = Paths.get(targetFolderPath.toString(), outputFileName);
+    if (Files.exists(resultFilePath)) {
+      throw new FileExistsException();
+    }
     Files.copy(inputStream, resultFilePath);
     return resultFilePath;
   }

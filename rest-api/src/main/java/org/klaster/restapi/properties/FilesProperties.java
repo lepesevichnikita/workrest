@@ -8,6 +8,7 @@ package org.klaster.restapi.properties;
  */
 
 import java.io.File;
+import org.klaster.restapi.constant.FilesOutputPropertyKey;
 import org.klaster.restapi.constant.PropertyClassPath;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 @PropertySource(PropertyClassPath.APPLICATION)
 public class FilesProperties {
 
-  @Value("${files.output.folder}")
+  @Value(FilesOutputPropertyKey.OUTPUT_FOLDER)
   private String outputFolder;
 
   public File getOutputFolder() {
