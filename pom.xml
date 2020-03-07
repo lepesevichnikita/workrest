@@ -20,11 +20,15 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <argLine></argLine>
     <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
     <sonar.organization>lepesevichnikita</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <!--suppress UnresolvedMavenProperty -->
     <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.language>java</sonar.language>
   </properties>
 
   <modules>
@@ -64,9 +68,34 @@
           <version>3.8.0</version>
         </plugin>
         <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.5</version>
+          <configuration>
+            <append>true</append>
+          </configuration>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-site</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M4</version>
           <configuration>
+            <forkCount>3</forkCount>
+            <reuseForks>true</reuseForks>
             <excludes>
               <include>**/AdministratorControllerTest.java</include>
               <include>**/JobControllerTest.java</include>
@@ -75,9 +104,7 @@
               <include>**/UsersControllerTest.java</include>
               <exclude>**/service/*</exclude>
             </excludes>
-            <forkCount>1</forkCount>
-            <reuseForks>true</reuseForks>
-            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+            <argLine>@{argLine} -Xmx1024m -XX:MaxPermSize=256m</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -110,35 +137,6 @@
               <phase>verify</phase>
               <goals>
                 <goal>sonar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.2</version>
-          <configuration>
-            <append>true</append>
-          </configuration>
-          <executions>
-            <execution>
-              <id>prepare-agent</id>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>prepare-agent-integration</id>
-              <goals>
-                <goal>prepare-agent-integration</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>jacoco-site</id>
-              <phase>verify</phase>
-              <goals>
-                <goal>report</goal>
               </goals>
             </execution>
           </executions>
