@@ -8,7 +8,6 @@ package org.klaster.restapi.configuration;
  */
 
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 import org.klaster.restapi.constant.PackageName;
 import org.klaster.restapi.constant.PropertyClassPath;
 import org.klaster.restapi.properties.DataSourceProperties;
@@ -42,17 +41,13 @@ public class PersistenceJPAConfig {
 
   public static final String JPA_PERSISTENCE_UNIT_NAME = "myJpaPersistenceUnit";
 
-  @Autowired
-  private HibernateProperties hibernateProperties;
-
-  @Autowired
-  private DataSourceProperties dataSourceProperties;
-
   @Bean
-  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+  @Autowired
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory(DriverManagerDataSource driverManagerDataSource,
+                                                                     HibernateProperties hibernateProperties) {
     LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
     entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());
-    entityManagerFactoryBean.setDataSource(dataSource());
+    entityManagerFactoryBean.setDataSource(driverManagerDataSource);
     entityManagerFactoryBean.setPersistenceUnitName(JPA_PERSISTENCE_UNIT_NAME);
     entityManagerFactoryBean.setPackagesToScan(PackageName.DOMAIN, PackageName.REST_API);
     entityManagerFactoryBean.setJpaProperties(hibernateProperties);
@@ -71,7 +66,8 @@ public class PersistenceJPAConfig {
   }
 
   @Bean
-  public DataSource dataSource() {
+  @Autowired
+  public DriverManagerDataSource driverManagerDataSource(DataSourceProperties dataSourceProperties) {
     DriverManagerDataSource dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(dataSourceProperties.getDriverClassName());
     dataSource.setUrl(dataSourceProperties.getUrl());

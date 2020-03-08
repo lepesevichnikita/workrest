@@ -45,4 +45,15 @@ public class HibernateProperties extends Properties {
     put(AvailableSettings.SHOW_SQL, showSql);
     put(AvailableSettings.HBM2DDL_AUTO, hbm2ddlAuto);
   }
+
+  @Override
+  public synchronized boolean equals(Object o) {
+    boolean result = super.equals(o);
+    if (result) {
+      HibernateProperties hibernateProperties = (HibernateProperties) o;
+      result = hibernateProperties.dialect.equals(dialect) && hibernateProperties.formatSql.equals(formatSql) &&
+               hibernateProperties.hbm2ddlAuto.equals(hbm2ddlAuto) && hibernateProperties.showSql.equals(showSql);
+    }
+    return result;
+  }
 }
