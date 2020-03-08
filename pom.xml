@@ -94,10 +94,6 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M4</version>
           <configuration>
-            <excludes>
-              <exclude>**/DefaultTokenBasedDetailsUserServiceTest</exclude>
-              <exclude>**/DefaultUserServiceTest</exclude>
-            </excludes>
             <argLine>@{argLine} -Xmx1024m -XX:MaxPermSize=256m</argLine>
           </configuration>
         </plugin>
