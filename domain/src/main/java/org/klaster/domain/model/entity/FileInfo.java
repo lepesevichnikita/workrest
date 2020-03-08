@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +19,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
 import org.klaster.domain.serializer.LocalDateTimeSerializer;
+import org.springframework.data.annotation.CreatedDate;
 
 /**
  * FileInfo
@@ -40,6 +42,7 @@ public class FileInfo implements Serializable {
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   private LocalDateTime createdAt;
 
+  @CreatedDate
   public LocalDateTime getCreatedAt() {
     return createdAt;
   }
@@ -87,7 +90,8 @@ public class FileInfo implements Serializable {
 
   @Transient
   public String getTimeStamp() {
-    return String.valueOf(createdAt.getNano());
+    final long timestamp = createdAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    return String.valueOf(timestamp);
   }
 
   @PrePersist

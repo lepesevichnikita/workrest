@@ -48,12 +48,11 @@ public class HibernateProperties extends Properties {
 
   @Override
   public synchronized boolean equals(Object o) {
-    boolean result = super.equals(o);
-    if (result) {
-      HibernateProperties hibernateProperties = (HibernateProperties) o;
-      result = hibernateProperties.dialect.equals(dialect) && hibernateProperties.formatSql.equals(formatSql) &&
-               hibernateProperties.hbm2ddlAuto.equals(hbm2ddlAuto) && hibernateProperties.showSql.equals(showSql);
-    }
-    return result;
+    return super.equals(o);
+  }
+
+  @Override
+  public synchronized int hashCode() {
+    return super.hashCode();
   }
 }

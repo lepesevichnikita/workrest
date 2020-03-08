@@ -24,7 +24,7 @@ import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.properties.FilesProperties;
-import org.klaster.restapi.util.FileUtil;
+import org.klaster.domain.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;

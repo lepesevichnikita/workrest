@@ -95,8 +95,6 @@
           <version>3.0.0-M4</version>
           <configuration>
             <excludes>
-              <exclude>**/DefaultJobServiceTest</exclude>
-              <exclude>**/DefaultPersonalDataServiceTest</exclude>
               <exclude>**/DefaultTokenBasedDetailsUserServiceTest</exclude>
               <exclude>**/DefaultUserServiceTest</exclude>
             </excludes>
