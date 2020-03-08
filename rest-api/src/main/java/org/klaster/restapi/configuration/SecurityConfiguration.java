@@ -41,6 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     web.ignoring()
        .antMatchers(HttpMethod.POST, "/token")
        .antMatchers(HttpMethod.POST, "/users")
+       .antMatchers(HttpMethod.GET, "/jobs/all")
        .antMatchers(HttpMethod.GET, "/file/*");
   }
 

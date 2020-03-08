@@ -22,9 +22,9 @@ import org.apache.commons.io.FileExistsException;
 import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
+import org.klaster.domain.util.FileUtil;
 import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.properties.FilesProperties;
-import org.klaster.domain.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -59,13 +59,12 @@ public class DefaultFileService {
   public FileInfo saveFile(InputStream inputStream, String outputFileName) throws IOException {
     LocalDateTime createdAt = LocalDateTime.now();
     final long timeStamp = FileUtil.getTimeStampFromLocalDateTime(createdAt);
-    String md5DigestAsHex = DigestUtils.md5DigestAsHex(inputStream);
-    Path targetFolderPath = Paths.get(filesProperties.getOutputFolder()
-                                                     .getCanonicalPath(), String.valueOf(timeStamp));
-    Path resultFilePath = writeFileIntoFolder(inputStream, outputFileName, targetFolderPath);
+    File targetFolder = new File(filesProperties.getOutputFolder(), String.valueOf(timeStamp));
+    File targetFile = new File(outputFileName);
+    File writtenFile = writeFileIntoFolder(inputStream, targetFile, targetFolder);
+    String md5DigestAsHex = DigestUtils.md5DigestAsHex(new FileInputStream(writtenFile));
     defaultFileInfoBuilder.setMd5(md5DigestAsHex)
-                          .setPath(resultFilePath.toFile()
-                                                 .getCanonicalPath())
+                          .setPath(writtenFile.getCanonicalPath())
                           .setCreatedAt(createdAt);
     return fileInfoRepository.save(defaultFileInfoBuilder.build());
   }
@@ -75,8 +74,11 @@ public class DefaultFileService {
                                                .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(
                                                    FileInfo.class,
                                                    id)));
-    File foundFile = new File(foundFileInfo.getPath());
-    return new FileInputStream(foundFile);
+    Path foundFilePath = Paths.get(foundFileInfo.getPath());
+    if (Files.notExists(foundFilePath)) {
+      throw new FileNotFoundException();
+    }
+    return new FileInputStream(foundFilePath.toFile());
   }
 
   @Transactional
@@ -86,18 +88,21 @@ public class DefaultFileService {
                                                      FileInfo.class,
                                                      id)));
     File deletedFile = new File(removedFileInfo.getPath());
-    Files.delete(deletedFile.toPath());
     fileInfoRepository.delete(removedFileInfo);
+    if (Files.notExists(deletedFile.toPath())) {
+      throw new FileNotFoundException();
+    }
+    Files.delete(deletedFile.toPath());
     return removedFileInfo;
   }
 
-  private Path writeFileIntoFolder(InputStream inputStream, String outputFileName, Path targetFolderPath) throws IOException {
-    Files.createDirectories(targetFolderPath);
-    Path resultFilePath = Paths.get(targetFolderPath.toString(), outputFileName);
-    if (Files.exists(resultFilePath)) {
+  private File writeFileIntoFolder(InputStream inputStream, File targetFile, File targetFolder) throws IOException {
+    Files.createDirectories(targetFolder.toPath());
+    File resultFile = new File(targetFolder, targetFile.getName());
+    if (resultFile.exists()) {
       throw new FileExistsException();
     }
-    Files.copy(inputStream, resultFilePath);
-    return resultFilePath;
+    Files.copy(inputStream, resultFile.toPath());
+    return resultFile;
   }
 }

@@ -41,8 +41,7 @@ public class JobController {
 
   @GetMapping("/all")
   public ResponseEntity<List<Job>> findAll() {
-    return ResponseEntity.ok()
-                         .build();
+    return ResponseEntity.ok(defaultJobService.findAll());
   }
 
   @PostMapping
@@ -54,9 +53,8 @@ public class JobController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<Job> deleteById(@PathVariable long id, @AuthenticationPrincipal User currentUser) {
-    Job foundJob = defaultJobService.findById(id);
     return ResponseEntity.accepted()
-                         .body(defaultJobService.delete(foundJob, currentUser));
+                         .body(defaultJobService.deleteById(id, currentUser));
   }
 
   @GetMapping("/{id}")
@@ -65,27 +63,24 @@ public class JobController {
                          .body(defaultJobService.findById(id));
   }
 
-  @PutMapping("/{id}/start")
+  @PostMapping("/{id}/start")
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<Job> startById(@PathVariable long id, @AuthenticationPrincipal User currentUser) {
-    Job foundJob = defaultJobService.findById(id);
     return ResponseEntity.accepted()
-                         .body(defaultJobService.start(foundJob, currentUser));
+                         .body(defaultJobService.startById(id, currentUser));
   }
 
-  @PutMapping("/{id}/finish")
+  @PostMapping("/{id}/finish")
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<Job> finishById(@PathVariable long id, @AuthenticationPrincipal User currentUser) {
-    Job foundJob = defaultJobService.findById(id);
     return ResponseEntity.accepted()
-                         .body(defaultJobService.finish(foundJob, currentUser));
+                         .body(defaultJobService.finishById(id, currentUser));
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<Job> updateById(@PathVariable long id, JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
-    Job foundJob = defaultJobService.findById(id);
+  public ResponseEntity<Job> updateById(@PathVariable long id, @RequestBody JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
     return ResponseEntity.accepted()
-                         .body(defaultJobService.update(foundJob, jobDTO, currentUser));
+                         .body(defaultJobService.updateById(id, jobDTO, currentUser));
   }
 }

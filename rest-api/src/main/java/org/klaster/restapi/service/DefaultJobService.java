@@ -25,6 +25,7 @@ import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DefaultJobService
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@Transactional
 public class DefaultJobService {
 
   @Autowired
@@ -44,10 +46,7 @@ public class DefaultJobService {
   @Autowired
   private JobBuilder defaultJobBuilder;
 
-  public List<Job> findAllByEmployerProfile(EmployerProfile employerProfile) {
-    return jobRepository.findAllByEmployerProfile(employerProfile);
-  }
-
+  @Transactional
   public Job create(JobDTO jobDTO, User author) {
     EmployerProfile employerProfile = author.getCurrentState()
                                             .getEmployerProfile();
@@ -60,54 +59,69 @@ public class DefaultJobService {
                                     .setEndDateTime(jobDTO.getEndDateTime())
                                     .build();
     savedJob.setEmployerProfile(employerProfile);
-    return jobRepository.save(savedJob);
+    return jobRepository.saveAndFlush(savedJob);
   }
 
-  public Job update(Job sourceJob, JobDTO jobDTO, User user) {
-    validateJobBelongsToUser(sourceJob,
-                             user.getCurrentState()
-                                 .getEmployerProfile());
+  @Transactional
+  public Job updateById(long jobId, JobDTO jobDTO, User user) {
+    Job foundJob = findById(jobId);
+    validateJobBelongsToUser(foundJob, user);
     Job targetJob = defaultJobBuilder.setSkills(skillRepository.findAllByNamesOrCreate(jobDTO.getSkills()))
                                      .setDescription(jobDTO.getDescription())
                                      .setEndDateTime(jobDTO.getEndDateTime())
                                      .build();
-    sourceJob.getCurrentState()
-             .updateJob(targetJob);
-    return jobRepository.save(sourceJob);
+    foundJob.getCurrentState()
+            .updateJob(targetJob);
+    return jobRepository.saveAndFlush(foundJob);
   }
 
-  public Job start(Job job, User user) {
-    validateJobBelongsToUser(job,
-                             user.getCurrentState()
-                                 .getEmployerProfile());
-    job.setCurrentState(new StartedJobState());
-    return jobRepository.save(job);
-  }
-
-  public Job delete(Job job, User user) {
-    validateJobBelongsToUser(job,
-                             user.getCurrentState()
-                                 .getEmployerProfile());
-    job.setCurrentState(new DeletedJobState());
-    return jobRepository.save(job);
-  }
-
-  public Job finish(Job job, User user) {
-    validateJobBelongsToUser(job,
-                             user.getCurrentState()
-                                 .getEmployerProfile());
-    job.setCurrentState(new FinishedJobState());
-    return jobRepository.save(job);
-  }
-
-  public Job findById(long id) {
-    return jobRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(Job.class, id)));
-  }
-
-  private void validateJobBelongsToUser(Job job, EmployerProfile employerProfile) {
-    if (!job.belongsToEmployer(employerProfile.getId())) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(User.class, employerProfile.getId()));
+  @Transactional
+  public Job startById(long jobId, User user) {
+    Job foundJob = findById(jobId);
+    validateJobBelongsToUser(foundJob, user);
+    if (!(foundJob.getCurrentState() instanceof StartedJobState)) {
+      foundJob.setCurrentState(new StartedJobState());
+      foundJob = jobRepository.save(foundJob);
     }
+    return foundJob;
+  }
+
+  @Transactional
+  public Job deleteById(long jobId, User user) {
+    Job foundJob = findById(jobId);
+    validateJobBelongsToUser(foundJob, user);
+    if (!(foundJob.getCurrentState() instanceof DeletedJobState)) {
+      foundJob.setCurrentState(new DeletedJobState());
+      foundJob = jobRepository.saveAndFlush(foundJob);
+    }
+    return foundJob;
+  }
+
+  @Transactional
+  public Job finishById(long jobId, User user) {
+    Job foundJob = findById(jobId);
+    validateJobBelongsToUser(foundJob, user);
+    if (!(foundJob.getCurrentState() instanceof FinishedJobState)) {
+      foundJob.setCurrentState(new FinishedJobState());
+      foundJob = jobRepository.saveAndFlush(foundJob);
+    }
+    return foundJob;
+  }
+
+  public Job findById(long jobId) {
+    return jobRepository.findById(jobId)
+                        .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(Job.class, jobId)));
+  }
+
+  private void validateJobBelongsToUser(Job job, User user) {
+    EmployerProfile employerProfile = user.getCurrentState()
+                                          .getEmployerProfile();
+    if (!job.belongsToEmployer(employerProfile.getId())) {
+      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(User.class, user.getId()));
+    }
+  }
+
+  public List<Job> findAll() {
+    return jobRepository.findAll();
   }
 }

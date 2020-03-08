@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/file")
-public class FileInfoController {
+public class FileController {
 
   @Autowired
   private DefaultFileService defaultFileService;
@@ -41,6 +41,7 @@ public class FileInfoController {
   @PostMapping
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<FileInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
+    System.out.println(file.getOriginalFilename());
     FileInfo savedFileInfo = defaultFileService.saveFile(file.getInputStream(), file.getOriginalFilename());
     return new ResponseEntity<>(savedFileInfo, HttpStatus.CREATED);
   }

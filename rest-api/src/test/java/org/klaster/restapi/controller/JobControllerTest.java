@@ -1,15 +1,21 @@
 package org.klaster.restapi.controller;
 
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.klaster.domain.constant.JobStateName;
 import org.klaster.domain.dto.EmployerProfileDTO;
 import org.klaster.domain.dto.JobDTO;
@@ -21,7 +27,6 @@ import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomEmployerProfileFactory;
 import org.klaster.restapi.factory.RandomJobFactory;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
-import org.klaster.restapi.service.DefaultAdministratorService;
 import org.klaster.restapi.service.DefaultJobService;
 import org.klaster.restapi.service.DefaultUserService;
 import org.klaster.restapi.service.TokenBasedUserDetailsService;
@@ -74,10 +79,6 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private WebApplicationContext webApplicationContext;
 
-
-  @Autowired
-  private DefaultAdministratorService defaultAdministratorService;
-
   @Autowired
   private DefaultUserService defaultUserService;
 
@@ -125,7 +126,8 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(jsonPath("$.description").value(randomJob.getDescription()))
            .andExpect(jsonPath("$.states[0].name").value(JobStateName.PUBLISHED))
            .andExpect(jsonPath("$.employerProfile").doesNotExist())
-           .andExpect(jsonPath("$.skills.*").value(not(empty())));
+           .andExpect(jsonPath("$.skills.*").value(not(empty())))
+           .andExpect(jsonPath("$.endDateTime").value(not(empty())));
   }
 
   @Test
@@ -193,5 +195,70 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
                              .contentType(MediaType.APPLICATION_JSON)
                              .content(jobDTOAsJson))
            .andExpect(unauthenticated());
+  }
+
+
+  @Test
+  public void acceptedForDeleteByVerifiedUserWithValidToken() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    JobDTO jobDTO = JobDTO.fromJob(randomJob);
+    Job createdJob = defaultJobService.create(jobDTO, userWithEmployerProfile);
+    final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                   randomLoginInfo.getPassword())
+                                                                      .getValue();
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, createdJob.getId());
+    mockMvc.perform(delete(uri).header(HttpHeaders.AUTHORIZATION, validTokenValue)
+                               .accept(MediaType.APPLICATION_JSON)
+                               .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isAccepted())
+           .andExpect(jsonPath("$.description").value(randomJob.getDescription()))
+           .andExpect(jsonPath("$.states[0].name").value(JobStateName.DELETED))
+           .andExpect(jsonPath("$.employerProfile").doesNotExist())
+           .andExpect(jsonPath("$.skills.*").value(not(empty())));
+  }
+
+  @Test
+  public void acceptedForPutWithValidJobUpdateByVerifiedUserWithValidToken() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    JobDTO jobDTO = JobDTO.fromJob(randomJob);
+    Job createdJob = defaultJobService.create(jobDTO, userWithEmployerProfile);
+    JobDTO jobUpdate = JobDTO.fromJob(randomJobFactory.build());
+    final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
+                                                                                   randomLoginInfo.getPassword())
+                                                                      .getValue();
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, createdJob.getId());
+    final String jobUpdateAsJson = objectMapper.writeValueAsString(jobUpdate);
+    mockMvc.perform(put(uri).header(HttpHeaders.AUTHORIZATION, validTokenValue)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(jobUpdateAsJson))
+           .andExpect(status().isAccepted())
+           .andExpect(jsonPath("$.description").value(jobUpdate.getDescription()))
+           .andExpect(jsonPath("$.states[0].name").value(JobStateName.PUBLISHED))
+           .andExpect(jsonPath("$.employerProfile").doesNotExist())
+           .andExpect(jsonPath("$.skills.*").value(hasSize(jobUpdate.getSkills().length)));
+  }
+
+  @Test
+  public void okForGetAll() throws Exception {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    JobDTO jobDTO = JobDTO.fromJob(randomJob);
+    defaultJobService.create(jobDTO, userWithEmployerProfile);
+    List<Job> expectedJobs = defaultJobService.findAll();
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, "all");
+    final String expectedJobsAsJson = objectMapper.writeValueAsString(expectedJobs);
+    mockMvc.perform(get(uri).accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(content().json(expectedJobsAsJson));
   }
 }

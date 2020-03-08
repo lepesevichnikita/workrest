@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.klaster.domain.model.entity.FileInfo;
@@ -54,17 +55,18 @@ import org.testng.annotations.Test;
 
 @WebAppConfiguration
 @ContextConfiguration(classes = {ApplicationContext.class})
-public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
+public class FileControllerTest extends AbstractTestNGSpringContextTests {
 
   private static final String CONTROLLER_NAME = "file";
   private static final String CONTROLLER_PATH_TEMPLATE = "/%s";
   private static final String ACTION_PATH_TEMPLATE = "/%s/%s";
   private static final String INPUT_FILE_NAME = "image.jpg";
+  private static final String INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS = "изображение.jpg";
   private static final String INPUT_FOLDER_NAME = "input";
 
   private MockMvc mockMvc;
   private File inputFolder;
-  private Path inputFilePath;
+  private File inputFile;
   private RandomLoginInfoFactory randomLoginInfoFactory;
   private LoginInfo randomLoginInfo;
 
@@ -84,16 +86,15 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   private DefaultFileService defaultFileService;
 
   @BeforeClass
-  public void setup() throws IOException {
+  public void setup() {
     mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                              .apply(springSecurity())
                              .build();
-    ClassLoader classloader = Thread.currentThread()
-                                    .getContextClassLoader();
+    ClassLoader classloader = getClass().getClassLoader();
     final String inputFolderPath = classloader.getResource(INPUT_FOLDER_NAME)
                                               .getPath();
     inputFolder = new File(inputFolderPath);
-    inputFilePath = Paths.get(inputFolder.getCanonicalPath(), INPUT_FILE_NAME);
+    inputFile = new File(inputFolder, INPUT_FILE_NAME);
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
   }
 
@@ -112,7 +113,7 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
                                                                  .getValue();
-    InputStream inputStream = new FileInputStream(inputFilePath.toString());
+    InputStream inputStream = new FileInputStream(inputFile.toString());
     MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
                                                                       INPUT_FILE_NAME,
                                                                       MediaType.IMAGE_JPEG.toString(),
@@ -129,13 +130,73 @@ public class FileInfoControllerTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void okWithInputStreamForGetWithValidFileId() throws Exception {
-    final String newFileName = INPUT_FILE_NAME + "2";
-    InputStream inputStream = new FileInputStream(inputFilePath.toString());
-    FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, newFileName);
+  public void okWithContentForGetWithValidFileInfoId() throws Exception {
+    InputStream inputStream = new FileInputStream(inputFile.toString());
+    FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, INPUT_FILE_NAME);
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, savedFileInfo.getId());
     mockMvc.perform(get(uri))
            .andExpect(status().isOk());
+  }
+
+  @Test
+  public void notFoundForNotForGetWithInvalidFileInfoId() throws Exception {
+    final long invalidId = 1000000L;
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, invalidId);
+    mockMvc.perform(get(uri))
+           .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void notFoundForNotForGetNonExistedFile() throws Exception {
+    InputStream inputStream = new FileInputStream(inputFile.toString());
+    FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, INPUT_FILE_NAME);
+    Files.delete(Paths.get(savedFileInfo.getPath()));
+    final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, savedFileInfo.getId());
+    mockMvc.perform(get(uri))
+           .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void savesOriginalFileNameWithNonAsciiEncodingCharacters() throws Exception {
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                 .getValue();
+    InputStream inputStream = new FileInputStream(new File(inputFolder, INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS));
+    MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
+                                                                      INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS,
+                                                                      MediaType.IMAGE_JPEG.toString(),
+                                                                      inputStream);
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    mockMvc.perform(MockMvcRequestBuilders.multipart(uri)
+                                          .file(mockMultipartUploadFile)
+                                          .accept(MediaType.APPLICATION_JSON)
+                                          .header(HttpHeaders.AUTHORIZATION, tokenValue))
+           .andExpect(status().isCreated())
+           .andExpect(jsonPath("$.id").value(notNullValue()))
+           .andExpect(jsonPath("$.path").value(endsWith(INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS)))
+           .andExpect(jsonPath("$.md5").value(notNullValue()));
+  }
+
+  @Test
+  public void savesOriginalFileNameWithNonAsciiEncodingCharactersEvenWithAsciiEncodingCharactersInHeader() throws Exception {
+    defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    final String tokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(), randomLoginInfo.getPassword())
+                                                                 .getValue();
+    InputStream inputStream = new FileInputStream(new File(inputFolder, INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS));
+    MockMultipartFile mockMultipartUploadFile = new MockMultipartFile("file",
+                                                                      INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS,
+                                                                      MediaType.IMAGE_JPEG.toString(),
+                                                                      inputStream);
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    mockMvc.perform(MockMvcRequestBuilders.multipart(uri)
+                                          .file(mockMultipartUploadFile)
+                                          .accept(MediaType.APPLICATION_JSON)
+                                          .header(HttpHeaders.AUTHORIZATION, tokenValue)
+                                          .header(HttpHeaders.ACCEPT_CHARSET, StandardCharsets.US_ASCII.name()))
+           .andExpect(status().isCreated())
+           .andExpect(jsonPath("$.id").value(notNullValue()))
+           .andExpect(jsonPath("$.path").value(endsWith(INPUT_FILE_NAME_WITH_NON_ASCII_CHARACTERS)))
+           .andExpect(jsonPath("$.md5").value(notNullValue()));
   }
 
   private void deleteOutputFiles() {
