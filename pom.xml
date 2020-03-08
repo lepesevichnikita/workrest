@@ -95,7 +95,10 @@
           <version>3.0.0-M4</version>
           <configuration>
             <excludes>
-              <exclude>**/service/*</exclude>
+              <exclude>**/DefaultJobServiceTest</exclude>
+              <exclude>**/DefaultPersonalDataServiceTest</exclude>
+              <exclude>**/DefaultTokenBasedDetailsUserServiceTest</exclude>
+              <exclude>**/DefaultUserServiceTest</exclude>
             </excludes>
             <argLine>@{argLine} -Xmx1024m -XX:MaxPermSize=256m</argLine>
           </configuration>
