@@ -1,63 +1,56 @@
-import {redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
+import { redirectToPage } from "../main.js";
+import { Page } from "./Page.js";
 
 export class SignUp extends Page {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
     this._loginInfo = {};
-    this.addListener("input[name=login]", ["change", this._onLoginChange.bind(this), false])
-        .addListener("input[name=password]", ["change", this._onPasswordChange.bind(this), false])
-        .addListener("input[name=passwordConfirmation]",
-                     ["change", this._onPasswordConfirmationChange.bind(this), false])
-        .addListener("input[name=eulaAgreed]", ["change", this._onEulaAgreedChange.bind(this), false])
-        .addListener("form", ["submit", this._onFormSubmit.bind(this), false]);
+    this.addListener(SignUp.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
   process() {
     this.showDimmer();
-    return this._authorizationService.checkIsAuthorized()
-               .then(() => redirectToPage("home"))
-               .catch((error) => this.replacePage("signup")
-                                     .finally(() => super.process()));
+    this._authorizationService.checkIsAuthorized()
+        .then(() => redirectToPage("home"))
+        .catch(() => this.replacePage("signup")
+                         .then(() => this._setValidationOnSignUpForm())
+                         .then(() => super.process()))
+        .finally(() => this.hideDimmer());
   }
 
-  _onLoginChange(event) {
-    event.preventDefault();
-    this._loginInfo.login = event.target.value;
-  }
-
-  _onPasswordChange(event) {
-    event.preventDefault();
-    this._loginInfo.password = event.target.value;
+  _setValidationOnSignUpForm() {
+    const loginForm = $("#signupForm");
+    loginForm.form({
+                     login: {identifier: "login", rules: [{type: "empty", prompt: "Login is required"}]},
+                     password: {identifier: "password", rules: [{type: "empty", prompt: "Password is required"}]},
+                     passwordConfirmation: {
+                       identifier: "passwordConfirmation",
+                       depends: "password",
+                       rules: [{type: "empty", prompt: "Password confirmation is required"}, {type: "match[password]", prompt: "Passwords should match"}]
+                     },
+                     eulaAgreed: {identifier: "eulaAgreed", rules: [{type: "checked", prompt: "EULA must be agreed"}]}
+                   }, {
+                     onSuccess: this._signUp.bind(this)
+                   });
   }
 
   _onFormSubmit(event) {
     event.preventDefault();
+    const loginForm = $(SignUp.FORM_SELECTOR);
+    loginForm.form("validate form");
+  }
+
+  _signUp(event, fields) {
+    fields.eulaAgreed = fields.eulaAgreed == "on";
     this.showDimmer();
-    this._authorizationService.signUp(this._loginInfo)
-        .catch(error => {
-          if (error.status == 422) {
-            this.addErrorsToForm("form", error.response.body);
-          }
-          return error;
-        })
+    this._authorizationService.signUp(fields)
+        .catch(error => this.addErrorsToForm(SignUp.FORM_SELECTOR, error.response.body))
         .finally(() => {
-          $('form')
-          .form('clear');
-          this.hideDimmer()
+          this.hideDimmer();
         });
-  }
-
-  _onPasswordConfirmationChange(event) {
-    event.preventDefault();
-    this._loginInfo.passwordConfirmation = event.target.value;
-  }
-
-  _onEulaAgreedChange(event) {
-    event.preventDefault();
-    this._loginInfo.eulaAgreed = event.target.value == 'on';
   }
 }
 
+SignUp.FORM_SELECTOR = "#signupForm";
 export default SignUp;

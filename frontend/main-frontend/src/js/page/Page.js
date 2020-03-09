@@ -1,5 +1,5 @@
-import {TemplateHelper} from "../helper";
-import {loadTemplate, redirectToPage} from "../main.js";
+import { TemplateHelper } from "../helper";
+import { loadTemplate, redirectToPage } from "../main.js";
 
 export class Page {
   constructor() {
@@ -42,12 +42,11 @@ export class Page {
 
   replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
-    this.showDimmer();
     return new Promise((resolve, reject) => loadTemplate(pageSelector,
                                                          this._templateHelper.getPagePath(pageName.toLowerCase()),
                                                          pageData)
     .then(resolve)
-    .catch(reject)).finally(() => this.hideDimmer());
+    .catch(reject));
   }
 
   _initializeListeners() {
@@ -56,7 +55,11 @@ export class Page {
             const listeners = this._eventsListeners[selector] || [];
             document
             .querySelectorAll(selector)
-            .forEach(node => listeners.forEach(listener => node.addEventListener(...listener)));
+            .forEach(node => listeners.forEach(listener => {
+              $(node)
+              .unbind();
+              node.addEventListener(...listener);
+            }));
           });
   }
 

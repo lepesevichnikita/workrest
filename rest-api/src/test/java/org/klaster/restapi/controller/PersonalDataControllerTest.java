@@ -5,7 +5,6 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,7 +17,6 @@ import org.klaster.domain.dto.FullPersonalDataDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.entity.PersonalData;
-import org.klaster.domain.util.MessageUtil;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.klaster.restapi.factory.RandomPersonalDataFactory;
@@ -145,11 +143,10 @@ public class PersonalDataControllerTest extends AbstractTestNGSpringContextTests
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     final long nonExistedUserId = 10000000000000000L;
     final String uri = String.format(ACTION_PATH_TEMPLATE, CONTROLLER_NAME, nonExistedUserId);
-    final String expectedContent = String.format("\"%s\"", MessageUtil.getEntityByIdNotFoundMessage(User.class, nonExistedUserId));
     mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, administratorToken)
                             .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isNotFound())
-           .andExpect(content().string(expectedContent));
+           .andExpect(jsonPath("$.*").value(notNullValue()));
   }
 
   @Test

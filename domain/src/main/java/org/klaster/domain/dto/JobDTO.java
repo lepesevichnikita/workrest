@@ -30,6 +30,7 @@ public class JobDTO {
   @NotEmpty(message = ValidationMessage.DESCRIPTION_IS_REQUIRED)
   private String description;
 
+  @NotEmpty(message = ValidationMessage.END_DATETIME_IS_REQUIRED)
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   private LocalDateTime endDateTime;

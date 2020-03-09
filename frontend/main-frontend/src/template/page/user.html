@@ -18,111 +18,144 @@
       <div class="ui link basic attached bottom button" name="personal_data">Edit</div>
       {{/if}}
     </div>
+    <div class="ui fluid card" id="freelancerProfile">
+      <div class="content">
+        <div class="header">Freelancer profile</div>
+        {{if freelancerProfile}}
+        <div class="description">
+          ${freelancerProfile.description}
+        </div>
+        {{/if}}
+      </div>
       {{if freelancerProfile}}
-    <div class="ui fluid card" id="${freelancerProfile.id}">
-        <div class="content">
-          <div class="header">Freelancer profile</div>
-          <div class="description">
-            ${freelancerProfile.description}
-          </div>
-        </div>
-        <div class="extra content">
-          {{each freelancerProfile.skills}}
-          <span class="ui label">${name}</span>
-          {{/each}}
-        </div>
+      <div class="extra content">
+        {{each freelancerProfile.skills}}
+        <span class="ui label">${name}</span>
+        {{/each}}
+      </div>
+      <div class="ui basic attached bottom primary button" data-action="update" data-target="freelancerProfileFormModal">Update</div>
+      {{/if}}
+      {{if !freelancerProfile && currentState.name == 'Verified'}}
+      <div class="ui basic attached bottom green button" data-action="update" data-target="freelancerProfileFormModal">Create</div>
+      {{/if}}
     </div>
-      {{/if}}
-      {{if !freelancerProfile}}
-      <form class="ui form" id="freelancerProfileForm">
-        <div class="ui segment">
-          <div class="field">
-            <label>Description</label>
-            <textarea name="description"></textarea>
-          </div>
-          <div class="field">
-            <div class="ui right labeled left icon input">
-              <i class="tags icon"></i>
-              <input name="skill" placeholder="Enter skill" type="text">
-              <a class="ui tag label" data-action="skillAdd">
-                Add skill
-              </a>
-            </div>
-          </div>
-          <div class="field" id="freelancerSkills">
-            <div class="ui tag label">Delete</div>
-          </div>
-          <input class="ui fluid large primary submit button" type="submit" value="Save"/>
-        </div>
-      </form>
-      {{/if}}
-      {{if employerProfile}}
-      <div class="ui fluid card">
-        <div class="content">
-          <div class="header center aligned">Employer profile</div>
+    <div class="ui fluid card" id="employerProfile">
+      <div class="content">
+        <div class="header">Employer profile</div>
+        {{if employerProfile}}
           <div class="description">
             ${employerProfile.description}
           </div>
-        </div>
-        <div class="ui basic attached bottom primary button">Update</div>
-        <div class="extra content">
-          <div class="meta">
-            Published jobs
-          </div>
-          <div class="ui four doubling stackable cards" id="job-cards">
-            {{if employerProfile.jobs}}
-            {{each employerProfile.jobs}}
-            <div class="ui link card">
-              <div class="content">
-                <div class="header">Create Twitter</div>
-                <div class="meta"></div>
-                <div class="description">
-                  ${description}
-                </div>
+        {{/if}}
+      </div>
+      {{if employerProfile}}
+      <div class="ui basic attached bottom primary button" data-action="update" data-target="employerProfileFormModal">Update</div>
+      {{/if}}
+      {{if !employerProfile && currentState.name == 'Verified'}}
+      <div class="ui basic attached bottom green button" data-action="update" data-target="employerProfileFormModal">Create</div>
+      {{/if}}
+    </div>
+    {{if employerProfile}}
+    <div class="ui fluid card">
+      <div class="header">
+        Published jobs
+      </div>
+      <div class="extra content">
+        <div class="ui four doubling stackable cards" id="job-cards">
+          {{if employerProfile.jobs}}
+          {{each employerProfile.jobs}}
+          <div class="ui link card">
+            <div class="content">
+              <div class="header">Create Twitter</div>
+              <div class="meta"></div>
+              <div class="description">
+                ${description}
               </div>
-              <div class="extra content">
-                {{each $skills}}
-                <span class="ui label">${skill.name}</span>
-                {{/each}}
-              </div>
-              <div class="ui basic attached bottom primary button">Update</div>
             </div>
-            {{/each}}
-            {{/if}}
-          </div>
-          <form class="ui form" id="jobForm">
-            <div class="ui segment">
-              <div class="ui header">
-                Add job
-              </div>
-              <div class="field">
-                <label>
-                  Description
-                  <textarea name="description"></textarea>
-                </label>
-              </div>
-              <div class="field">
-                <label>Skills</label>
-                <input name="skill" placeholder="Enter required skill" type="text">
-                <div id="jobSkills"></div>
-              </div>
-              <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+            <div class="extra content">
+              {{each $skills}}
+              <span class="ui label">${skill.name}</span>
+              {{/each}}
             </div>
-          </form>
+            <div class="ui basic attached bottom primary button" data-action="update" data-id="${$value.id}" data-target="jobFormModal">Update</div>
+          </div>
+          {{/each}}
+          {{/if}}
         </div>
       </div>
-      {{/if}}
-      {{if !employerProfile}}
-    <form class="ui form" id="employerProfileForm">
-      <div class="ui segment">
+      <div class="ui basic attached bottom green button" data-action="create" data-target="jobFormModal">Create</div>
+    </div>
+    {{/if}}
+    <div class="ui modal" id="jobFormModal">
+      <form class="ui segment form" id="jobForm">
+        <div class="ui header">
+          Add job
+        </div>
+        <div class="field">
+          <label>
+            Description
+            <textarea name="description"></textarea>
+          </label>
+        </div>
+        <div class="field">
+          <div class="ui right labeled left icon input">
+            <i class="tags icon"></i>
+            <input name="skill" placeholder="Enter required skill" type="text">
+            <a class="ui tag label" data-action="skillAdd">
+              Add skill
+            </a>
+          </div>
+        </div>
+        <div class="inlinefield">
+          <label>
+            End date
+          </label>
+          <input name="endDateTime" type="datetime-local"/>
+        </div>
+        <div class="field" id="jobSkills"></div>
+        <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+        <div class="ui error message"></div>
+      </form>
+    </div>
+    <div class="ui modal" id="freelancerProfileFormModal">
+      <form class="ui segment form" id="freelancerProfileForm">
         <div class="field">
           <label>Description</label>
-          <textarea name="description"></textarea>
+          <textarea name="description">
+            {{if freelancerProfile}}
+            ${freelancerProfile.description}
+            {{/if}}
+          </textarea>
+        </div>
+        <div class="field">
+          <div class="ui right labeled left icon input">
+            <i class="tags icon"></i>
+            <input name="skill" placeholder="Enter skill" type="text">
+            <a class="ui tag label" data-action="skillAdd">
+              Add skill
+            </a>
+          </div>
+        </div>
+        <div class="field" id="freelancerSkills">
         </div>
         <input class="ui fluid large primary submit button" type="submit" value="Save"/>
-      </div>
-    </form>
-      {{/if}}
+        <div class="ui error message"></div>
+      </form>
+    </div>
+    <div class="ui modal" id="employerProfileFormModal">
+      <form class="ui segment form" id="employerProfileForm">
+        <div class="field">
+          <label>Description</label>
+          <textarea name="description">
+            {{if employerProfile}}
+            ${employerProfile.description}
+            {{/if}}
+          </textarea>
+        </div>
+        <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+        <div class="ui error message"></div>
+      </form>
+    </div>
   </div>
 </div>
 </div>

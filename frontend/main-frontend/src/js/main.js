@@ -27,18 +27,18 @@ const loadMenu = menuName => {
   .dimmer("show");
   $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
    .done(menuTemplate => {
-     $(menuContainerId)
-     .dimmer("hide");
-     $(menuContainerId)
-     .html($.tmpl(menuTemplate, {}));
-     // $(".ui.link")
-     // .click(function (event) {
-     //   event.preventDefault();
-     //   redirectToPage($(this)
-     //                  .attr("name"));
-     // });
-     $("#signout")
-     .click(function (event) {
+     const menuContainer = $(menuContainerId);
+     menuContainer.dimmer("hide");
+     menuContainer.html($.tmpl(menuTemplate, {}));
+     const links = $(".ui.link");
+     const signOutButton = $("#signout");
+     links.unbind();
+     links.click(function(event) {
+       event.preventDefault();
+       redirectToPage($(this)
+                      .attr("name"));
+     });
+     signOutButton.click(function(event) {
        event.preventDefault();
        authorizationService.signOut();
      });

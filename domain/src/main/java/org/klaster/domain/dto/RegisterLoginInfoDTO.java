@@ -31,7 +31,6 @@ public class RegisterLoginInfoDTO {
   @NotEmpty(message = ValidationMessage.PASSWORD_CONFIRMATION_IS_REQUIRED)
   private String passwordConfirmation;
 
-  @NotEmpty(message = ValidationMessage.EULA_AGREE_REQUIRED)
   @NotNull(message = ValidationMessage.EULA_AGREE_REQUIRED)
   @AssertTrue(message = ValidationMessage.EULA_AGREE_REQUIRED)
   private boolean eulaAgreed;

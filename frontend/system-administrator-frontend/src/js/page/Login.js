@@ -6,33 +6,46 @@ export class Login extends Page {
     super();
     this._authorizationService = props.authorizationService;
     this._loginInfo = {};
-    this.addListener("input[name=login]", ["change", this._onLoginChange.bind(this), false])
-        .addListener("input[name=password]", ["change", this._onPasswordChange.bind(this), false])
-        .addListener("#loginForm", ["submit", this._onFormSubmit.bind(this), false]);
+    this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
   process() {
     this._authorizationService.checkIsAuthorized()
-        .then(() => redirectToPage("home"))
+        .then(() => redirectToPage("administrators"))
         .catch(() => this.replacePage("login")
-                         .then(() => super.process()));
+                         .then(() => this._setValidationOnLoginForm())
+                         .finally(() => super.process()));
   }
 
-  _onLoginChange(event) {
-    event.preventDefault();
-    this._loginInfo.login = event.target.value;
-  }
-
-  _onPasswordChange(event) {
-    event.preventDefault();
-    this._loginInfo.password = event.target.value;
+  _setValidationOnLoginForm() {
+    const loginForm = $(Login.FORM_SELECTOR);
+    loginForm.form({
+                     login: {identifier: "login", rules: [{type: "empty", prompt: "Login is required"}]},
+                     password: {identifier: "password", rules: [{type: "empty", prompt: "Password is required"}]}
+                   }, {
+                     onSuccess: this._signIn.bind(this)
+                   });
   }
 
   _onFormSubmit(event) {
     event.preventDefault();
+    const loginForm = $(Login.FORM_SELECTOR);
+    loginForm.form("validate form");
+  }
+
+  _signIn(event, fields) {
+    event.preventDefault();
     this.showDimmer();
-    this._authorizationService.signIn(this._loginInfo);
+    this._authorizationService.signIn(fields)
+        .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
+        .finally(() => {
+          $(Login.FORM_SELECTOR)
+          .form("reset");
+          this.hideDimmer();
+        });
   }
 }
+
+Login.FORM_SELECTOR = "#loginForm";
 
 export default Login;

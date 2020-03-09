@@ -11,6 +11,10 @@ export class FileService extends Subscribable {
     this._restClient = new RestClient();
   }
 
+  getFileUrl(id) {
+    return RestClient.getActionUrl(endpoint.file.by_id(id));
+  }
+
   uploadFile(file) {
     return new Promise((resolve, reject) => {
       this._restClient

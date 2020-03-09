@@ -125,6 +125,7 @@ public class DefaultFileServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsFileNotFoundAtNonExistedFileDelete() throws IOException {
     InputStream inputStream = new FileInputStream(inputFilePath.toString());
     FileInfo savedFileInfo = defaultFileService.saveFile(inputStream, INPUT_FILE_NAME);
+    inputStream.close();
     Files.delete(Paths.get(savedFileInfo.getPath()));
     defaultFileService.deleteById(savedFileInfo.getId());
   }

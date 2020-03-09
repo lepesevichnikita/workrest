@@ -1,4 +1,4 @@
-import {redirectToPage} from "../main.js";
+import { redirectToPage } from "../main.js";
 import Page from "./Page.js";
 
 export class Login extends Page {
@@ -6,51 +6,48 @@ export class Login extends Page {
     super();
     this._authorizationService = props.authorizationService;
     this._loginInfo = {};
-    this.addListener("input[name=login]", ["change", this._onLoginChange.bind(this), false])
-        .addListener("input[name=password]", ["change", this._onPasswordChange.bind(this), false])
-        .addListener("form", ["submit", this._onFormSubmit.bind(this), false]);
+    this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
   process() {
-    return this._authorizationService.checkIsAuthorized()
-               .then(() => redirectToPage("users"))
-               .catch((error) => this.replacePage("login")
-                                     .then(() => super.process()));
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then(() => redirectToPage("users"))
+        .catch(() => this.replacePage("login")
+                         .then(() => this._setValidationOnLoginForm())
+                         .finally(() => super.process()))
+        .finally(() => this.hideDimmer());
   }
 
-  _onLoginChange(event) {
-    event.preventDefault();
-    this._loginInfo.login = event.target.value;
-  }
-
-  _onPasswordChange(event) {
-    event.preventDefault();
-    this._loginInfo.password = event.target.value;
+  _setValidationOnLoginForm() {
+    const loginForm = $(Login.FORM_SELECTOR);
+    loginForm.form({
+                     login: {identifier: "login", rules: [{type: "empty", prompt: "Login is required"}]},
+                     password: {identifier: "password", rules: [{type: "empty", prompt: "Password is required"}]}
+                   }, {
+                     onSuccess: this._signIn.bind(this)
+                   });
   }
 
   _onFormSubmit(event) {
     event.preventDefault();
+    const loginForm = $(Login.FORM_SELECTOR);
+    loginForm.form("validate form");
+  }
+
+  _signIn(event, fields) {
+    event.preventDefault();
     this.showDimmer();
-    this._authorizationService.signIn(this._loginInfo)
-        .catch(error => {
-          this.hideDimmer();
-          if (error.status == 401) {
-            $('form')
-            .form('add errors', [error.response.body]);
-          }
-          return error;
-        })
-        .catch(error => {
-          if (error.status == 422) {
-            this.addErrorsToForm("form", error.response.body);
-          }
-          return error;
-        })
+    this._authorizationService.signIn(fields)
+        .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
         .finally(() => {
-          $('form')
-          .form('clear');
+          $(Login.FORM_SELECTOR)
+          .form("reset");
+          this.hideDimmer();
         });
   }
 }
+
+Login.FORM_SELECTOR = "#loginForm";
 
 export default Login;

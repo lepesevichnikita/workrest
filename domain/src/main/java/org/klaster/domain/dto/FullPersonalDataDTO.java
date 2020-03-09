@@ -9,9 +9,13 @@ package org.klaster.domain.dto;/*
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import org.klaster.domain.builder.concrete.DefaultPersonalDataBuilder;
 import org.klaster.domain.builder.general.PersonalDataBuilder;
 import org.klaster.domain.constant.PersonalDataState;
+import org.klaster.domain.constant.ValidationMessage;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.model.entity.PersonalData;
 
@@ -22,14 +26,20 @@ public class FullPersonalDataDTO {
 
   private long id;
 
+  @NotEmpty(message = ValidationMessage.DOCUMENT_NUMBER_IS_REQUIRED)
   private String documentNumber;
 
+  @NotEmpty(message = ValidationMessage.DOCUMENT_NAME_IS_REQUIRED)
   private String documentName;
 
+  @NotEmpty(message = ValidationMessage.FIRST_NAME_IS_REQUIRED)
   private String firstName;
 
+  @NotEmpty(message = ValidationMessage.LAST_NAME_IS_REQUIRED)
   private String lastName;
 
+  @Valid
+  @NotNull(message = ValidationMessage.ATTACHMENT_IS_REQUIRED)
   private FileInfo attachment;
 
   private PersonalDataState state;

@@ -87,24 +87,27 @@ public class DefaultUserService {
     User user = defaultUserBuilder.setLoginInfo(savedLoginInfo)
                                   .setAuthorities(userAuthorities)
                                   .build();
-    return userRepository.save(user);
+    return userRepository.saveAndFlush(user);
   }
 
+  @Transactional
   public User deleteById(long id) {
     User deletedUser = userRepository.findById(id)
                                      .orElseThrow(EntityNotFoundException::new);
     deletedUser.setCurrentState(new DeletedUserState());
     defaultTokenBasedUserDetailsService.deleteAllTokensByUserId(deletedUser.getId());
-    return userRepository.save(deletedUser);
+    return userRepository.saveAndFlush(deletedUser);
   }
 
+  @Transactional
   public User blockById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
     foundUser.setCurrentState(new BlockedUserState());
-    return userRepository.save(foundUser);
+    return userRepository.saveAndFlush(foundUser);
   }
 
+  @Transactional
   public User unblockById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
@@ -114,22 +117,25 @@ public class DefaultUserService {
         foundUser.setCurrentState(previousState);
       }
     }
-    return userRepository.save(foundUser);
+    return userRepository.saveAndFlush(foundUser);
   }
 
+  @Transactional
   public User findFirstById(long id) {
     return userRepository.findById(id)
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
+  @Transactional
   public User createEmployerProfile(User user, EmployerProfileDTO employerProfileDTO) {
     EmployerProfile employerProfile = defaultEmployerProfileBuilder.setDescription(employerProfileDTO.getDescription())
                                                                    .build();
     user.getCurrentState()
         .updateEmployer(employerProfile);
-    return userRepository.save(user);
+    return userRepository.saveAndFlush(user);
   }
 
+  @Transactional
   public User createFreelancerProfile(User user, FreelancerProfileDTO freelancerProfileDTO) {
     Set<Skill> skills = skillRepository.findAllByNamesOrCreate(freelancerProfileDTO.getSkills());
     FreelancerProfile freelancerProfile = defaultFreelancerProfileBuilder.setDescription(freelancerProfileDTO.getDescription())
@@ -137,16 +143,17 @@ public class DefaultUserService {
                                                                          .build();
     user.getCurrentState()
         .updateFreelancerProfile(freelancerProfile);
-    return userRepository.save(user);
+    return userRepository.saveAndFlush(user);
   }
 
+  @Transactional
   public User verifyById(long id) {
     User foundUser = userRepository.findById(id)
                                    .orElseThrow(EntityNotFoundException::new);
     if (!(foundUser.getCurrentState() instanceof VerifiedUserState)) {
       foundUser.setCurrentState(new VerifiedUserState());
     }
-    return userRepository.save(foundUser);
+    return userRepository.saveAndFlush(foundUser);
   }
 
   public List<User> findAll() {

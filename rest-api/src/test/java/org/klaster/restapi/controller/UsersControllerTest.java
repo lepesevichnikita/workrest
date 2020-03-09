@@ -157,7 +157,7 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
                              .content(registerLoginInfoDTOAsJson))
-           .andExpect(status().isUnprocessableEntity());
+           .andExpect(status().isBadRequest());
   }
 
   @Test

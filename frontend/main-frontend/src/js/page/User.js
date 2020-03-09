@@ -13,28 +13,77 @@ export class User extends Page {
     this._freelancerProfile = {};
     this._employerProfile = {};
     this._job = {};
-    this.addListener(User.Selectors.FREELANCER_DESCRIPTION_INPUT, ["change", this._freelancerDescriptionChange.bind(this), false])
-        .addListener(User.Selectors.FREELANCER_SKILL_ADD_BUTTON, ["click", this._freelancerSkillAddClick.bind(this), false])
+    this.addListener(User.Selectors.FREELANCER_SKILL_ADD_BUTTON, ["click", this._freelancerSkillAddClick.bind(this), false])
         .addListener(User.Selectors.FREELANCER_FORM, ["submit", this._freelancerFormSubmit.bind(this), false])
-        .addListener(User.Selectors.EMPLOYER_DESCRIPTION_INPUT, ["change", this._employerDescriptionChange.bind(this), false])
         .addListener(User.Selectors.EMPLOYER_FORM, ["submit", this._employerFormSubmit.bind(this), false])
-        .addListener(User.Selectors.JOB_DESCRIPTION_INPUT, ["change", this._jobDescriptionChange.bind(this), false])
         .addListener(User.Selectors.JOB_SKILL_ADD_BUTTON, ["click", this._jobSkillAddClick.bind(this), false])
-        .addListener(User.Selectors.JOB_FORM, ["submit", this._jobFormSubmit.bind(this), false]);
+        .addListener(User.Selectors.JOB_FORM, ["submit", this._jobFormSubmit.bind(this), false])
+        .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false])
+        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false]);
   }
 
   process() {
+    this.showDimmer();
     checkIsAuthorized()
     .then(() => {
       this._userService.getCurrentUser()
           .then(response => {
             this._user = response.body;
-            this._renderPage();
-          });
+            if (this._user.freelancerProfile) {
+              this._freelancerProfile = this._user.freelancerProfile;
+            }
+            if (this._freelancerProfile && this._freelancerProfile.skills) {
+              this._freelancerProfile.skills = this._freelancerProfile.skills.map(skill => skill.name);
+            }
+            if (this._user._employerProfile) {
+              this._employerProfile = this._user.employerProfile;
+            }
+          })
+          .then(() => this._renderPage())
+          .then(() => this._initFormsValidators())
     })
     .catch(() => {
       redirectToPage("login");
+    })
+    .finally(() => {
+      this.hideDimmer();
+      super.process();
     });
+  }
+
+  _showModal(event) {
+    event.preventDefault();
+    const targetModalId = event.currentTarget.getAttribute("data-target");
+    $(`#${targetModalId}`)
+    .modal({detachable: false})
+    .modal("show");
+  }
+
+  _initFormsValidators() {
+    const freelancerForm = $(User.Selectors.FREELANCER_FORM);
+    const employerForm = $(User.Selectors.EMPLOYER_FORM);
+    const jobForm = $(User.Selectors.JOB_FORM);
+    freelancerForm.form({
+                          description: {
+                            identifier: "description", rules: [{
+                              type: "empty", prompt: "Description is required"
+                            }]
+                          }
+                        }, {onSuccess: this._updateFreelancerProfile.bind(this)});
+    employerForm.form({
+                        description: {
+                          identifier: "description", rules: [{
+                            type: "empty", prompt: "Description is required"
+                          }]
+                        }
+                      }, {onSuccess: this._updateEmployerProfile.bind(this)});
+    jobForm.form({
+                   description: {
+                     identifier: "description", rules: [{
+                       type: "empty", prompt: "Description is required"
+                     }]
+                   }
+                 }, {onSuccess: this._processJob.bind(this)});
   }
 
   get _jobSkillInput() {
@@ -46,86 +95,116 @@ export class User extends Page {
   }
 
   _renderPage() {
-    this._authorizationService.checkIsAuthorized()
-        .then(() => this._loadData());
-  }
-
-  _loadData() {
-    this.showDimmer();
-    this._userService.getCurrentUser()
-        .then(response => {
-          this.replacePage("user", this._user)
-              .then(() => this.replacePage("user", response.body))
-              .finally(() => super.process());
-        });
-  }
-
-  _freelancerDescriptionChange(event) {
-    event.preventDefault();
-    this._freelancerProfile.description = event.target.value;
-  }
-
-  _employerDescriptionChange(event) {
-    event.preventDefault();
-    this._employerProfile.description = event.target.value;
-  }
-
-  _jobDescriptionChange(event) {
-    event.preventDefault();
-    this._job.description = event.target.value;
+    this.replacePage("user", this._user)
+        .finally(() => super.process());
   }
 
   _freelancerSkillAddClick(event) {
     event.preventDefault();
-    const freelancerSkills = this._freelancerProfile.skills || [];
+    const freelancerSkills = (this._freelancerProfile && this._freelancerProfile.skills) || [];
     const input = this._freelancerSkillInput.value;
     this._freelancerSkillInput.value = "";
     this._splitInputAndPushUniqueToArray(freelancerSkills, input);
     this._freelancerProfile.skills = freelancerSkills;
-    loadTemplate("#freelancerSkills", this._templateHelper.getTemplatePath("general/tags"), {skills: this._freelancerProfile.skills})
-    .then(() => {
-      $("#freelancerSkills span")
-      .click((event) => {
-        event.preventDefault();
-        const skill = event.currentTarget.getAttribute("data-name");
-        let skills = this._freelancerProfile.skills || [];
-        skills = skills.filter(skillInArray => !skillInArray.includes(skill));
-        this._freelancerProfile.skills = skills;
-      });
+    this._renderSkillsInFreelancerProfileForm()
+        .then(() => {
+          $("#freelancerSkills a")
+          .click(this._removeSkillFromFreelancerProfileForm.bind(this));
     });
+  }
+
+  _removeSkillFromFreelancerProfileForm(event) {
+    event.preventDefault();
+    this._removeSkillFromArray(event, "freelancerProfile");
+    $(event.currentTarget)
+    .remove();
+  }
+
+  _removeSkillFromJobForm(event) {
+    event.preventDefault();
+    this._removeSkillFromArray(event, "job");
+    $(event.currentTarget)
+    .remove();
+  }
+
+  _removeSkillFromArray(event, skillsOwner) {
+    const skill = event.currentTarget.getAttribute("data-name");
+    const skillsOwnerName = `_${skillsOwner}`;
+    let skills = this[skillsOwnerName].skills || [];
+    skills = skills.filter(skillInArray => !skillInArray.includes(skill));
+    this[skillsOwnerName].skills = skills;
+  }
+
+  _renderSkillsInContainer(containerSelector, skills) {
+    return loadTemplate(containerSelector, this._templateHelper.getTemplatePath("general/tags"), {skills});
+  }
+
+  _renderSkillsInFreelancerProfileForm() {
+    return this._renderSkillsInContainer("#freelancerSkills", this._freelancerProfile.skills);
+  }
+
+  _renderSkillsInJobForm() {
+    return this._renderSkillsInContainer("#jobSkills", this._job.skills);
   }
 
   _jobSkillAddClick(event) {
     event.preventDefault();
-    const jobSkills = this._job.skills || [];
+    const jobSkills = (this._job && this._job.skills) || [];
     const input = this._jobSkillInput.value;
     this._jobSkillInput.value = "";
     this._splitInputAndPushUniqueToArray(jobSkills, input);
     this._job.skills = jobSkills;
-    console.dir(this._job.skills);
+    this._renderSkillsInJobForm()
+        .then(() => {
+          $("#jobSkills a")
+          .click(this._removeSkillFromJobForm.bind(this));
+        });
   }
 
   _freelancerFormSubmit(event) {
     event.preventDefault();
-    this.showDimmer();
-    this._userService.updateFreelancerProfile(this._freelancerProfile)
-        .then(response => this.replacePage("user", response.body));
+    const freelancerForm = $(User.Selectors.FREELANCER_FORM);
+    freelancerForm.form("validate form");
   }
 
   _employerFormSubmit(event) {
     event.preventDefault();
-    this.showDimmer();
-    this._userService.updateEmployerProfile(this._employerProfile)
-        .then(response => this.replacePage("user", response.body))
-        .finally(() => this.hideDimmer());
+    const employerForm = $(User.Selectors.EMPLOYER_FORM);
+    employerForm.form("validate form");
   }
 
   _jobFormSubmit(event) {
     event.preventDefault();
+    const jobForm = $(User.Selectors.JOB_FORM);
+    jobForm.form("validate form");
+  }
+
+  _updateEmployerProfile(event, fields) {
     this.showDimmer();
-    this._jobService.createJob(this._job)
-        .then(() => this._loadData())
+    this._userService.updateEmployerProfile(fields)
+        .then(response => this.replacePage("user", response.body))
         .finally(() => this.hideDimmer());
+  }
+
+  _updateFreelancerProfile(event, fields) {
+    this.showDimmer();
+    fields.skills = this._freelancerProfile.skills;
+    this._userService.updateFreelancerProfile(this._freelancerProfile)
+        .then(response => this.replacePage("user", response.body))
+        .finally(() => this.hideDimmer());
+  }
+
+  _processJob(event, fields) {
+    this.showDimmer();
+    let promise = null;
+    fields.skills = this._job.skills;
+    if (fields.id == 0) {
+      promise = this._jobService.createJob(this._job);
+    } else {
+      promise = this._jobService.updateJob(fields.id, fields);
+    }
+    promise.then(() => this._renderPage())
+           .finally(() => this.hideDimmer());
   }
 
   _splitInputAndPushUniqueToArray(array, input) {
@@ -141,6 +220,8 @@ export class User extends Page {
 }
 
 User.Selectors = {
+  FREELANCER_PROFILE_UPDATE_BUTTON: "#freelancerProfile .ui.button[data-action=update]",
+  EMPLOYER_PROFILE_UPDATE_BUTTON: "#employerProfile .ui.button[data-action=update]",
   FREELANCER_SKILL_ADD_BUTTON: "#freelancerProfileForm a[data-action=skillAdd]",
   FREELANCER_SKILL_INPUT: "#freelancerProfileForm input[name=skill]",
   JOB_SKILL_ADD_BUTTON: "#jobForm a[data-action=skillAdd]",

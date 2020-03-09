@@ -1,8 +1,8 @@
-import {AuthorizationService} from "./api";
+import { AuthorizationService } from "./api";
 
-import {Action} from "./constant";
-import {TemplateHelper} from "./helper";
-import {Login, PersonalData, Users} from "./page";
+import { Action } from "./constant";
+import { TemplateHelper } from "./helper";
+import { Login, PersonalData, Users } from "./page";
 
 const menuContainerId = "#menu";
 const templateHelper = new TemplateHelper();
@@ -19,14 +19,13 @@ const loadMenu = menuName => {
    .done(menuTemplate => {
      $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
-     $(".ui.link")
-     .click(function (event) {
+     const links = $(".ui.link");
+     links.click(function(event) {
        event.preventDefault();
        redirectToPage($(this)
                       .attr("name"));
      });
-     $(".ui.link")
-     .unbind();
+     links.unbind();
      $("#signout")
      .click(function (event) {
        event.preventDefault();

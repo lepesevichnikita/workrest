@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,7 +76,7 @@ public class PersonalDataController {
   }
 
   @PutMapping
-  public ResponseEntity<FullPersonalDataDTO> updateForCurrentUser(@RequestBody FullPersonalDataDTO personalDataDTO,
+  public ResponseEntity<FullPersonalDataDTO> updateForCurrentUser(@Validated @RequestBody FullPersonalDataDTO personalDataDTO,
                                                                   @AuthenticationPrincipal User currentUser) {
     PersonalData updatedPersonalData = defaultPersonalDataService.updateByUserId(currentUser.getId(), personalDataDTO.toPersonalData());
     FullPersonalDataDTO personalDataForAdministratorDTO = FullPersonalDataDTO.fromPersonalData(updatedPersonalData);

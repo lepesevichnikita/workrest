@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 @PropertySource(PropertyClassPath.APPLICATION)
 public class HibernateProperties extends Properties {
-
   @Value(HibernatePropertyKey.HIBERNATE_DIALECT)
   private String dialect;
 

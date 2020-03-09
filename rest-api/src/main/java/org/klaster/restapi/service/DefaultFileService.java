@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import org.apache.commons.io.FileExistsException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.klaster.domain.builder.general.FileInfoBuilder;
 import org.klaster.domain.model.entity.FileInfo;
 import org.klaster.domain.repository.FileInfoRepository;
@@ -38,6 +40,8 @@ import org.springframework.util.DigestUtils;
 @Service
 @Transactional
 public class DefaultFileService {
+
+  private Log logger = LogFactory.getLog(getClass());
 
   private FileInfoBuilder defaultFileInfoBuilder;
 
@@ -92,7 +96,11 @@ public class DefaultFileService {
     if (Files.notExists(deletedFile.toPath())) {
       throw new FileNotFoundException();
     }
-    Files.delete(deletedFile.toPath());
+    try {
+      Files.delete(deletedFile.toPath());
+    } catch (IOException exception) {
+      logger.error(exception);
+    }
     return removedFileInfo;
   }
 

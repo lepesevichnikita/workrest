@@ -1,10 +1,8 @@
 import { TemplateHelper } from "../helper";
 import { loadTemplate, redirectToPage } from "../main.js";
-import { Component } from "./Component.js";
 
-export class Page extends Component {
+export class Page {
   constructor() {
-    super();
     this._eventsListeners = {};
     this._templateHelper = new TemplateHelper();
     this.addListener(".ui.link", ["click", this._onLinkClick.bind(this), false]);
@@ -30,15 +28,24 @@ export class Page extends Component {
     .dimmer("hide");
   }
 
+  addErrorsToForm(formSelector, errors) {
+    const globalErrors = errors.globalErrors || [];
+    delete errors.globalErrors;
+    const form = $(formSelector);
+    form.form("add errors", [...Object.values(errors), ...globalErrors]);
+    Object.keys(errors)
+          .forEach(fieldName => {
+            const message = errors[fieldName];
+            form.form("add prompt", fieldName, message);
+          });
+  }
+
   replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
     this.showDimmer();
-    return new Promise((resolve, reject) => {
-      loadTemplate(pageSelector, this._templateHelper.getPagePath(pageName.toLowerCase()), pageData)
-      .then(resolve)
-      .catch(reject)
-      .finally(() => this.hideDimmer());
-    });
+    return new Promise((resolve, reject) => loadTemplate(pageSelector, this._templateHelper.getPagePath(pageName.toLowerCase()), pageData)
+    .then(resolve)
+    .catch(reject)).finally(() => this.hideDimmer());
   }
 
   _initializeListeners() {

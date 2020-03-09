@@ -14,13 +14,11 @@ export class Users extends Page {
   }
 
   process() {
+    this.showDimmer();
     this._authorizationService.checkIsAuthorized()
-        .then(() => {
-          this._loadData();
-        })
-        .catch(() => {
-          redirectToPage("login");
-        });
+        .then(() => this._loadData())
+        .catch(() => redirectToPage("login"))
+        .finally(() => this.hideDimmer());
   }
 
   _onRestoreClick(event) {
@@ -28,7 +26,8 @@ export class Users extends Page {
     this.showDimmer();
     const userId = event.currentTarget.getAttribute("data-id");
     this._userService.restoreUser(userId)
-        .then(() => this._loadData());
+        .then(() => this._loadData())
+        .finally(() => this.hideDimmer());
   }
 
   _onUnblockClick(event) {
@@ -36,7 +35,8 @@ export class Users extends Page {
     this.showDimmer();
     const userId = event.currentTarget.getAttribute("data-id");
     this._userService.unblockUser(userId)
-        .then(() => this._loadData());
+        .then(() => this._loadData())
+        .finally(() => this.hideDimmer());
   }
 
   _onDeleteClick(event) {
@@ -44,7 +44,8 @@ export class Users extends Page {
     this.showDimmer();
     const userId = event.currentTarget.getAttribute("data-id");
     this._userService.deleteUser(userId)
-        .then(() => this._loadData());
+        .then(() => this._loadData())
+        .finally(() => this.hideDimmer());
   }
 
   _onBlockClick(event) {
@@ -52,14 +53,17 @@ export class Users extends Page {
     this.showDimmer();
     const userId = event.currentTarget.getAttribute("data-id");
     this._userService.blockUser(userId)
-        .then(() => this._loadData());
+        .then(() => this._loadData())
+        .finally(() => this.hideDimmer());
   }
 
   _loadData() {
     this._userService.getUsers()
-        .then(response => this.replacePage("users", {kek: "kek", users: response.body})
-                              .catch(console.error)
-                              .finally(() => super.process()));
+        .then(response => this._users = response.body)
+        .then(() => console.dir(this._users))
+        .then(() => this.replacePage("users", {users: this._users})
+                        .catch(console.error))
+        .finally(() => super.process());
   }
 }
 

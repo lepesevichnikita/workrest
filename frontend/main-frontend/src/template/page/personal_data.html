@@ -14,6 +14,9 @@
                 name="firstName"
                 placeholder="Enter your first name"
                 type="text"
+                firstName}} value="${firstName}"
+                {{
+                {{if/if}}
             />
           </div>
         </div>
@@ -24,6 +27,9 @@
                 name="lastName"
                 placeholder="Enter your last name"
                 type="text"
+                lastName}} value="${lastName}"
+                {{
+                {{if/if}}
             />
           </div>
         </div>
@@ -34,6 +40,9 @@
                 name="documentName"
                 placeholder="Enter document name"
                 type="text"
+                documentName}} value="${documentName}"
+                {{
+                {{if/if}}
             />
           </div>
         </div>
@@ -44,16 +53,26 @@
                 name="documentNumber"
                 placeholder="Enter document number"
                 type="text"
+                documentNumber}} value="${documentNumber}"
+                {{
+                {{if/if}}
             />
           </div>
         </div>
+        <img !=null}}
+             attachment class="ui fluid image" src="http://localhost:9091/file/${attachment.id}"
+             {{
+             {{if/if}}
+        >
         <div class="field">
           <div class="ui labeled icon fluid button" id="fileChooseButton">
             <i class="file icon"></i>
             Choose document scan
           </div>
           <label class="centered label" for="fileChooseButton">
+            {{if !attachment}}
             File not selected
+            {{/if}}
           </label>
           <div
               class="ui small indicating progress"
@@ -71,6 +90,7 @@
             value="Send"
         />
       </div>
+      <div class="ui error message"></div>
     </form>
     <input hidden name="file" type="file"/>
   </div>

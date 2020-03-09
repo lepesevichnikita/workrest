@@ -11,6 +11,7 @@ package org.klaster.restapi.advice;
 
 import java.io.FileNotFoundException;
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class DefaultControllerAdvice {
 
   protected final Log logger = LogFactory.getLog(this.getClass());
+  private static final String GLOBAL_ERRORS = "globalErrors";
 
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<?> handle(EntityNotFoundException exception) {
@@ -88,14 +90,13 @@ public class DefaultControllerAdvice {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<Object, Object>> handle(MethodArgumentNotValidException exception) {
-    final String globalErrors = "globalErrors";
     logger.error(exception);
     Map<Object, Object> response = new LinkedHashMap<>();
-    response.put(globalErrors, exception.getBindingResult()
-                                        .getGlobalErrors()
-                                        .stream()
-                                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                                        .collect(Collectors.toList()));
+    response.put(GLOBAL_ERRORS, exception.getBindingResult()
+                                         .getGlobalErrors()
+                                         .stream()
+                                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                         .collect(Collectors.toList()));
     exception.getBindingResult()
              .getFieldErrors()
              .forEach(fieldError -> response.put(fieldError.getField(), fieldError.getDefaultMessage()));
@@ -105,7 +106,7 @@ public class DefaultControllerAdvice {
   private ResponseEntity<Map<Object, Object>> handleException(Exception exception, HttpStatus httpStatus) {
     logger.error(exception);
     Map<Object, Object> result = new LinkedHashMap<>();
-    result.put("globalErrors", exception.getMessage());
+    result.put(GLOBAL_ERRORS, Collections.singletonList(exception.getMessage()));
     return new ResponseEntity<>(result, httpStatus);
   }
 }
