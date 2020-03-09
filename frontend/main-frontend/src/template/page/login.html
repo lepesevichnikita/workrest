@@ -4,22 +4,21 @@
       <i class="sign-in icon"></i>
       Log-in to your account
     </h1>
-    <form class="ui large form" enctype="" id="loginForm">
-      <div class="ui segment">
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="user icon"></i>
-            <input name="login" placeholder="Enter your login" type="text">
-          </div>
+    <form class="ui large form segment" id="loginForm">
+      <div class="field">
+        <div class="ui left icon input">
+          <i class="user icon"></i>
+          <input name="login" placeholder="Enter your login" type="text">
         </div>
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="lock icon"></i>
-            <input name="password" placeholder="Enter your password" type="password">
+      </div>
+      <div class="field">
+        <div class="ui left icon input">
+          <i class="lock icon"></i>
+          <input name="password" placeholder="Enter your password" type="password">
           </div>
         </div>
         <input class="ui fluid large primary submit button" type="submit" value="Submit"/>
-      </div>
+      <div class="ui error message"></div>
     </form>
 
     <div class="ui message">

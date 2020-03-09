@@ -215,7 +215,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
                                .contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isAccepted())
            .andExpect(jsonPath("$.description").value(randomJob.getDescription()))
-           .andExpect(jsonPath("$.states[0].name").value(JobStateName.DELETED))
+           .andExpect(jsonPath("$.currentState.name").value(JobStateName.DELETED))
            .andExpect(jsonPath("$.employerProfile").doesNotExist())
            .andExpect(jsonPath("$.skills.*").value(not(empty())));
   }

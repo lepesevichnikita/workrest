@@ -28,6 +28,18 @@ export class Page {
     .dimmer("hide");
   }
 
+  addErrorsToForm(formSelector, errors) {
+    const globalErrors = errors.globalErrors || [];
+    delete errors.globalErrors;
+    const form = $(formSelector);
+    form.form("add errors", [...Object.values(errors), ...globalErrors]);
+    Object.keys(errors)
+          .forEach(fieldName => {
+            const message = errors[fieldName];
+            form.form("add prompt", fieldName, message);
+          });
+  }
+
   replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
     this.showDimmer();

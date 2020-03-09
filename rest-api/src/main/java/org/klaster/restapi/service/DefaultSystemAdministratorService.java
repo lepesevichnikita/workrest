@@ -54,6 +54,7 @@ public class DefaultSystemAdministratorService {
   @Autowired
   private LoginInfoRepository loginInfoRepository;
 
+  @Transactional
   public User getSystemAdministrator() {
     LoginInfo systemAdministratorLoginInfo = defaultLoginInfoService.findFirstByLoginAndPassword(systemAdministratorProperties.getLogin(),
                                                                                                  systemAdministratorProperties.getPassword());
@@ -62,6 +63,7 @@ public class DefaultSystemAdministratorService {
                                : userRepository.findFirstByLoginInfo(systemAdministratorLoginInfo);
     if (isInvalidSystemAdministrator(systemAdministrator)) {
       userRepository.delete(systemAdministrator);
+      userRepository.flush();
       systemAdministrator = createSystemAdministrator();
     }
     return systemAdministrator;

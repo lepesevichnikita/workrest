@@ -1,6 +1,6 @@
-import { JobService } from "../api";
-import { limitContentText } from "../main.js";
-import { Page } from "./Page.js";
+import {JobService} from "../api";
+import {limitContentText} from "../main.js";
+import {Page} from "./Page.js";
 
 export class Jobs extends Page {
   constructor(props) {
@@ -25,36 +25,38 @@ export class Jobs extends Page {
         .then(response => {
           const jobs = response.body;
           $.get(this.templateHelper.getTemplatePath(this._cardTemplateName), cardBody => {
-            $.tmpl(cardBody, jobs)
-             .appendTo(this._containerSelector);
-            limitContentText(this._cardDescriptionSelector, this._maxDescriptionLength);
-            $.get(this.templateHelper.getTemplatePath(this._popupTemplateName), popupBody => {
-              $(this._modalsSelector)
-              .remove();
-              $.tmpl(popupBody, jobs)
-               .appendTo(this._containerSelector);
-              $(this._containerSelector)
-              .dimmer("hide");
-              $(this._cardSelector)
-              .unbind();
-              $(this._cardSelector)
-              .click(event => {
-                event.preventDefault();
-                const item = $(event.currentTarget);
-                const id = item.attr("id");
-                $(this._getModalSelectorById(id))
-                .modal("show");
-              });
-            });
-          }
-      );
-    });
+                  $.tmpl(cardBody, jobs)
+                   .appendTo(this._containerSelector);
+                  limitContentText(this._cardDescriptionSelector, this._maxDescriptionLength);
+                  $.get(this.templateHelper.getTemplatePath(this._popupTemplateName), popupBody => {
+                    $(this._modalsSelector)
+                    .remove();
+                    $.tmpl(popupBody, jobs)
+                     .appendTo(this._containerSelector);
+                    $(this._containerSelector)
+                    .dimmer("hide");
+                    $(this._cardSelector)
+                    .unbind();
+                    $(this._cardSelector)
+                    .click(event => {
+                      event.preventDefault();
+                      const item = $(event.currentTarget);
+                      const id = item.attr("id");
+                      $(this._getModalSelectorById(id))
+                      .modal("show");
+                    });
+                  });
+                }
+          );
+        });
   }
 
   process() {
+    this.showDimmer();
     this.replacePage("jobs")
         .then(() => this._loadData())
-        .then(() => super.process());
+        .then(() => super.process())
+        .finally(() => this.hideDimmer());
   }
 }
 

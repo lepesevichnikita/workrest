@@ -9,6 +9,7 @@ package org.klaster.restapi.factory;
 
 import org.klaster.domain.builder.concrete.DefaultLoginInfoBuilder;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.constant.LoginInfoConstraint;
 import org.klaster.domain.model.entity.LoginInfo;
 
 /**
@@ -44,7 +45,7 @@ public class RandomLoginInfoFactory extends AbstractRandomFactory<LoginInfo> {
 
   private String getPassword() {
     return getFaker().internet()
-                     .password();
+                     .password(LoginInfoConstraint.MIN_PASSWORD_LENGTH, LoginInfoConstraint.MAX_PASSWORD_LENGTH);
   }
 
   public LoginInfo build() {

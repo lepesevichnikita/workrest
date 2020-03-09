@@ -17,38 +17,6 @@
   <name>WorkRest</name>
   <url>https://github.com/lepesevichnikita/${project.artifactId}</url>
 
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <argLine></argLine>
-    <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
-    <sonar.organization>lepesevichnikita</sonar.organization>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <!--suppress UnresolvedMavenProperty -->
-    <sonar.login>${env.SONAR_TOKEN}</sonar.login>
-    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-    <sonar.language>java</sonar.language>
-  </properties>
-
-  <modules>
-    <module>domain</module>
-    <module>rest-api</module>
-  </modules>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>7.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <version>2.2</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <pluginManagement>
       <!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
@@ -72,6 +40,7 @@
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>0.8.5</version>
           <configuration>
+            <destFile>${sonar.jacoco.reportPath}</destFile>
             <append>true</append>
           </configuration>
           <executions>
@@ -157,4 +126,37 @@
       </plugin>
     </plugins>
   </build>
+
+  <modules>
+    <module>domain</module>
+    <module>rest-api</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>7.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>2.2</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <argLine></argLine>
+    <sonar.projectKey>lepesevichnikita_workrest</sonar.projectKey>
+    <sonar.organization>lepesevichnikita</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <!--suppress UnresolvedMavenProperty -->
+    <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.jacoco.xmlReportPaths>${project.basedir}/../target/jacoco.xml</sonar.jacoco.xmlReportPaths>
+    <sonar.language>java</sonar.language>
+  </properties>
 </project>

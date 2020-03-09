@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
 /**
- * LoginInfo
+ * LoginInfoConstraint
  *
  * @author Nikita Lepesevich
  */

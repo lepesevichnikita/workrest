@@ -1,4 +1,4 @@
-import { redirectToPage } from "../main.js";
+import {redirectToPage} from "../main.js";
 import Page from "./Page.js";
 
 export class Login extends Page {
@@ -33,7 +33,24 @@ export class Login extends Page {
     event.preventDefault();
     this.showDimmer();
     this._authorizationService.signIn(this._loginInfo)
-        .finally(() => this.hideDimmer());
+        .catch(error => {
+          this.hideDimmer();
+          if (error.status == 401) {
+            $('form')
+            .form('add errors', [error.response.body]);
+          }
+          return error;
+        })
+        .catch(error => {
+          if (error.status == 422) {
+            this.addErrorsToForm("form", error.response.body);
+          }
+          return error;
+        })
+        .finally(() => {
+          $('form')
+          .form('clear');
+        });
   }
 }
 

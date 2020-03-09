@@ -10,6 +10,8 @@ package org.klaster.domain.dto;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
+import javax.validation.constraints.NotEmpty;
+import org.klaster.domain.constant.ValidationMessage;
 import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.entity.Skill;
@@ -24,6 +26,8 @@ import org.klaster.domain.serializer.LocalDateTimeSerializer;
 public class JobDTO {
 
   private String[] skills;
+
+  @NotEmpty(message = ValidationMessage.DESCRIPTION_IS_REQUIRED)
   private String description;
 
   @JsonSerialize(using = LocalDateTimeSerializer.class)

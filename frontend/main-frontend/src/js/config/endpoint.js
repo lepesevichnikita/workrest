@@ -8,7 +8,8 @@ export const endpoint = {
   file: {
     root: "file"
   }, jobs: {
-    root: "jobs"
+    root: "jobs",
+    all: "jobs/all"
   }
 };
 

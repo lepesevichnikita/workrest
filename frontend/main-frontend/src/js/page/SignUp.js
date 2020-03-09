@@ -1,5 +1,5 @@
-import { redirectToPage } from "../main.js";
-import { Page } from "./Page.js";
+import {redirectToPage} from "../main.js";
+import {Page} from "./Page.js";
 
 export class SignUp extends Page {
   constructor(props) {
@@ -35,7 +35,18 @@ export class SignUp extends Page {
   _onFormSubmit(event) {
     event.preventDefault();
     this.showDimmer();
-    this._authorizationService.signUp(this._loginInfo);
+    this._authorizationService.signUp(this._loginInfo)
+        .catch(error => {
+          if (error.status == 422) {
+            this.addErrorsToForm("form", error.response.body);
+          }
+          return error;
+        })
+        .finally(() => {
+          $('form')
+          .form('clear');
+          this.hideDimmer()
+        });
   }
 
   _onPasswordConfirmationChange(event) {
@@ -45,7 +56,7 @@ export class SignUp extends Page {
 
   _onEulaAgreedChange(event) {
     event.preventDefault();
-    this._loginInfo.eulaAgreed = event.target.value;
+    this._loginInfo.eulaAgreed = event.target.value == 'on';
   }
 }
 

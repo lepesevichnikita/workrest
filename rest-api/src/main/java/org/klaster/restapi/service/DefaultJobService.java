@@ -81,7 +81,7 @@ public class DefaultJobService {
     validateJobBelongsToUser(foundJob, user);
     if (!(foundJob.getCurrentState() instanceof StartedJobState)) {
       foundJob.setCurrentState(new StartedJobState());
-      foundJob = jobRepository.save(foundJob);
+      foundJob = jobRepository.saveAndFlush(foundJob);
     }
     return foundJob;
   }

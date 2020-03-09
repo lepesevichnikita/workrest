@@ -1,5 +1,5 @@
-import { endpoint } from "../config";
-import { RestClient } from "./RestClient.js";
+import {endpoint} from "../config";
+import {RestClient} from "./RestClient.js";
 
 export class JobService {
   constructor(props) {
@@ -7,7 +7,7 @@ export class JobService {
     this._restClient = new RestClient();
   }
 
-  deleteJob(jobId, jobData) {
+  deleteJob(jobId) {
     return new Promise((resolve, reject) => {
       this._restClient.delete(`${endpoint.jobs.root}/${jobId}`)
           .secured(this._authorizationService.getToken().token)
@@ -20,6 +20,7 @@ export class JobService {
     return new Promise((resolve, reject) => {
       this._restClient.put(`${endpoint.jobs.root}/${jobId}`)
           .secured(this._authorizationService.getToken().token)
+          .send(jobData)
           .then(resolve)
           .catch(reject);
     })
@@ -29,6 +30,7 @@ export class JobService {
     return new Promise((resolve, reject) => {
       this._restClient.post(endpoint.jobs.root)
           .secured(this._authorizationService.getToken().token)
+          .send(jobData)
           .then(resolve)
           .catch(reject);
     })
@@ -36,7 +38,7 @@ export class JobService {
 
   getJobs() {
     return new Promise((resolve, reject) => {
-      this._restClient.get(endpoint.jobs.root)
+      this._restClient.get(endpoint.jobs.all)
           .then(resolve)
           .catch(reject);
     })

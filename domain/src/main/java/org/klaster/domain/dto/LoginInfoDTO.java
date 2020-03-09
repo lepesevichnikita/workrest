@@ -11,8 +11,10 @@ package org.klaster.domain.dto;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.constraints.NotEmpty;
 import org.klaster.domain.builder.concrete.DefaultLoginInfoBuilder;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
+import org.klaster.domain.constant.ValidationMessage;
 import org.klaster.domain.model.entity.LoginInfo;
 
 public class LoginInfoDTO {
@@ -20,8 +22,11 @@ public class LoginInfoDTO {
   @JsonIgnore
   private LoginInfoBuilder defaultLoginInfoBuilder;
 
-  private String password;
+  @NotEmpty(message = ValidationMessage.LOGIN_IS_REQUIRED)
   private String login;
+
+  @NotEmpty(message = ValidationMessage.PASSWORD_IS_REQUIRED)
+  private String password;
 
   public LoginInfoDTO() {
     defaultLoginInfoBuilder = new DefaultLoginInfoBuilder();

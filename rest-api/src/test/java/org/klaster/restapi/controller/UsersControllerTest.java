@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.klaster.domain.builder.general.LoginInfoBuilder;
 import org.klaster.domain.constant.UserStateName;
+import org.klaster.domain.constant.ValidationMessage;
 import org.klaster.domain.dto.EmployerProfileDTO;
 import org.klaster.domain.dto.FreelancerProfileDTO;
 import org.klaster.domain.dto.LoginInfoDTO;
+import org.klaster.domain.dto.RegisterLoginInfoDTO;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
@@ -125,10 +127,10 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   @Test
   public void createdForPostWithValidLoginInfo() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    final String registerLoginInfoDTOAsJson = objectMapper.writeValueAsString(RegisterLoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
-                             .content(loginInfoDTOAsJson))
+                             .content(registerLoginInfoDTOAsJson))
            .andExpect(status().isCreated())
            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
            .andExpect(jsonPath("$.id").isNotEmpty())
@@ -140,10 +142,10 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     randomLoginInfo.setLogin(systemAdministratorProperties.getLogin());
     randomLoginInfo.setPassword(systemAdministratorProperties.getPassword());
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    final String registerLoginInfoDTOAsJson = objectMapper.writeValueAsString(RegisterLoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
-                             .content(loginInfoDTOAsJson))
+                             .content(registerLoginInfoDTOAsJson))
            .andExpect(status().isUnprocessableEntity());
   }
 
@@ -151,13 +153,12 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
   public void unprocessableEntityForPostWithNonUniqueLogin() throws Exception {
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
     defaultUserService.registerUserByLoginInfo(randomLoginInfo);
-    final String loginInfoDTOAsJson = objectMapper.writeValueAsString(LoginInfoDTO.fromLoginInfo(randomLoginInfo));
+    final String registerLoginInfoDTOAsJson = objectMapper.writeValueAsString(RegisterLoginInfoDTO.fromLoginInfo(randomLoginInfo));
     mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
                              .accept(MediaType.APPLICATION_JSON)
-                             .content(loginInfoDTOAsJson))
+                             .content(registerLoginInfoDTOAsJson))
            .andExpect(status().isUnprocessableEntity());
   }
-
 
   @Test
   public void unauthorizedForDeleteWithInvalidToken() throws Exception {
@@ -322,6 +323,38 @@ public class UsersControllerTest extends AbstractTestNGSpringContextTests {
                             .accept(MediaType.APPLICATION_JSON)
                             .content(freelancerProfileDTOAsJson))
            .andExpect(unauthenticated());
+  }
+
+  @Test
+  public void unprocessableEntityWithErrorMessagesForPostWithBadRegisterLoginInfoDTO() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    RegisterLoginInfoDTO registerLoginInfoDTO = RegisterLoginInfoDTO.fromLoginInfo(randomLoginInfo);
+    registerLoginInfoDTO.setEulaAgreed(false);
+    registerLoginInfoDTO.setLogin("");
+    registerLoginInfoDTO.setPassword("");
+    registerLoginInfoDTO.setPasswordConfirmation("");
+    final String registerLoginInfoDTOAsJson = objectMapper.writeValueAsString(registerLoginInfoDTO);
+    mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .content(registerLoginInfoDTOAsJson))
+           .andExpect(status().isUnprocessableEntity())
+           .andExpect(jsonPath("$.login").value(ValidationMessage.LOGIN_IS_REQUIRED))
+           .andExpect(jsonPath("$.password").value(ValidationMessage.PASSWORD_IS_REQUIRED))
+           .andExpect(jsonPath("$.passwordConfirmation").value(ValidationMessage.PASSWORD_CONFIRMATION_IS_REQUIRED))
+           .andExpect(jsonPath("$.eulaAgreed").value(ValidationMessage.EULA_AGREE_REQUIRED));
+  }
+
+  @Test
+  public void unprocessableEntityWithErrorMessagesForPostWithBadPasswords() throws Exception {
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, CONTROLLER_NAME);
+    RegisterLoginInfoDTO registerLoginInfoDTO = RegisterLoginInfoDTO.fromLoginInfo(randomLoginInfo);
+    registerLoginInfoDTO.setPasswordConfirmation("1");
+    final String registerLoginInfoDTOAsJson = objectMapper.writeValueAsString(registerLoginInfoDTO);
+    mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON)
+                             .accept(MediaType.APPLICATION_JSON)
+                             .content(registerLoginInfoDTOAsJson))
+           .andExpect(status().isUnprocessableEntity())
+           .andExpect(jsonPath("$.globalErrors[0]").value(ValidationMessage.PASSWORDS_MUST_MATCH));
   }
 
   private void registerAdministrator() {
