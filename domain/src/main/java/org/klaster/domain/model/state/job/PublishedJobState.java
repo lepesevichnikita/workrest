@@ -3,6 +3,7 @@ package org.klaster.domain.model.state.job;
 import javax.persistence.Entity;
 import org.klaster.domain.constant.JobStateName;
 import org.klaster.domain.model.context.Job;
+import org.klaster.domain.model.entity.FreelancerProfile;
 
 /**
  * PublishedJobState
@@ -23,5 +24,11 @@ public class PublishedJobState extends AbstractJobState {
   @Override
   public String getName() {
     return JobStateName.PUBLISHED;
+  }
+
+  @Override
+  public void setFreelancerProfile(FreelancerProfile freelancerProfile) {
+    getContext().setFreelancerProfile(freelancerProfile);
+    freelancerProfile.getJobs().add(getContext());
   }
 }

@@ -7,25 +7,44 @@
       </h2>
     </a>
     <div class="ui four doubling stackable cards" id="job-cards">
-    </div>
-    <div class="ui segment">
-      <div class="ui pagination menu">
-        <a class="active item">
-          1
-        </a>
-        <div class="disabled item">
-          ...
+      {{if jobs}}
+      {{each jobs}}
+      <div class="ui card">
+        <div class="content">
+          <div class="meta">${$value.endDateTime}</div>
+          <div class="description">
+            ${$value.description}
+          </div>
         </div>
-        <a class="item">
-          10
-        </a>
-        <a class="item">
-          11
-        </a>
-        <a class="item">
-          12
-        </a>
+        <div class="extra content">
+          {{each $value.skills}}
+          <span class="ui label">${$value.name}</span>
+          {{/each}}
+        </div>
+        <div class="ui animated button basic bottom attached primary" data-action="show" data-target="job${$value.id}">
+          <div class="hidden content">See</div>
+          <div class="visible content">
+            <i class="eye icon"></i>
+          </div>
+        </div>
       </div>
+      <div class="ui modal" id="job${id}">
+        <i class="close icon"></i>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Description</div>
+            <p>${description}</p>
+          </div>
+        </div>
+        <div class="extra content">
+          {{each $value.skills}}
+          <span class="ui label">${$value.name}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/each}}
+      {{/if}}
     </div>
   </div>
+</div>
 </div>

@@ -27,6 +27,7 @@ import org.klaster.domain.model.state.user.AbstractUserState;
 import org.klaster.domain.model.state.user.BlockedUserState;
 import org.klaster.domain.model.state.user.DeletedUserState;
 import org.klaster.domain.model.state.user.VerifiedUserState;
+import org.klaster.domain.repository.FreelancerProfileRepository;
 import org.klaster.domain.repository.LoginInfoRepository;
 import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.repository.UserAuthorityRepository;
@@ -48,6 +49,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultUserService {
 
   private static String[] userAuthoritiesNames = {AuthorityName.USER};
+
+  @Autowired
+  private FreelancerProfileRepository freelancerProfileRepository;
 
   @Autowired
   private UserRepository userRepository;
@@ -127,7 +131,7 @@ public class DefaultUserService {
   }
 
   @Transactional
-  public User createEmployerProfile(User user, EmployerProfileDTO employerProfileDTO) {
+  public User updateEmployerProfile(User user, EmployerProfileDTO employerProfileDTO) {
     EmployerProfile employerProfile = defaultEmployerProfileBuilder.setDescription(employerProfileDTO.getDescription())
                                                                    .build();
     user.getCurrentState()
@@ -136,14 +140,15 @@ public class DefaultUserService {
   }
 
   @Transactional
-  public User createFreelancerProfile(User user, FreelancerProfileDTO freelancerProfileDTO) {
+  public User updateFreelancerProfile(User user, FreelancerProfileDTO freelancerProfileDTO) {
     Set<Skill> skills = skillRepository.findAllByNamesOrCreate(freelancerProfileDTO.getSkills());
     FreelancerProfile freelancerProfile = defaultFreelancerProfileBuilder.setDescription(freelancerProfileDTO.getDescription())
                                                                          .setSkills(skills)
                                                                          .build();
     user.getCurrentState()
         .updateFreelancerProfile(freelancerProfile);
-    return userRepository.saveAndFlush(user);
+    FreelancerProfile finalFreelancerProfile = freelancerProfileRepository.saveAndFlush(user.getFreelancerProfile());
+    return finalFreelancerProfile.getOwner();
   }
 
   @Transactional

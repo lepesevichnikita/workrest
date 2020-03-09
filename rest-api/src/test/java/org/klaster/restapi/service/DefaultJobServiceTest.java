@@ -75,7 +75,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void createsJobForVerifiedUserWithEmployerProfile() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     assertThat(createdJob, allOf(
@@ -91,7 +91,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobCreateForBlockedUserWithEmployerProfile() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    defaultUserService.createEmployerProfile(verifiedUser,
+    defaultUserService.updateEmployerProfile(verifiedUser,
                                              EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User blockedUser = defaultUserService.blockById(registeredUser.getId());
     defaultJobService.create(JobDTO.fromJob(randomJob), blockedUser);
@@ -101,7 +101,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobCreateForDeletedUserWithEmployerProfile() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    defaultUserService.createEmployerProfile(verifiedUser,
+    defaultUserService.updateEmployerProfile(verifiedUser,
                                              EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User deletedUser = defaultUserService.deleteById(registeredUser.getId());
     defaultJobService.create(JobDTO.fromJob(randomJob), deletedUser);
@@ -125,7 +125,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void deletesJobForVerifiedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     Job deletedJob = defaultJobService.deleteById(createdJob.getId(), userWithEmployerProfile);
@@ -144,7 +144,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void doesntDeleteTwice() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     Job deletedJob = defaultJobService.deleteById(createdJob.getId(), userWithEmployerProfile);
@@ -162,7 +162,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobDeleteByBlockedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     User blockedUser = defaultUserService.blockById(userWithEmployerProfile.getId());
@@ -173,7 +173,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobDeleteByDeletedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     User deletedUser = defaultUserService.deleteById(userWithEmployerProfile.getId());
@@ -184,7 +184,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void updatesPublishedJob() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     JobDTO jobUpdate = JobDTO.fromJob(randomJobFactory.build());
@@ -201,7 +201,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobUpdateByDeletedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     User deletedUser = defaultUserService.deleteById(userWithEmployerProfile.getId());
@@ -212,7 +212,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtJobUpdateByBlockedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     User blockedUser = defaultUserService.blockById(userWithEmployerProfile.getId());
@@ -223,7 +223,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtStartedJobUpdated() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.startById(createdJob.getId(), userWithEmployerProfile);
@@ -234,7 +234,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtFinishedJobUpdated() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.finishById(createdJob.getId(), userWithEmployerProfile);
@@ -245,7 +245,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByCurrentStateAtDeletedJobUpdated() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.deleteById(createdJob.getId(), userWithEmployerProfile);
@@ -256,11 +256,11 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsEntityNotFoundAtSomeoneElseJobUpdate() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User anotherUserWithEmployerProfile = defaultUserService.createEmployerProfile(anotherVerifiedUser,
+    User anotherUserWithEmployerProfile = defaultUserService.updateEmployerProfile(anotherVerifiedUser,
                                                                                    EmployerProfileDTO.fromEmployerProfile(
                                                                                        randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
@@ -272,11 +272,11 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsEntityNotFoundAtSomeoneElseJobDelete() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User anotherUserWithEmployerProfile = defaultUserService.createEmployerProfile(anotherVerifiedUser,
+    User anotherUserWithEmployerProfile = defaultUserService.updateEmployerProfile(anotherVerifiedUser,
                                                                                    EmployerProfileDTO.fromEmployerProfile(
                                                                                        randomEmployerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);

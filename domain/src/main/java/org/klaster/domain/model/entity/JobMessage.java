@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import org.klaster.domain.model.context.Job;
+import org.klaster.domain.model.context.User;
 
 /*
  * workrest
@@ -17,26 +18,32 @@ import org.klaster.domain.model.context.Job;
 
 public class JobMessage {
 
-  private final FreelancerProfile author;
-  private final Job job;
-  private final String message;
+  private User author;
+  private Job job;
+  private String message;
 
 
-  public JobMessage(FreelancerProfile author, Job job, String message) {
-    this.author = author;
-    this.job = job;
-    this.message = message;
+  public User getAuthor() {
+    return author;
   }
 
-  public FreelancerProfile getAuthor() {
-    return author;
+  public void setAuthor(User author) {
+    this.author = author;
   }
 
   public Job getJob() {
     return job;
   }
 
+  public void setJob(Job job) {
+    this.job = job;
+  }
+
   public String getMessage() {
     return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

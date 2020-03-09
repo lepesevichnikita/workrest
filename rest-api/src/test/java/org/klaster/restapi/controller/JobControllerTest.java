@@ -111,7 +111,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   public void createdForPostByVerifiedUserWithEmployerProfileWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     registeredUser = defaultUserService.verifyById(registeredUser.getId());
-    defaultUserService.createEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    defaultUserService.updateEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     JobDTO jobDTO = JobDTO.fromJob(randomJob);
     final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(randomLoginInfo.getLogin(),
                                                                                    randomLoginInfo.getPassword())
@@ -202,7 +202,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   public void acceptedForDeleteByVerifiedUserWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     JobDTO jobDTO = JobDTO.fromJob(randomJob);
     Job createdJob = defaultJobService.create(jobDTO, userWithEmployerProfile);
@@ -224,7 +224,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   public void acceptedForPutWithValidJobUpdateByVerifiedUserWithValidToken() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     JobDTO jobDTO = JobDTO.fromJob(randomJob);
     Job createdJob = defaultJobService.create(jobDTO, userWithEmployerProfile);
@@ -249,7 +249,7 @@ public class JobControllerTest extends AbstractTestNGSpringContextTests {
   public void okForGetAll() throws Exception {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     JobDTO jobDTO = JobDTO.fromJob(randomJob);
     defaultJobService.create(jobDTO, userWithEmployerProfile);

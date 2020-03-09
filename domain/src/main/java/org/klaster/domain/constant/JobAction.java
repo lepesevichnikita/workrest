@@ -13,6 +13,7 @@ package org.klaster.domain.constant;
 public class JobAction {
 
   public static final String UPDATE = "Job update";
+  public static final String SET_FREELANCER = "Set freelancer";
 
   private JobAction() {
   }

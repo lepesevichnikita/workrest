@@ -23,12 +23,9 @@ const capitalizeFirstLetter = string => {
 };
 
 const loadMenu = menuName => {
-  $(menuContainerId)
-  .dimmer("show");
   $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
    .done(menuTemplate => {
      const menuContainer = $(menuContainerId);
-     menuContainer.dimmer("hide");
      menuContainer.html($.tmpl(menuTemplate, {}));
      const links = $(".ui.link");
      const signOutButton = $("#signout");

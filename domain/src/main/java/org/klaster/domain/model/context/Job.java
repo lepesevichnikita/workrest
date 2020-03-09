@@ -12,12 +12,14 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.deserializer.LocalDateTimeDeserializer;
 import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.AbstractJobState;
 import org.klaster.domain.model.state.job.PublishedJobState;
@@ -36,6 +38,11 @@ public class Job extends AbstractContext<AbstractJobState> {
   @ManyToOne(fetch = FetchType.EAGER)
   @Fetch(FetchMode.SELECT)
   private EmployerProfile employerProfile;
+
+  @JsonBackReference
+  @ManyToOne(fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SELECT)
+  private FreelancerProfile freelancerProfile;
 
   @NotNull
   private String description;
@@ -92,5 +99,13 @@ public class Job extends AbstractContext<AbstractJobState> {
   @JsonIgnore
   protected AbstractJobState getDefaultState() {
     return new PublishedJobState();
+  }
+
+  public FreelancerProfile getFreelancerProfile() {
+    return freelancerProfile;
+  }
+
+  public void setFreelancerProfile(FreelancerProfile freelancerProfile) {
+    this.freelancerProfile = freelancerProfile;
   }
 }

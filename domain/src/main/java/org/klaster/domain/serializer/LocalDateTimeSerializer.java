@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 
 public class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
-  public static final String LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+  public static final String LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm";
 
   @Override
   public void serialize(LocalDateTime localDateTime, JsonGenerator generator, SerializerProvider serializerProvider) throws IOException {

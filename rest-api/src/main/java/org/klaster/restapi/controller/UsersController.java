@@ -88,7 +88,7 @@ public class UsersController {
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<User> createFreelancerProfile(@RequestBody FreelancerProfileDTO freelancerProfileDTO,
                                                       @AuthenticationPrincipal User currentUser) {
-    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(currentUser, freelancerProfileDTO);
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(currentUser, freelancerProfileDTO);
     return ResponseEntity.accepted()
                          .body(userWithFreelancerProfile);
   }
@@ -97,7 +97,7 @@ public class UsersController {
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<User> createEmployerProfile(@RequestBody EmployerProfileDTO employerProfileDTO,
                                                     @AuthenticationPrincipal User currentUser) {
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(currentUser, employerProfileDTO);
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(currentUser, employerProfileDTO);
     return ResponseEntity.accepted()
                          .body(userWithEmployerProfile);
   }

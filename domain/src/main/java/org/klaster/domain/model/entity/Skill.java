@@ -12,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.klaster.domain.model.context.Job;
 
 /**
@@ -29,11 +31,13 @@ public class Skill implements Serializable {
 
   @JsonBackReference
   @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
   private Set<Job> jobs = new LinkedHashSet<>();
 
   @JsonBackReference
-  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
-  private Set<FreelancerProfile> freelancerProfiles = new LinkedHashSet<>();
+  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
+  @Fetch(FetchMode.SELECT)
+  private Set<FreelancerProfile> freelancerProfiles;
 
   @NotNull(message = "")
   private String name;
@@ -42,12 +46,16 @@ public class Skill implements Serializable {
     return jobs;
   }
 
+  public void setJobs(Set<Job> jobs) {
+    this.jobs = jobs;
+  }
+
   public String getName() {
     return name;
   }
 
-  public void setJobs(Set<Job> jobs) {
-    this.jobs = jobs;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public long getId() {
@@ -58,7 +66,11 @@ public class Skill implements Serializable {
     this.id = id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public Set<FreelancerProfile> getFreelancerProfiles() {
+    return freelancerProfiles;
+  }
+
+  public void setFreelancerProfiles(Set<FreelancerProfile> freelancerProfiles) {
+    this.freelancerProfiles = freelancerProfiles;
   }
 }

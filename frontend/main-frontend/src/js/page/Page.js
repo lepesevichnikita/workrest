@@ -42,6 +42,7 @@ export class Page {
 
   replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
+    $('.ui.modal').remove();
     return new Promise((resolve, reject) => loadTemplate(pageSelector,
                                                          this._templateHelper.getPagePath(pageName.toLowerCase()),
                                                          pageData)

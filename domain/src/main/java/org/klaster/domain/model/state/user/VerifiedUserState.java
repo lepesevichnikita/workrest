@@ -32,17 +32,24 @@ public class VerifiedUserState extends AbstractUserState {
 
   @Override
   public void updateEmployer(EmployerProfile targetEmployerProfile) {
-    if (!getContext().hasEmployerProfile()) {
+    EmployerProfile employerProfile = getEmployerProfile();
+    if (null == employerProfile) {
       targetEmployerProfile.setOwner(getContext());
       getContext().setEmployerProfile(targetEmployerProfile);
+    } else {
+      employerProfile.setDescription(targetEmployerProfile.getDescription());
     }
   }
 
   @Override
   public void updateFreelancerProfile(FreelancerProfile targetFreelancerProfile) {
-    if (!getContext().hasFreelancerProfile()) {
+    FreelancerProfile freelancerProfile = getFreelancerProfile();
+    if (null == freelancerProfile) {
       targetFreelancerProfile.setOwner(getContext());
       getContext().setFreelancerProfile(targetFreelancerProfile);
+    } else {
+      freelancerProfile.setSkills(targetFreelancerProfile.getSkills());
+      freelancerProfile.setDescription(targetFreelancerProfile.getDescription());
     }
   }
 

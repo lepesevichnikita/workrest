@@ -9,26 +9,47 @@
         Freelancers
       </h2>
     </a>
-    <div class="ui four doubling stackable cards" id="freelancer-cards"></div>
-    <div id="freelancer-popups"></div>
-    <div class="ui segment">
-      <div class="ui pagination menu">
-        <a class="active item">
-          1
-        </a>
-        <div class="disabled item">
-          ...
+    <div class="ui four doubling stackable cards" id="freelancer-cards">
+      {{if freelancers}}
+      {{each freelancers}}
+      <div class="ui card">
+        <div class="content">
+          <div class="header">${$value.personalData.firstName} ${$value.personalData.lastName}</div>
+          <div class="description">
+            ${$value.description}
+          </div>
         </div>
-        <a class="item">
-          10
-        </a>
-        <a class="item">
-          11
-        </a>
-        <a class="item">
-          12
-        </a>
+        <div class="extra content">
+          {{each $value.skills}}
+          <span class="ui label">${$value}</span>
+          {{/each}}
+        </div>
+        <div class="ui animated button basic bottom attached primary" data-action="show" data-target="freelancer${$value.id}">
+          <div class="hidden content">See</div>
+          <div class="visible content">
+            <i class="eye icon"></i>
+          </div>
+        </div>
       </div>
+      <div class="ui modal" id="freelancer${$value.id}">
+        <i class="close icon"></i>
+        <div class="header">
+          ${$value.personalData.firstName} ${$value.personalData.lastName}
+        </div>
+        <div class="content">
+          <div class="description">
+            <div class="ui header">Description</div>
+            <p>${$value.description}</p>
+          </div>
+        </div>
+        <div class="extra content">
+          {{each $value.skills}}
+          <span class="ui label">${$value}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/each}}
+      {{/if}}
     </div>
   </div>
 </div>

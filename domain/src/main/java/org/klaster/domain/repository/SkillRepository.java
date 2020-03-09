@@ -27,12 +27,11 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
   Optional<Skill> findFirstByName(String name);
 
   default Skill findFirstByNameOrCreate(String name) {
-    Skill foundSkill = findFirstByName(name).orElse(new Skill());
-    if (foundSkill.getId() == 0) {
-      foundSkill.setName(name);
-      foundSkill = save(foundSkill);
-    }
-    return foundSkill;
+    return findFirstByName(name).orElseGet(() -> {
+      Skill newSkill = new Skill();
+      newSkill.setName(name);
+      return saveAndFlush(newSkill);
+    });
   }
 
   default Set<Skill> findAllByNamesOrCreate(String... names) {

@@ -16,10 +16,12 @@ import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.FreelancerProfile;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.DeletedJobState;
 import org.klaster.domain.model.state.job.FinishedJobState;
 import org.klaster.domain.model.state.job.StartedJobState;
+import org.klaster.domain.repository.FreelancerProfileRepository;
 import org.klaster.domain.repository.JobRepository;
 import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.util.MessageUtil;
@@ -45,6 +47,9 @@ public class DefaultJobService {
 
   @Autowired
   private JobBuilder defaultJobBuilder;
+
+  @Autowired
+  private FreelancerProfileRepository freelancerProfileRepository;
 
   @Transactional
   public Job create(JobDTO jobDTO, User author) {
@@ -72,6 +77,17 @@ public class DefaultJobService {
                                      .build();
     foundJob.getCurrentState()
             .updateJob(targetJob);
+    return jobRepository.saveAndFlush(foundJob);
+  }
+
+  @Transactional
+  public Job setFreelancerProfile(long jobId, long freelancerId) {
+    Job foundJob = findById(jobId);
+    FreelancerProfile freelancerProfile = freelancerProfileRepository.findById(freelancerId)
+                                                                     .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(
+                                                                         FreelancerProfile.class,
+                                                                         freelancerId)));
+    foundJob.getCurrentState().setFreelancerProfile(freelancerProfile);
     return jobRepository.saveAndFlush(foundJob);
   }
 

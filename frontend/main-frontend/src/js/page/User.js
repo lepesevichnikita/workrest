@@ -1,7 +1,7 @@
-import { JobService, UserService } from "../api";
-import { TemplateHelper } from "../helper";
-import { checkIsAuthorized, loadTemplate, redirectToPage } from "../main.js";
-import { Page } from "./Page.js";
+import {checkIsAuthorized, loadTemplate, redirectToPage} from "../main.js";
+import {Page} from "./Page.js";
+import {JobService, UserService} from "../api";
+import {TemplateHelper} from "../helper";
 
 export class User extends Page {
   constructor(props) {
@@ -13,13 +13,18 @@ export class User extends Page {
     this._freelancerProfile = {};
     this._employerProfile = {};
     this._job = {};
-    this.addListener(User.Selectors.FREELANCER_SKILL_ADD_BUTTON, ["click", this._freelancerSkillAddClick.bind(this), false])
+    this.addListener(User.Selectors.FREELANCER_SKILL_ADD_BUTTON,
+                     ["click", this._freelancerSkillAddClick.bind(this), false])
         .addListener(User.Selectors.FREELANCER_FORM, ["submit", this._freelancerFormSubmit.bind(this), false])
         .addListener(User.Selectors.EMPLOYER_FORM, ["submit", this._employerFormSubmit.bind(this), false])
         .addListener(User.Selectors.JOB_SKILL_ADD_BUTTON, ["click", this._jobSkillAddClick.bind(this), false])
         .addListener(User.Selectors.JOB_FORM, ["submit", this._jobFormSubmit.bind(this), false])
         .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false])
-        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false]);
+        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false])
+        .addListener(User.Selectors.JOB_CREATE_BUTTON, ["click", this._showModal.bind(this), false])
+        .addListener(User.Selectors.JOB_DELETE_BUTTON, ["click", this._deleteJob.bind(this), false])
+        .addListener(User.Selectors.JOB_START_BUTTON, ["click", this._startJob.bind(this), false])
+        .addListener(User.Selectors.JOB_FINISH_BUTTON, ["click", this._finishJob.bind(this), false]);
   }
 
   process() {
@@ -40,7 +45,6 @@ export class User extends Page {
             }
           })
           .then(() => this._renderPage())
-          .then(() => this._initFormsValidators())
     })
     .catch(() => {
       redirectToPage("login");
@@ -51,39 +55,30 @@ export class User extends Page {
     });
   }
 
+  _startJob(event) {
+    event.preventDefault();
+    const id = event.currentTarget.getAttribute('data-id');
+    this._jobService.startJob(id).then(() => this.process());
+  }
+
+  _deleteJob(event) {
+    event.preventDefault();
+    const id = event.currentTarget.getAttribute('data-id');
+    this._jobService.deleteJob(id).then(() => this.process());
+  }
+
+  _finishJob(event) {
+    event.preventDefault();
+    const id = event.currentTarget.getAttribute('data-id');
+    this._jobService.finishJob(id).then(() => this.process());
+  }
+
   _showModal(event) {
     event.preventDefault();
     const targetModalId = event.currentTarget.getAttribute("data-target");
     $(`#${targetModalId}`)
-    .modal({detachable: false})
+    .modal({detachable: false, dimmerSettings: {closable: true, useCss: false}})
     .modal("show");
-  }
-
-  _initFormsValidators() {
-    const freelancerForm = $(User.Selectors.FREELANCER_FORM);
-    const employerForm = $(User.Selectors.EMPLOYER_FORM);
-    const jobForm = $(User.Selectors.JOB_FORM);
-    freelancerForm.form({
-                          description: {
-                            identifier: "description", rules: [{
-                              type: "empty", prompt: "Description is required"
-                            }]
-                          }
-                        }, {onSuccess: this._updateFreelancerProfile.bind(this)});
-    employerForm.form({
-                        description: {
-                          identifier: "description", rules: [{
-                            type: "empty", prompt: "Description is required"
-                          }]
-                        }
-                      }, {onSuccess: this._updateEmployerProfile.bind(this)});
-    jobForm.form({
-                   description: {
-                     identifier: "description", rules: [{
-                       type: "empty", prompt: "Description is required"
-                     }]
-                   }
-                 }, {onSuccess: this._processJob.bind(this)});
   }
 
   get _jobSkillInput() {
@@ -110,7 +105,7 @@ export class User extends Page {
         .then(() => {
           $("#freelancerSkills a")
           .click(this._removeSkillFromFreelancerProfileForm.bind(this));
-    });
+        });
   }
 
   _removeSkillFromFreelancerProfileForm(event) {
@@ -164,47 +159,57 @@ export class User extends Page {
   _freelancerFormSubmit(event) {
     event.preventDefault();
     const freelancerForm = $(User.Selectors.FREELANCER_FORM);
-    freelancerForm.form("validate form");
+    this._freelancerProfile.description = freelancerForm.find('textarea')
+                                                        .val();
+    this._userService.updateFreelancerProfile(this._freelancerProfile)
+        .then(response => {
+          $('.ui.modals')
+          .remove();
+          this.replacePage("user", response.body)
+              .finally(() => super.process());
+        })
+        .catch(error => {
+          $('.ui.modal')
+          .modal('hide');
+          this.process();
+        })
+        .finally(() => this.hideDimmer());
   }
 
   _employerFormSubmit(event) {
     event.preventDefault();
     const employerForm = $(User.Selectors.EMPLOYER_FORM);
-    employerForm.form("validate form");
+    this._employerProfile.description = employerForm.find('textarea')
+                                                    .val();
+    this._userService.updateEmployerProfile(this._employerProfile)
+        .then(response => {
+          $('.ui.modals')
+          .remove();
+          this.replacePage("user", response.body)
+              .finally(() => super.process());
+        })
+        .catch(error => this.addErrorsToForm(User.Selectors.EMPLOYER_FORM, error.response.body))
+        .finally(() => this.hideDimmer());
   }
 
   _jobFormSubmit(event) {
     event.preventDefault();
     const jobForm = $(User.Selectors.JOB_FORM);
-    jobForm.form("validate form");
-  }
+    this._job.description = jobForm.find('textarea')
+                                   .val();
+    this._job.endDateTime = jobForm.find('input[name=endDateTime]')
+                                   .val(
 
-  _updateEmployerProfile(event, fields) {
+                                   );
     this.showDimmer();
-    this._userService.updateEmployerProfile(fields)
-        .then(response => this.replacePage("user", response.body))
+    this._jobService.createJob(this._job)
+        .then(() => this._renderPage())
+        .catch(() => {
+          $('.ui.modal')
+          .modal('hide');
+          this.process();
+        })
         .finally(() => this.hideDimmer());
-  }
-
-  _updateFreelancerProfile(event, fields) {
-    this.showDimmer();
-    fields.skills = this._freelancerProfile.skills;
-    this._userService.updateFreelancerProfile(this._freelancerProfile)
-        .then(response => this.replacePage("user", response.body))
-        .finally(() => this.hideDimmer());
-  }
-
-  _processJob(event, fields) {
-    this.showDimmer();
-    let promise = null;
-    fields.skills = this._job.skills;
-    if (fields.id == 0) {
-      promise = this._jobService.createJob(this._job);
-    } else {
-      promise = this._jobService.updateJob(fields.id, fields);
-    }
-    promise.then(() => this._renderPage())
-           .finally(() => this.hideDimmer());
   }
 
   _splitInputAndPushUniqueToArray(array, input) {
@@ -231,7 +236,11 @@ User.Selectors = {
   JOB_DESCRIPTION_INPUT: "#jobForm textarea[name=description]",
   FREELANCER_FORM: "#freelancerProfileForm",
   EMPLOYER_FORM: "#employerProfileForm",
-  JOB_FORM: "#jobForm"
+  JOB_FORM: "#jobForm",
+  JOB_CREATE_BUTTON: "div[data-target=jobFormModal]",
+  JOB_DELETE_BUTTON: "div[data-action=delete]",
+  JOB_START_BUTTON: "div[data-action=start]",
+  JOB_FINISH_BUTTON: "div[data-action=finish]"
 };
 
 export default User;

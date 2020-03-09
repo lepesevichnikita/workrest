@@ -155,7 +155,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    User userWithEmployerProfile = defaultUserService.createEmployerProfile(verifiedUser,
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     assertThat(userWithEmployerProfile.getEmployerProfile(), allOf(
         hasProperty("description", equalTo(randomEmployerProfile.getDescription())),
@@ -168,7 +168,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByStateOnEmployerProfileCreateForUnverifiedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    defaultUserService.createEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    defaultUserService.updateEmployerProfile(registeredUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
   }
 
   @Test(expectedExceptions = ActionForbiddenByStateException.class)
@@ -176,7 +176,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User blockedUser = defaultUserService.blockById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    defaultUserService.createEmployerProfile(blockedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    defaultUserService.updateEmployerProfile(blockedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
   }
 
 
@@ -185,7 +185,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User deletedUser = defaultUserService.deleteById(registeredUser.getId());
     EmployerProfile randomEmployerProfile = randomEmployerProfileFactory.build();
-    defaultUserService.createEmployerProfile(deletedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    defaultUserService.updateEmployerProfile(deletedUser, EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
   }
 
 
@@ -194,7 +194,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    User userWithFreelancerProfile = defaultUserService.createFreelancerProfile(verifiedUser,
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(verifiedUser,
                                                                                 FreelancerProfileDTO.fromFreelancerProfile(
                                                                                     randomFreelancerProfile));
     assertThat(userWithFreelancerProfile.getFreelancerProfile(), allOf(
@@ -208,7 +208,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
   public void throwsActionForbiddenByStateOnFreelancerProfileCreateForUnverifiedUser() {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    defaultUserService.updateFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
   }
 
   @Test(expectedExceptions = ActionForbiddenByStateException.class)
@@ -216,7 +216,7 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User blockedUser = defaultUserService.blockById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    defaultUserService.updateFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
   }
 
 
@@ -225,6 +225,6 @@ public class DefaultUserServiceTest extends AbstractTestNGSpringContextTests {
     User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
     User deletedUser = defaultUserService.deleteById(registeredUser.getId());
     FreelancerProfile randomFreelancerProfile = randomFreelancerProfileFactory.build();
-    defaultUserService.createFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    defaultUserService.updateFreelancerProfile(registeredUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
   }
 }

@@ -29,6 +29,7 @@ export class PersonalData extends Page {
       super.process();
     })
     .catch(error => {
+      console.error(error);
       error && error.unauthorized && redirectToPage("login");
     });
   }

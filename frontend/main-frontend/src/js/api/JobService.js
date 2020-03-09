@@ -43,6 +43,24 @@ export class JobService {
           .catch(reject);
     })
   }
+
+  finishJob(id) {
+    return new Promise((resolve, reject) => {
+      this._restClient.post(endpoint.jobs.finish_by_id(id))
+          .secured(this._authorizationService.getToken().token)
+          .then(resolve)
+          .catch(reject);
+    })
+  }
+
+  startJob(id) {
+    return new Promise((resolve, reject) => {
+      this._restClient.post(endpoint.jobs.start_by_id(id))
+          .secured(this._authorizationService.getToken().token)
+          .then(resolve)
+          .catch(reject);
+    })
+  }
 }
 
 export default JobService;

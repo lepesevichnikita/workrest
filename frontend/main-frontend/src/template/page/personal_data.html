@@ -14,9 +14,9 @@
                 name="firstName"
                 placeholder="Enter your first name"
                 type="text"
-                firstName}} value="${firstName}"
-                {{
-                {{if/if}}
+                {{if firstName}}
+                value="${firstName}"
+                {{/if}}
             />
           </div>
         </div>
@@ -27,9 +27,9 @@
                 name="lastName"
                 placeholder="Enter your last name"
                 type="text"
-                lastName}} value="${lastName}"
-                {{
-                {{if/if}}
+                {{if lastName}}
+                value="${lastName}"
+                {{/if}}
             />
           </div>
         </div>
@@ -40,9 +40,9 @@
                 name="documentName"
                 placeholder="Enter document name"
                 type="text"
-                documentName}} value="${documentName}"
-                {{
-                {{if/if}}
+                {{if documentName}}
+                value="${documentName}"
+                {{/if}}
             />
           </div>
         </div>
@@ -53,16 +53,15 @@
                 name="documentNumber"
                 placeholder="Enter document number"
                 type="text"
-                documentNumber}} value="${documentNumber}"
-                {{
-                {{if/if}}
+                {{if documentNumber}} value="${documentNumber}"
+                {{/if}}
             />
           </div>
         </div>
-        <img !=null}}
-             attachment class="ui fluid image" src="http://localhost:9091/file/${attachment.id}"
-             {{
-             {{if/if}}
+        <img class="ui fluid image"
+             {{if attachment != null}}
+             src="http://localhost:9091/file/${attachment.id}"
+             {{/if}}
         >
         <div class="field">
           <div class="ui labeled icon fluid button" id="fileChooseButton">

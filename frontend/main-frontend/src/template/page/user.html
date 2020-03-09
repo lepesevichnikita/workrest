@@ -30,7 +30,7 @@
       {{if freelancerProfile}}
       <div class="extra content">
         {{each freelancerProfile.skills}}
-        <span class="ui label">${name}</span>
+        <span class="ui label">${$value}</span>
         {{/each}}
       </div>
       <div class="ui basic attached bottom primary button" data-action="update" data-target="freelancerProfileFormModal">Update</div>
@@ -57,8 +57,10 @@
     </div>
     {{if employerProfile}}
     <div class="ui fluid card">
+      <div class="content">
       <div class="header">
         Published jobs
+      </div>
       </div>
       <div class="extra content">
         <div class="ui four doubling stackable cards" id="job-cards">
@@ -66,18 +68,27 @@
           {{each employerProfile.jobs}}
           <div class="ui link card">
             <div class="content">
-              <div class="header">Create Twitter</div>
-              <div class="meta"></div>
+              <div class="meta">
+                ${$value.currentState.name}
+              </div>
               <div class="description">
                 ${description}
               </div>
             </div>
-            <div class="extra content">
-              {{each $skills}}
-              <span class="ui label">${skill.name}</span>
+           <div class="extra content">
+              {{each $value.skills}}
+              <span class="ui label">${$value.name}</span>
               {{/each}}
             </div>
-            <div class="ui basic attached bottom primary button" data-action="update" data-id="${$value.id}" data-target="jobFormModal">Update</div>
+            {{if $value.currentState.name == 'Published'}}
+            <div class="ui basic attached bottom green button" data-action="start" data-id="${$value.id}">Start</div>
+            {{/if}}
+            {{if $value.currentState.name == 'Started'}}
+            <div class="ui basic attached bottom primary button" data-action="finish" data-id="${$value.id}">Finish</div>
+            {{/if}}
+            {{if $value.currentState.name == 'Finished'}}
+            <div class="ui basic attached bottom red button" data-action="delete" data-id="${$value.id}">Delete</div>
+            {{/if}}
           </div>
           {{/each}}
           {{/if}}
@@ -91,6 +102,7 @@
         <div class="ui header">
           Add job
         </div>
+        <input name="id" type="hidden" value="">
         <div class="field">
           <label>
             Description
@@ -106,13 +118,13 @@
             </a>
           </div>
         </div>
-        <div class="inlinefield">
+        <div class="field" id="jobSkills"></div>
+        <div class="inline field">
           <label>
             End date
           </label>
           <input name="endDateTime" type="datetime-local"/>
         </div>
-        <div class="field" id="jobSkills"></div>
         <input class="ui fluid large primary submit button" type="submit" value="Save"/>
         <div class="ui error message"></div>
       </form>
@@ -121,11 +133,12 @@
       <form class="ui segment form" id="freelancerProfileForm">
         <div class="field">
           <label>Description</label>
-          <textarea name="description">
-            {{if freelancerProfile}}
-            ${freelancerProfile.description}
-            {{/if}}
-          </textarea>
+          {{if freelancerProfile}}
+          <textarea name="description">${freelancerProfile.description}</textarea>
+          {{/if}}
+          {{if !freelancerProfile}}
+          <textarea name="description"></textarea>
+          {{/if}}
         </div>
         <div class="field">
           <div class="ui right labeled left icon input">
@@ -137,6 +150,11 @@
           </div>
         </div>
         <div class="field" id="freelancerSkills">
+          {{if freelancerProfile}}
+          {{each freelancerProfile.skills}}
+          <a class="ui label link" data-name="${$value}">${$value}</a>
+          {{/each}}
+          {{/if}}
         </div>
         <input class="ui fluid large primary submit button" type="submit" value="Save"/>
         <div class="ui error message"></div>
@@ -146,11 +164,12 @@
       <form class="ui segment form" id="employerProfileForm">
         <div class="field">
           <label>Description</label>
-          <textarea name="description">
-            {{if employerProfile}}
-            ${employerProfile.description}
-            {{/if}}
-          </textarea>
+          {{if employerProfile}}
+          <textarea name="description">${employerProfile.description}</textarea>
+          {{/if}}
+          {{if !employerProfile}}
+          <textarea name="description"></textarea>
+          {{/if}}
         </div>
         <input class="ui fluid large primary submit button" type="submit" value="Save"/>
         <div class="ui error message"></div>
