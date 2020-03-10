@@ -6,6 +6,8 @@ import Page from "./Page.js";
 export class Freelancers extends Page {
   constructor(props) {
     super(props);
+    this._authorizationService = props.authorizationService;
+    this._freelancerService = new FreelancerService(props);
     this.addListener("div[data-action=show]", ["click", this._onShowClick.bind(this), false]);
   }
 

@@ -8,7 +8,7 @@
       {{each personalData}}
       <div class="ui link card">
         <div class="content">
-          <div class="header">${firstName} ${lastName}</div>
+          <div class="header">${$value.firstName} ${$value.lastName}</div>
         </div>
         <div class="ui basic primary bottom attached animated button" data-action="show" data-id="${$value.id}">
           <div class="hidden content">Consider</div>
@@ -17,15 +17,20 @@
           </div>
         </div>
       </div>
-      <div class="ui fullscreen modal" id="personalData${$value.id}">
-        <div class="header">Personal data</div>
-        <div class="image content">
-          <img class="image fluid" src="http://localhost:9091/file/${attachment.id}">
-          <div class="description">
-            <p>First name: ${firstName}</p>
-            <p>Last name: ${lastName}</p>
-            <p>Document name: ${documentName}</p>
-            <p>Document number: ${documentNumber}</p>
+      <div class="ui modal" id="personalData${$value.id}">
+          <div class="header">Personal data</div>
+          <div class="ui image content">
+            <div class="ui large image">
+              <img src="http://localhost:9091/file/${attachment.id}">
+            </div>
+            <div class="description">
+              <p>First name: ${$value.firstName}</p>
+              <p>Last name: ${$value.lastName}</p>
+              <p>Document name: ${$value.documentName}</p>
+              <p>Document number: ${$value.documentNumber}</p>
+            </div>
+          </div>
+          <div class="actions">
             <div class="ui two buttons">
               <div class="ui basic green animated button" data-action="approve" data-id="${id}">
                 <div class="hidden content">Approve</div>
@@ -41,9 +46,7 @@
               </div>
             </div>
           </div>
-        </div>
       </div>
-
       {{/each}}
     </div>
   </div>

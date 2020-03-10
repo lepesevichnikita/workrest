@@ -10,6 +10,7 @@ export class Login extends Page {
   }
 
   process() {
+    this.showDimmer();
     this._authorizationService.checkIsAuthorized()
         .then(() => redirectToPage("administrators"))
         .catch(() => this.replacePage("login")
@@ -35,14 +36,13 @@ export class Login extends Page {
 
   _signIn(event, fields) {
     event.preventDefault();
-    this.showDimmer();
     this._authorizationService.signIn(fields)
         .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
-        .finally(() => {
-          $(Login.FORM_SELECTOR)
-          .form("reset");
-          this.hideDimmer();
-        });
+        // .finally(() => {
+        //   $(Login.FORM_SELECTOR)
+        //   .form("reset");
+        //   this.hideDimmer();
+        // });
   }
 }
 

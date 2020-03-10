@@ -1,7 +1,7 @@
-import {checkIsAuthorized, loadTemplate, redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
-import {JobService, UserService} from "../api";
-import {TemplateHelper} from "../helper";
+import { JobService, UserService } from "../api";
+import { TemplateHelper } from "../helper";
+import { checkIsAuthorized, loadTemplate, redirectToPage } from "../main.js";
+import { Page } from "./Page.js";
 
 export class User extends Page {
   constructor(props) {
@@ -29,6 +29,9 @@ export class User extends Page {
 
   process() {
     this.showDimmer();
+    this._freelancerProfile = {};
+    this._employerProfile = {};
+    this._job = {};
     checkIsAuthorized()
     .then(() => {
       this._userService.getCurrentUser()
@@ -203,10 +206,14 @@ export class User extends Page {
                                    );
     this.showDimmer();
     this._jobService.createJob(this._job)
-        .then(() => this._renderPage())
+        .then(() => {
+          $(".ui.modals")
+          .remove();
+          this.process();
+        })
         .catch(() => {
           $('.ui.modal')
-          .modal('hide');
+          .remove();
           this.process();
         })
         .finally(() => this.hideDimmer());

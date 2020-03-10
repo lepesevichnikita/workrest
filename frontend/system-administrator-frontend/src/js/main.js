@@ -18,12 +18,8 @@ const capitalizeFirstLetter = string => {
 };
 
 const loadMenu = menuName => {
-  $(menuContainerId)
-  .dimmer("show");
   $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
    .done(menuTemplate => {
-     $(menuContainerId)
-     .dimmer("hide");
      $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
      $(".ui.link")
