@@ -1,5 +1,5 @@
-import {RestClient} from "./RestClient.js";
-import {endpoint} from "../config";
+import { RestClient } from "/frontend/src/js/domain/api/index.js";
+import { endpoint } from "/frontend/src/js/domain/config/index.js";
 
 export class FreelancerService {
   constructor(props) {

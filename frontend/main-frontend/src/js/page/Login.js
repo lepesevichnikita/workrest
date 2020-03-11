@@ -1,11 +1,10 @@
-import { redirectToPage } from "../main.js";
-import Page from "./Page.js";
+import { redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { Page } from "./Page.js";
 
 export class Login extends Page {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
-    this._loginInfo = {};
     this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
@@ -13,8 +12,10 @@ export class Login extends Page {
     this._authorizationService.checkIsAuthorized()
         .then(() => redirectToPage("home"))
         .catch(() => this.replacePage("login")
-                         .then(() => this._setValidationOnLoginForm())
-                         .finally(() => super.process()));
+                         .then(() => {
+                           this._setValidationOnLoginForm();
+                           super.process();
+                         }));
   }
 
   _setValidationOnLoginForm() {
@@ -34,6 +35,7 @@ export class Login extends Page {
   }
 
   _signIn(event, fields) {
+    event.preventDefault();
     this.showDimmer();
     this._authorizationService.signIn(fields)
         .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))

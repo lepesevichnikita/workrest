@@ -1,7 +1,7 @@
-import { FileService, PersonalDataService } from "../api";
-import { Action } from "../constant";
-import { checkIsAuthorized, redirectToPage } from "../main.js";
 import { Page } from "./Page.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { FileService, PersonalDataService } from "/frontend/main-frontend/src/js/api/index.js";
+import { checkIsAuthorized, redirectToPage } from "/frontend/main-frontend/src/js/main.js";
 
 export class PersonalData extends Page {
   constructor(props) {
@@ -10,7 +10,8 @@ export class PersonalData extends Page {
     this._fileService = new FileService(props);
     this._personalData = {attachment: null};
     this._personalDataService = new PersonalDataService(props);
-    this.addListener(PersonalData.FILE_CHOOSE_BUTTON_SELECTOR, ["click", this._onChooseFileButtonClick.bind(this), false])
+    this.addListener(PersonalData.FILE_CHOOSE_BUTTON_SELECTOR,
+                     ["click", this._onChooseFileButtonClick.bind(this), false])
         .addListener(PersonalData.FILE_INPUT_SELECTOR, ["change", this._onChangeFileInput.bind(this), false])
         .addListener(PersonalData.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
     this._fileService.subscribe(Action.LOADING_PROGRESS, this._onFileLoadingProgress.bind(this));
@@ -37,10 +38,22 @@ export class PersonalData extends Page {
   _setValidationOnPersonalDataForm() {
     const personalDataForm = $(PersonalData.FORM_SELECTOR);
     personalDataForm.form({
-                            firstName: {identifier: "firstName", rules: [{type: "empty", prompt: "First name is required"}]},
-                            lastName: {identifier: "lastName", rules: [{type: "empty", prompt: "Last name is required"}]},
-                            documentName: {identifier: "documentName", rules: [{type: "empty", prompt: "Document name is required"}]},
-                            documentNumber: {identifier: "documentNumber", rules: [{type: "empty", prompt: "Last name is required"}]}
+                            firstName: {
+                              identifier: "firstName",
+                              rules: [{type: "empty", prompt: "First name is required"}]
+                            },
+                            lastName: {
+                              identifier: "lastName",
+                              rules: [{type: "empty", prompt: "Last name is required"}]
+                            },
+                            documentName: {
+                              identifier: "documentName",
+                              rules: [{type: "empty", prompt: "Document name is required"}]
+                            },
+                            documentNumber: {
+                              identifier: "documentNumber",
+                              rules: [{type: "empty", prompt: "Last name is required"}]
+                            }
                           }, {
                             onSuccess: this._updatePersonalData.bind(this)
                           });

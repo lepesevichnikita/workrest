@@ -1,8 +1,17 @@
-import { AuthorizationService, FreelancerService, JobService, UserService } from "./api";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
+import { FreelancerService, JobService, UserService } from "/frontend/main-frontend/src/js/api/index.js";
 
-import { Action } from "./constant";
-import { TemplateHelper } from "./helper";
-import { Freelancers, Home, Jobs, Login, PersonalData, SignUp, User } from "./page";
+import {
+  Freelancers,
+  Home,
+  Jobs,
+  Login,
+  PersonalData,
+  SignUp,
+  User
+} from "/frontend/main-frontend/src/js/page/index.js";
 
 const menuContainerId = "#menu";
 const authorizationService = new AuthorizationService();
@@ -30,12 +39,12 @@ const loadMenu = menuName => {
      const links = $(".ui.link");
      const signOutButton = $("#signout");
      links.unbind();
-     links.click(function(event) {
+     links.click(function (event) {
        event.preventDefault();
        redirectToPage($(this)
                       .attr("name"));
      });
-     signOutButton.click(function(event) {
+     signOutButton.click(function (event) {
        event.preventDefault();
        authorizationService.signOut();
      });

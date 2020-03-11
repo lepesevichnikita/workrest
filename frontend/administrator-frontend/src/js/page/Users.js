@@ -1,5 +1,5 @@
-import { UserService } from "../api";
-import { redirectToPage } from "../main.js";
+import { UserService } from "/frontend/administrator-frontend/src/js/api/index.js";
+import { redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
 import { Page } from "./Page.js";
 
 export class Users extends Page {

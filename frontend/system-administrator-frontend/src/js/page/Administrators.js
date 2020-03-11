@@ -1,6 +1,6 @@
-import {AdministratorService} from "../api";
-import {redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
+import { AdministratorService } from "/frontend/system-administrator-frontend/src/js/api/index.js";
+import { redirectToPage } from "/frontend/system-administrator-frontend/src/js/main.js";
+import { Page } from "./Page.js";
 
 export class Administrators extends Page {
   constructor(props) {

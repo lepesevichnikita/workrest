@@ -1,11 +1,10 @@
-import { redirectToPage } from "../main.js";
-import Page from "./Page.js";
+import { redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
+import { Page } from "./Page.js";
 
 export class Login extends Page {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
-    this._loginInfo = {};
     this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 

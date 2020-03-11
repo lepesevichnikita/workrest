@@ -1,13 +1,12 @@
-import { endpoint } from "../config";
-import { Action } from "../constant";
-import { Subscribable } from "../model";
-import { RestClient } from "./RestClient.js";
+import { RestClient } from "/frontend/src/js/domain/api/index.js";
+import { endpoint } from "/frontend/src/js/domain/config/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { Subscribable } from "/frontend/src/js/domain/model/index.js";
 
 export class FileService extends Subscribable {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
-
     this._restClient = new RestClient();
   }
 

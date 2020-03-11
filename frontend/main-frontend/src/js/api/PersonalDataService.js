@@ -1,6 +1,6 @@
-import { endpoint } from "../config";
-import { ContentType, Header } from "../constant";
-import RestClient from "./RestClient.js";
+import { RestClient } from "/frontend/src/js/domain/api/index.js";
+import { endpoint } from "/frontend/src/js/domain/config/index.js";
+import { ContentType, Header } from "/frontend/src/js/domain/constant/index.js";
 
 export class PersonalDataService {
   constructor(props) {

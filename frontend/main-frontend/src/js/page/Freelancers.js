@@ -1,11 +1,12 @@
-import {FreelancerService} from "../api";
-import {TemplateHelper} from "../helper";
-import {redirectToPage} from "../main.js";
-import Page from "./Page.js";
+import { FreelancerService } from "/frontend/main-frontend/src/js/api/index.js";
+import { redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { Page } from "./Page.js";
 
 export class Freelancers extends Page {
   constructor(props) {
     super(props);
+    this._authorizationService = props.authorizationService;
+    this._freelancerService = new FreelancerService(props);
     this.addListener("div[data-action=show]", ["click", this._onShowClick.bind(this), false]);
   }
 

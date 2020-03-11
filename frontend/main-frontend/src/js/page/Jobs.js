@@ -1,5 +1,5 @@
-import {JobService} from "../api";
-import {Page} from "./Page.js";
+import { JobService } from "/frontend/main-frontend/src/js/api/index.js";
+import { Page } from "./Page.js";
 
 export class Jobs extends Page {
   constructor(props) {

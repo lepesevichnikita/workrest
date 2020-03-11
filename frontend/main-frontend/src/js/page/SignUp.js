@@ -1,11 +1,10 @@
-import { redirectToPage } from "../main.js";
 import { Page } from "./Page.js";
+import { redirectToPage } from "/frontend/main-frontend/src/js/main.js";
 
 export class SignUp extends Page {
   constructor(props) {
     super();
     this._authorizationService = props.authorizationService;
-    this._loginInfo = {};
     this.addListener(SignUp.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
@@ -27,7 +26,8 @@ export class SignUp extends Page {
                      passwordConfirmation: {
                        identifier: "passwordConfirmation",
                        depends: "password",
-                       rules: [{type: "empty", prompt: "Password confirmation is required"}, {type: "match[password]", prompt: "Passwords should match"}]
+                       rules: [{type: "empty", prompt: "Password confirmation is required"},
+                         {type: "match[password]", prompt: "Passwords should match"}]
                      },
                      eulaAgreed: {identifier: "eulaAgreed", rules: [{type: "checked", prompt: "EULA must be agreed"}]}
                    }, {

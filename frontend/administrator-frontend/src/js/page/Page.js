@@ -1,5 +1,5 @@
-import { TemplateHelper } from "../helper";
-import { loadTemplate, redirectToPage } from "../main.js";
+import { loadTemplate, redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
 
 export class Page {
   constructor() {

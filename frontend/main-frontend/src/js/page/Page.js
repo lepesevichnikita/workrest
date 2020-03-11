@@ -1,11 +1,15 @@
-import { TemplateHelper } from "../helper";
-import { loadTemplate, redirectToPage } from "../main.js";
+import { loadTemplate, redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
 
 export class Page {
   constructor() {
     this._eventsListeners = {};
     this._templateHelper = new TemplateHelper();
     this.addListener(".ui.link", ["click", this._onLinkClick.bind(this), false]);
+  }
+
+  process() {
+    this._initializeListeners();
   }
 
   get templateHelper() {
@@ -42,7 +46,6 @@ export class Page {
 
   replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
-    $('.ui.modal').remove();
     return new Promise((resolve, reject) => loadTemplate(pageSelector,
                                                          this._templateHelper.getPagePath(pageName.toLowerCase()),
                                                          pageData)
@@ -56,11 +59,7 @@ export class Page {
             const listeners = this._eventsListeners[selector] || [];
             document
             .querySelectorAll(selector)
-            .forEach(node => listeners.forEach(listener => {
-              $(node)
-              .unbind();
-              node.addEventListener(...listener);
-            }));
+            .forEach(node => listeners.forEach(listener => node.addEventListener(...listener)));
           });
   }
 
@@ -68,10 +67,6 @@ export class Page {
     event.preventDefault();
     const pageName = event.currentTarget.getAttribute("name");
     redirectToPage(pageName);
-  }
-
-  process() {
-    this._initializeListeners();
   }
 }
 

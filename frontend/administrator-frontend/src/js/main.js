@@ -1,8 +1,9 @@
-import { AuthorizationService } from "./api";
+import { Login, PersonalData, Users } from "/frontend/administrator-frontend/src/js/page/index.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
 
-import { Action } from "./constant";
-import { TemplateHelper } from "./helper";
-import { Login, PersonalData, Users } from "./page";
+AuthorizationService.TOKEN = 'administrator_token';
 
 const menuContainerId = "#menu";
 const templateHelper = new TemplateHelper();
@@ -20,7 +21,7 @@ const loadMenu = menuName => {
      $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
      const links = $(".ui.link");
-     links.click(function(event) {
+     links.click(function (event) {
        event.preventDefault();
        redirectToPage($(this)
                       .attr("name"));
@@ -51,7 +52,7 @@ export const loadTemplate = (selector, link, templateData) => new Promise((resol
 
 export const limitContentText = (contentSelector, maxTextLength) => {
   $(contentSelector)
-  .each(function(i) {
+  .each(function (i) {
     const len = $(this)
     .text().length;
     if (len > maxTextLength) {

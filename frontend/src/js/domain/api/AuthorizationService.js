@@ -1,7 +1,7 @@
-import { endpoint } from "../config";
-import { Action, ContentType, Header } from "../constant";
-import { Subscribable } from "../model";
-import { RestClient } from "./RestClient.js";
+import { RestClient } from "/frontend/src/js/domain/api/RestClient.js";
+import { endpoint } from "/frontend/src/js/domain/config/index.js";
+import { Action, ContentType, Header } from "/frontend/src/js/domain/constant/index.js";
+import { Subscribable } from "/frontend/src/js/domain/model/Subscribable.js";
 
 export class AuthorizationService extends Subscribable {
   constructor() {
@@ -79,7 +79,7 @@ export class AuthorizationService extends Subscribable {
   signUp(loginInfo) {
     return new Promise((resolve, reject) => {
       this._restClient
-          .post("users")
+          .post("AdministratorService")
           .accept(ContentType.APPLICATION_JSON)
           .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(loginInfo)
@@ -92,6 +92,6 @@ export class AuthorizationService extends Subscribable {
   }
 }
 
-AuthorizationService.TOKEN = "token";
+AuthorizationService.TOKEN = "admin_token";
 
 export default AuthorizationService;

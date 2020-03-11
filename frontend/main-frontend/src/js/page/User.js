@@ -1,7 +1,7 @@
-import {checkIsAuthorized, loadTemplate, redirectToPage} from "../main.js";
-import {Page} from "./Page.js";
-import {JobService, UserService} from "../api";
-import {TemplateHelper} from "../helper";
+import { JobService, UserService } from "/frontend/main-frontend/src/js/api/index.js";
+import { checkIsAuthorized, loadTemplate, redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/TemplateHelper.js";
+import { Page } from "./Page.js";
 
 export class User extends Page {
   constructor(props) {
@@ -57,19 +57,19 @@ export class User extends Page {
 
   _startJob(event) {
     event.preventDefault();
-    const id = event.currentTarget.getAttribute('data-id');
+    const id = event.currentTarget.getAttribute("data-id");
     this._jobService.startJob(id).then(() => this.process());
   }
 
   _deleteJob(event) {
     event.preventDefault();
-    const id = event.currentTarget.getAttribute('data-id');
+    const id = event.currentTarget.getAttribute("data-id");
     this._jobService.deleteJob(id).then(() => this.process());
   }
 
   _finishJob(event) {
     event.preventDefault();
-    const id = event.currentTarget.getAttribute('data-id');
+    const id = event.currentTarget.getAttribute("data-id");
     this._jobService.finishJob(id).then(() => this.process());
   }
 
@@ -159,18 +159,17 @@ export class User extends Page {
   _freelancerFormSubmit(event) {
     event.preventDefault();
     const freelancerForm = $(User.Selectors.FREELANCER_FORM);
-    this._freelancerProfile.description = freelancerForm.find('textarea')
+    this._freelancerProfile.description = freelancerForm.find("textarea")
                                                         .val();
     this._userService.updateFreelancerProfile(this._freelancerProfile)
         .then(response => {
-          $('.ui.modals')
+          $(".ui.modals")
           .remove();
           this.replacePage("user", response.body)
               .finally(() => super.process());
         })
         .catch(error => {
-          $('.ui.modal')
-          .modal('hide');
+          $(".ui.modal").remove();
           this.process();
         })
         .finally(() => this.hideDimmer());
@@ -179,34 +178,34 @@ export class User extends Page {
   _employerFormSubmit(event) {
     event.preventDefault();
     const employerForm = $(User.Selectors.EMPLOYER_FORM);
-    this._employerProfile.description = employerForm.find('textarea')
+    this._employerProfile.description = employerForm.find("textarea")
                                                     .val();
     this._userService.updateEmployerProfile(this._employerProfile)
         .then(response => {
-          $('.ui.modals')
+          $(".ui.modals")
           .remove();
           this.replacePage("user", response.body)
               .finally(() => super.process());
         })
-        .catch(error => this.addErrorsToForm(User.Selectors.EMPLOYER_FORM, error.response.body))
+        .catch(error => {
+          $(".ui.modals").remove();
+          this.process();
+        })
         .finally(() => this.hideDimmer());
   }
 
   _jobFormSubmit(event) {
     event.preventDefault();
     const jobForm = $(User.Selectors.JOB_FORM);
-    this._job.description = jobForm.find('textarea')
+    this._job.description = jobForm.find("textarea")
                                    .val();
-    this._job.endDateTime = jobForm.find('input[name=endDateTime]')
-                                   .val(
-
-                                   );
+    this._job.endDateTime = jobForm.find("input[name=endDateTime]")
+                                   .val();
     this.showDimmer();
     this._jobService.createJob(this._job)
         .then(() => this._renderPage())
         .catch(() => {
-          $('.ui.modal')
-          .modal('hide');
+          $(".ui.modals").remove();
           this.process();
         })
         .finally(() => this.hideDimmer());

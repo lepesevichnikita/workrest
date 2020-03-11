@@ -1,8 +1,9 @@
-import { AuthorizationService } from "./api";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
+import { Administrators, Login } from "/frontend/system-administrator-frontend/src/js/page/index.js";
 
-import { Action } from "./constant";
-import { TemplateHelper } from "./helper";
-import { Administrators, Login } from "./page";
+AuthorizationService.TOKEN = "system_administrator_token";
 
 const menuContainerId = "#menu";
 const authorizationService = new AuthorizationService();
@@ -18,22 +19,18 @@ const capitalizeFirstLetter = string => {
 };
 
 const loadMenu = menuName => {
-  $(menuContainerId)
-  .dimmer("show");
   $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
    .done(menuTemplate => {
      $(menuContainerId)
-     .dimmer("hide");
-     $(menuContainerId)
      .html($.tmpl(menuTemplate, {}));
      $(".ui.link")
-     .click(function(event) {
+     .click(function (event) {
        event.preventDefault();
        redirectToPage($(this)
                       .attr("name"));
      });
      $("#signout")
-     .click(function(event) {
+     .click(function (event) {
        event.preventDefault();
        authorizationService.signOut();
      });
@@ -58,7 +55,7 @@ export const loadTemplate = (selector, link, templateData) => new Promise((resol
 
 export const limitContentText = (contentSelector, maxTextLength) => {
   $(contentSelector)
-  .each(function(i) {
+  .each(function (i) {
     const len = $(this)
     .text().length;
     if (len > maxTextLength) {

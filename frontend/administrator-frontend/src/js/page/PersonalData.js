@@ -1,5 +1,5 @@
-import { PersonalDataService } from "../api";
-import { redirectToPage } from "../main.js";
+import { PersonalDataService } from "/frontend/administrator-frontend/src/js/api/index.js";
+import { redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
 import { Page } from "./Page.js";
 
 export class PersonalData extends Page {
