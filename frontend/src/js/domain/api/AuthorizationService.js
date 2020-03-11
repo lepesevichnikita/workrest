@@ -79,7 +79,7 @@ export class AuthorizationService extends Subscribable {
   signUp(loginInfo) {
     return new Promise((resolve, reject) => {
       this._restClient
-          .post("AdministratorService")
+          .post(endpoint.users.root)
           .accept(ContentType.APPLICATION_JSON)
           .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
           .send(loginInfo)
