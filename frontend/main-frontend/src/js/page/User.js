@@ -29,6 +29,9 @@ export class User extends Page {
 
   process() {
     this.showDimmer();
+    this._freelancerProfile = {};
+    this._employerProfile = {};
+    this._job = {};
     checkIsAuthorized()
     .then(() => {
       this._userService.getCurrentUser()
@@ -203,7 +206,11 @@ export class User extends Page {
                                    .val();
     this.showDimmer();
     this._jobService.createJob(this._job)
-        .then(() => this._renderPage())
+        .then(() => {
+          $(".ui.modals")
+          .remove();
+          this.process();
+        })
         .catch(() => {
           $(".ui.modals").remove();
           this.process();

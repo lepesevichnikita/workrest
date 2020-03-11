@@ -15,9 +15,9 @@ export class Administrators extends Page {
   }
 
   process() {
+    this.showDimmer();
     this._authorizationService.checkIsAuthorized()
         .then(() => {
-          this.showDimmer();
           this._loadData();
         })
         .catch(() => redirectToPage("login"))
@@ -45,9 +45,7 @@ export class Administrators extends Page {
   _loadData() {
     this._administratorService.getAdministrators()
         .then(response => this.replacePage("administrators", {administrators: response.body})
-                              .then(() => {
-                                super.process();
-                              }));
+                              .finally(() => super.process()));
   }
 
   _onDeleteClick(event) {
