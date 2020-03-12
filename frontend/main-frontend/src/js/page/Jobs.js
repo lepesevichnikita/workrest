@@ -1,16 +1,15 @@
 import { JobService } from "/frontend/main-frontend/src/js/api/index.js";
-import { Page } from "./Page.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class Jobs extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
-    this._jobService = new JobService(props);
+    super(props);
     this.addListener("div[data-action=show]", ["click", this._onShowClick.bind(this), false]);
   }
 
-  process() {
-    this._loadData();
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _onShowClick(event) {
@@ -21,12 +20,20 @@ export class Jobs extends Page {
                .modal("show");
   }
 
-  _loadData() {
+  get _jobService() {
+    return this.locator.getServiceByClass(JobService);
+  }
+
+  process() {
+    this.showDimmer();
     this._jobService.getJobs()
         .then(response => this.replacePage("jobs", {
           jobs: response.body
         })
-                              .finally(() => super.process()));
+                              .finally(() => {
+                                super.process();
+                                this.hideDimmer();
+                              }));
   }
 }
 

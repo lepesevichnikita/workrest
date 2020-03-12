@@ -1,15 +1,12 @@
-import { Page } from "./Page.js";
-import { Action } from "/frontend/src/js/domain/constant/index.js";
 import { FileService, PersonalDataService } from "/frontend/main-frontend/src/js/api/index.js";
-import { checkIsAuthorized, redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
 
 export class PersonalData extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
-    this._fileService = new FileService(props);
+    super(props);
     this._personalData = {attachment: null};
-    this._personalDataService = new PersonalDataService(props);
     this.addListener(PersonalData.FILE_CHOOSE_BUTTON_SELECTOR,
                      ["click", this._onChooseFileButtonClick.bind(this), false])
         .addListener(PersonalData.FILE_INPUT_SELECTOR, ["change", this._onChangeFileInput.bind(this), false])
@@ -17,22 +14,8 @@ export class PersonalData extends Page {
     this._fileService.subscribe(Action.LOADING_PROGRESS, this._onFileLoadingProgress.bind(this));
   }
 
-  process() {
-    this.showDimmer();
-    checkIsAuthorized()
-    .then(() => this._personalDataService.getPersonalData()
-                    .then(response => this._personalData = response.body)
-                    .catch(console.error)
-                    .finally(() => this.replacePage("personal_data", this._personalData)
-                                       .then(() => this._setValidationOnPersonalDataForm())))
-    .finally(() => {
-      this.hideDimmer();
-      super.process();
-    })
-    .catch(error => {
-      console.error(error);
-      error && error.unauthorized && redirectToPage("login");
-    });
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _setValidationOnPersonalDataForm() {
@@ -109,6 +92,32 @@ export class PersonalData extends Page {
         .then(() => $("img")
         .attr("src", this._fileService.getFileUrl(this._personalData.attachment.id)))
         .catch(() => progressBar.progress("set error"));
+  }
+
+  get _fileService() {
+    return this.locator.getServiceByClass(FileService);
+  }
+
+  get _personalDataService() {
+    return this.locator.getServiceByClass(PersonalDataService);
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then(() => this._personalDataService.getPersonalData()
+                        .then(response => this._personalData = response.body)
+                        .catch(console.error)
+                        .finally(() => this.replacePage("personal_data", this._personalData)
+                                           .then(() => this._setValidationOnPersonalDataForm())))
+        .finally(() => {
+          this.hideDimmer();
+          super.process();
+        })
+        .catch(error => {
+          console.error(error);
+          error && error.unauthorized && this.redirectToPage("login");
+        });
   }
 }
 

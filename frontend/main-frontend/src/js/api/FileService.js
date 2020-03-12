@@ -1,4 +1,4 @@
-import { RestClient } from "/frontend/src/js/domain/api/index.js";
+import { AuthorizationService, RestClient } from "/frontend/src/js/domain/api/index.js";
 import { endpoint } from "/frontend/src/js/domain/config/index.js";
 import { Action } from "/frontend/src/js/domain/constant/index.js";
 import { Subscribable } from "/frontend/src/js/domain/model/index.js";
@@ -6,8 +6,15 @@ import { Subscribable } from "/frontend/src/js/domain/model/index.js";
 export class FileService extends Subscribable {
   constructor(props) {
     super();
-    this._authorizationService = props.authorizationService;
-    this._restClient = new RestClient();
+    this._locator = props.locator;
+  }
+
+  get _authorizationService() {
+    return this._locator.getServiceByClass(AuthorizationService);
+  }
+
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
   }
 
   getFileUrl(id) {
@@ -26,6 +33,14 @@ export class FileService extends Subscribable {
           .then(resolve)
           .catch(reject);
     });
+  }
+
+  get _authorizationService() {
+    return this._locator.getServiceByClass(AuthorizationService);
+  }
+
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
   }
 }
 

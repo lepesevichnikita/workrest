@@ -2,9 +2,8 @@ import { AuthorizationService, RestClient } from "/frontend/src/js/domain/api/in
 import { endpoint } from "/frontend/src/js/domain/config/index.js";
 
 export class PersonalDataService {
-  constructor() {
-    this._authorizationService = new AuthorizationService();
-    this._restClient = new RestClient();
+  constructor(props) {
+    this._locator = props.locator;
   }
 
   getFileActionUrl() {
@@ -30,6 +29,14 @@ export class PersonalDataService {
                                                 .secured(this._authorizationService.getToken().token)
                                                 .then(resolve)
                                                 .catch(reject));
+  }
+
+  get _authorizationService() {
+    return this._locator.getServiceByClass(AuthorizationService);
+  }
+
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
   }
 }
 

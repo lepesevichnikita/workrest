@@ -1,21 +1,10 @@
-import { redirectToPage } from "/frontend/main-frontend/src/js/main.js";
-import { Page } from "./Page.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class Login extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
+    super(props);
     this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
-  }
-
-  process() {
-    this._authorizationService.checkIsAuthorized()
-        .then(() => redirectToPage("home"))
-        .catch(() => this.replacePage("login")
-                         .then(() => {
-                           this._setValidationOnLoginForm();
-                           super.process();
-                         }));
   }
 
   _setValidationOnLoginForm() {
@@ -42,6 +31,30 @@ export class Login extends Page {
         .finally(() => {
           $(Login.FORM_SELECTOR)
           .form("reset");
+          this.hideDimmer();
+        });
+  }
+
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (authorized) {
+            this.redirectToPage("home");
+          } else {
+            this.replacePage("login")
+                .then(() => {
+                  this._setValidationOnLoginForm();
+                  super.process();
+                });
+          }
+        })
+        .catch(console.dir)
+        .finally(() => {
           this.hideDimmer();
         });
   }

@@ -5,4 +5,3 @@ export { Jobs } from "./Jobs.js";
 export { SignUp } from "./SignUp.js";
 export { User } from "./User.js";
 export { PersonalData } from "./PersonalData.js";
-export { Page } from "./Page.js";

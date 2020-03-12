@@ -1,5 +1,5 @@
+import { backend } from "/frontend/src/js/domain/config/index.js";
 import { Header } from "/frontend/src/js/domain/constant/index.js";
-import backend from "/frontend/src/js/domain/config/backend.js";
 
 export class RestClient {
   constructor() {

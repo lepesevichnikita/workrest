@@ -1,15 +1,10 @@
 import { JobService, UserService } from "/frontend/main-frontend/src/js/api/index.js";
-import { checkIsAuthorized, loadTemplate, redirectToPage } from "/frontend/main-frontend/src/js/main.js";
-import { TemplateHelper } from "/frontend/src/js/domain/helper/TemplateHelper.js";
-import { Page } from "./Page.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class User extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
-    this._userService = new UserService(props);
-    this._jobService = new JobService(props);
-    this._templateHelper = new TemplateHelper();
+    super(props);
     this._freelancerProfile = {};
     this._employerProfile = {};
     this._job = {};
@@ -27,35 +22,8 @@ export class User extends Page {
         .addListener(User.Selectors.JOB_FINISH_BUTTON, ["click", this._finishJob.bind(this), false]);
   }
 
-  process() {
-    this.showDimmer();
-    this._freelancerProfile = {};
-    this._employerProfile = {};
-    this._job = {};
-    checkIsAuthorized()
-    .then(() => {
-      this._userService.getCurrentUser()
-          .then(response => {
-            this._user = response.body;
-            if (this._user.freelancerProfile) {
-              this._freelancerProfile = this._user.freelancerProfile;
-            }
-            if (this._freelancerProfile && this._freelancerProfile.skills) {
-              this._freelancerProfile.skills = this._freelancerProfile.skills.map(skill => skill.name);
-            }
-            if (this._user._employerProfile) {
-              this._employerProfile = this._user.employerProfile;
-            }
-          })
-          .then(() => this._renderPage())
-    })
-    .catch(() => {
-      redirectToPage("login");
-    })
-    .finally(() => {
-      this.hideDimmer();
-      super.process();
-    });
+  get _userService() {
+    return this.locator.getServiceByClass(UserService);
   }
 
   _startJob(event) {
@@ -82,19 +50,6 @@ export class User extends Page {
     $(`#${targetModalId}`)
     .modal({detachable: false, dimmerSettings: {closable: true, useCss: false}})
     .modal("show");
-  }
-
-  get _jobSkillInput() {
-    return document.querySelector(User.Selectors.JOB_SKILL_INPUT);
-  }
-
-  get _freelancerSkillInput() {
-    return document.querySelector(User.Selectors.FREELANCER_SKILL_INPUT);
-  }
-
-  _renderPage() {
-    this.replacePage("user", this._user)
-        .finally(() => super.process());
   }
 
   _freelancerSkillAddClick(event) {
@@ -133,8 +88,8 @@ export class User extends Page {
     this[skillsOwnerName].skills = skills;
   }
 
-  _renderSkillsInContainer(containerSelector, skills) {
-    return loadTemplate(containerSelector, this._templateHelper.getTemplatePath("general/tags"), {skills});
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _renderSkillsInFreelancerProfileForm() {
@@ -227,6 +182,62 @@ export class User extends Page {
     if (!array.includes(item)) {
       array.push(item);
     }
+  }
+
+  get _jobService() {
+    return this.locator.getServiceByClass(JobService);
+  }
+
+  get _jobSkillInput() {
+    return document.querySelector(User.Selectors.JOB_SKILL_INPUT);
+  }
+
+  get _freelancerSkillInput() {
+    return document.querySelector(User.Selectors.FREELANCER_SKILL_INPUT);
+  }
+
+  process() {
+    this.showDimmer();
+    this._freelancerProfile = {};
+    this._employerProfile = {};
+    this._job = {};
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (authorized) {
+            this._loadCurrentUser();
+          } else {
+            this.redirectToPage("login");
+          }
+        })
+        .catch(console.error);
+  }
+
+  _renderSkillsInContainer(containerSelector, skills) {
+    const skillsContainer = $(containerSelector);
+    const builtTemplate = this.locator.getServiceByClass(Renderer)
+                              .buildTemplate("general/tags", {skills});
+    return builtTemplate.html(skillsContainer);
+  }
+
+  _loadCurrentUser() {
+    this._userService.getCurrentUser()
+        .then(response => {
+          this._user = response.body;
+          if (this._user.freelancerProfile) {
+            this._freelancerProfile = this._user.freelancerProfile;
+          }
+          if (this._freelancerProfile && this._freelancerProfile.skills) {
+            this._freelancerProfile.skills = this._freelancerProfile.skills.map(skill => skill.name);
+          }
+          if (this._user._employerProfile) {
+            this._employerProfile = this._user.employerProfile;
+          }
+        })
+        .then(() => this.replacePage("user", this._user)
+                        .finally(() => {
+                          super.process();
+                          this.hideDimmer();
+                        }));
   }
 }
 

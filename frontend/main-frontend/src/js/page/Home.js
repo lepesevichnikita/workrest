@@ -1,8 +1,8 @@
-import { Page } from "./Page.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class Home extends Page {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
   }
 
   process() {

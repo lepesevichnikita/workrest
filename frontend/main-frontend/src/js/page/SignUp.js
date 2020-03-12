@@ -1,38 +1,14 @@
-import { Page } from "./Page.js";
-import { redirectToPage } from "/frontend/main-frontend/src/js/main.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class SignUp extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
+    super(props);
     this.addListener(SignUp.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then(() => redirectToPage("home"))
-        .catch(() => this.replacePage("signup")
-                         .then(() => this._setValidationOnSignUpForm())
-                         .then(() => super.process()))
-        .finally(() => this.hideDimmer());
-  }
-
-  _setValidationOnSignUpForm() {
-    const loginForm = $("#signupForm");
-    loginForm.form({
-                     login: {identifier: "login", rules: [{type: "empty", prompt: "Login is required"}]},
-                     password: {identifier: "password", rules: [{type: "empty", prompt: "Password is required"}]},
-                     passwordConfirmation: {
-                       identifier: "passwordConfirmation",
-                       depends: "password",
-                       rules: [{type: "empty", prompt: "Password confirmation is required"},
-                         {type: "match[password]", prompt: "Passwords should match"}]
-                     },
-                     eulaAgreed: {identifier: "eulaAgreed", rules: [{type: "checked", prompt: "EULA must be agreed"}]}
-                   }, {
-                     onSuccess: this._signUp.bind(this)
-                   });
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _onFormSubmit(event) {
@@ -49,6 +25,32 @@ export class SignUp extends Page {
         .finally(() => {
           this.hideDimmer();
         });
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then(() => this.redirectToPage("home"))
+        .catch(() => this.replacePage("signup")
+                         .then(() => this._setValidationOnSignUpForm())
+                         .then(() => super.process()))
+        .finally(() => this.hideDimmer());
+  }
+
+  _setValidationOnSignUpForm() {
+    const loginForm = $("#signupForm");
+    loginForm.form({
+                     login: {identifier: "login", rules: [{type: "empty", prompt: "Login is required"}]},
+                     password: {identifier: "password", rules: [{type: "empty", prompt: "Password is required"}]},
+                     passwordConfirmation: {
+                       identifier: "passwordConfirmation",
+                       depends: "password",
+                       rules: [{type: "empty", prompt: "Password confirmation is required"}, {type: "match[password]", prompt: "Passwords should match"}]
+                     },
+                     eulaAgreed: {identifier: "eulaAgreed", rules: [{type: "checked", prompt: "EULA must be agreed"}]}
+                   }, {
+                     onSuccess: this._signUp.bind(this)
+                   });
   }
 }
 

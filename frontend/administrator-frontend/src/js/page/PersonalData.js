@@ -1,23 +1,17 @@
 import { PersonalDataService } from "/frontend/administrator-frontend/src/js/api/index.js";
-import { redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
-import { Page } from "./Page.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class PersonalData extends Page {
   constructor(props) {
     super(props);
-    this._authorizationService = props.authorizationService;
-    this._personalDataService = new PersonalDataService(props);
     this.addListener(".button[data-action=approve]", ["click", this._onApproveClick.bind(this), false])
         .addListener(".button[data-action=reject]", ["click", this._onRejectClick.bind(this), false])
         .addListener(".button[data-action=show]", ["click", this._onShowClick.bind(this), false]);
   }
 
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then(() => this._loadData())
-        .catch(() => redirectToPage("login"))
-        .finally(() => this.hideDimmer());
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _onApproveClick(event) {
@@ -59,5 +53,17 @@ export class PersonalData extends Page {
           personalData: response.body
         })
                               .finally(() => super.process()));
+  }
+
+  get _personalDataService() {
+    return this.locator.getServiceByClass(PersonalDataService);
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then(() => this._loadData())
+        .catch(() => this.redirectToPage("login"))
+        .finally(() => this.hideDimmer());
   }
 }

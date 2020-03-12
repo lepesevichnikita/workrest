@@ -1,21 +1,14 @@
-import { redirectToPage } from "/frontend/administrator-frontend/src/js/main.js";
-import { Page } from "./Page.js";
+import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { Page } from "/frontend/src/js/domain/component/index.js";
 
 export class Login extends Page {
   constructor(props) {
-    super();
-    this._authorizationService = props.authorizationService;
+    super(props);
     this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then(() => redirectToPage("users"))
-        .catch(() => this.replacePage("login")
-                         .then(() => this._setValidationOnLoginForm())
-                         .finally(() => super.process()))
-        .finally(() => this.hideDimmer());
+  get _authorizationService() {
+    return this.locator.getServiceByClass(AuthorizationService);
   }
 
   _setValidationOnLoginForm() {
@@ -35,7 +28,6 @@ export class Login extends Page {
   }
 
   _signIn(event, fields) {
-    event.preventDefault();
     this.showDimmer();
     this._authorizationService.signIn(fields)
         .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
@@ -44,6 +36,22 @@ export class Login extends Page {
           .form("reset");
           this.hideDimmer();
         });
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (authorized) {
+            this.redirectToPage("users");
+          } else {
+            this.replacePage("login")
+                .then(() => this._setValidationOnLoginForm())
+                .finally(() => super.process());
+          }
+        })
+        .catch(console.dir)
+        .finally(() => this.hideDimmer());
   }
 }
 

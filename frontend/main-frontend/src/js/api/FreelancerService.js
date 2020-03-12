@@ -1,10 +1,9 @@
-import { RestClient } from "/frontend/src/js/domain/api/index.js";
+import { AuthorizationService, RestClient } from "/frontend/src/js/domain/api/index.js";
 import { endpoint } from "/frontend/src/js/domain/config/index.js";
 
 export class FreelancerService {
   constructor(props) {
-    this._authorizationService = props.authorizationService;
-    this._restClient = new RestClient();
+    this._locator = props.locator;
   }
 
   getFreelancers() {
@@ -14,6 +13,22 @@ export class FreelancerService {
           .then(resolve)
           .catch(reject);
     });
+  }
+
+  get _authorizationService() {
+    return this._locator.getServiceByClass(AuthorizationService);
+  }
+
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
+  }
+
+  get _authorizationService() {
+    return this._locator.getServiceByClass(AuthorizationService);
+  }
+
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
   }
 }
 

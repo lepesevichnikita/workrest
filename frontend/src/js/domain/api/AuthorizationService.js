@@ -1,46 +1,20 @@
-import { RestClient } from "/frontend/src/js/domain/api/RestClient.js";
 import { endpoint } from "/frontend/src/js/domain/config/index.js";
 import { Action, ContentType, Header } from "/frontend/src/js/domain/constant/index.js";
-import { Subscribable } from "/frontend/src/js/domain/model/Subscribable.js";
+import { Subscribable } from "/frontend/src/js/domain/model/index.js";
+import { RestClient } from "./RestClient.js";
 
 export class AuthorizationService extends Subscribable {
-  constructor() {
+  constructor(props) {
     super();
-    this._restClient = new RestClient();
+    this._locator = props.locator;
   }
 
   hasToken() {
     return localStorage.getItem(AuthorizationService.TOKEN) !== null;
   }
 
-  checkIsAuthorized() {
-    return new Promise((resolve, reject) => {
-      if (this.hasToken()) {
-        this.verifyToken()
-            .then(resolve)
-            .catch(reject);
-      } else {
-        reject();
-      }
-    });
-  };
-
-  verifyToken() {
-    return new Promise((resolve, reject) => {
-      this._restClient
-          .post(endpoint.token.verify)
-          .secured(this.getToken().token)
-          .accept(ContentType.APPLICATION_JSON)
-          .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-          .then(response => {
-            this.notifyAllSubscribers(Action.TOKEN_CORRECT);
-            resolve(response);
-          })
-          .catch(error => {
-            this.notifyAllSubscribers(Action.TOKEN_INCORRECT);
-            reject(error);
-          });
-    });
+  get _restClient() {
+    return this._locator.getServiceByClass(RestClient);
   }
 
   getToken() {
@@ -89,6 +63,26 @@ export class AuthorizationService extends Subscribable {
           })
           .catch(reject);
     });
+  }
+
+  async checkIsAuthorized() {
+    return this.hasToken() && await this.verifyToken();
+  }
+
+  async verifyToken() {
+    let result = false;
+    const response = await this._restClient
+                               .post(endpoint.token.verify)
+                               .secured(this.getToken().token)
+                               .accept(ContentType.APPLICATION_JSON)
+                               .set(Header.CONTENT_TYPE, ContentType.APPLICATION_JSON);
+    if (response.status >= 200 && response.status < 300) {
+      result = true;
+      this.notifyAllSubscribers(Action.TOKEN_CORRECT);
+    } else {
+      this.notifyAllSubscribers(Action.TOKEN_INCORRECT);
+    }
+    return result;
   }
 }
 

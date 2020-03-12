@@ -1,90 +1,51 @@
+import { PersonalDataService, UserService } from "/frontend/administrator-frontend/src/js/api/index.js";
 import { Login, PersonalData, Users } from "/frontend/administrator-frontend/src/js/page/index.js";
-import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
-import { Action } from "/frontend/src/js/domain/constant/index.js";
+import { AuthorizationService, RestClient, TemplateProvider } from "/frontend/src/js/domain/api/index.js";
 import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
+import { Locator, Renderer } from "/frontend/src/js/domain/service/index.js";
 
-AuthorizationService.TOKEN = 'administrator_token';
+const MENU_CONTAINER_ID = "#menu";
 
-const menuContainerId = "#menu";
-const templateHelper = new TemplateHelper();
-const authorizationService = new AuthorizationService();
+const locator = new Locator();
+locator.registerServiceByClass(TemplateHelper, new TemplateHelper())
+       .registerServiceByClass(RestClient, new RestClient())
+       .registerServiceByClass(Renderer, new Renderer({locator}))
+       .registerServiceByClass(AuthorizationService, new AuthorizationService({locator}))
+       .registerServiceByClass(TemplateProvider, new TemplateProvider({locator}))
+       .registerServiceByClass(UserService, new UserService({locator}))
+       .registerServiceByClass(PersonalDataService, new PersonalDataService({locator}))
+       .registerServiceByName("users", new Users({locator}))
+       .registerServiceByName("login", new Login({locator}))
+       .registerServiceByName("personal_data", new PersonalData({locator}));
 
-const pages = {
-  login: new Login({authorizationService}),
-  users: new Users({authorizationService}),
-  personal_data: new PersonalData({authorizationService})
-};
+const redirectToPage = (pageName) => locator.getServiceByName(pageName)
+                                            .process();
 
 const loadMenu = menuName => {
-  $.get(templateHelper.getTemplatePath(`menu/${menuName}`))
-   .done(menuTemplate => {
-     $(menuContainerId)
-     .html($.tmpl(menuTemplate, {}));
-     const links = $(".ui.link");
-     links.click(function (event) {
-       event.preventDefault();
-       redirectToPage($(this)
-                      .attr("name"));
-     });
-     links.unbind();
-     $("#signout")
-     .click(function (event) {
-       event.preventDefault();
-       authorizationService.signOut();
-     });
-   });
+  const menuContainer = $(MENU_CONTAINER_ID);
+  locator.getServiceByClass(Renderer)
+         .buildTemplate(`menu/${menuName}`)
+         .then(templateBody => {
+           menuContainer.html(templateBody);
+           const links = $(".ui.link");
+           const signOutButton = $("#signout");
+           links.unbind();
+           links.click((event) => {
+             event.preventDefault();
+             const pageName = event.currentTarget.getAttribute("name");
+             redirectToPage(pageName);
+           });
+           signOutButton.click((event) => {
+             event.preventDefault();
+             locator.getServiceByClass(AuthorizationService)
+                    .signOut();
+           });
+         });
 };
 
-export const redirectToPage = pageName => {
-  pages[pageName].process();
-};
-
-export const loadTemplate = (selector, link, templateData) => new Promise((resolve, reject) => {
-  superagent.get(link)
-            .then(response => {
-              const pageHtml = $.tmpl(response.text, templateData);
-              $(selector)
-              .html(pageHtml);
-              resolve(pageHtml);
-            })
-            .catch(reject);
-});
-
-export const limitContentText = (contentSelector, maxTextLength) => {
-  $(contentSelector)
-  .each(function (i) {
-    const len = $(this)
-    .text().length;
-    if (len > maxTextLength) {
-      $(this)
-      .text($(this)
-            .text()
-            .substr(0, maxTextLength) + "...");
-    }
-  });
-};
-
-window.limitContentText = limitContentText;
-window.authorizationService = authorizationService;
-
-authorizationService
-.subscribe(Action.SIGNED_IN, () => {
-  loadMenu("authorized");
-  redirectToPage("users");
-})
-.subscribe(Action.LOGGED_OUT, () => {
-  loadMenu("main");
-  redirectToPage("login");
-})
-.subscribe(Action.TOKEN_CORRECT, () => {
-  loadMenu("authorized");
-})
-.subscribe(Action.TOKEN_INCORRECT, () => {
-  authorizationService.signOut();
-});
-
-authorizationService.checkIsAuthorized()
-                    .then(() => loadMenu("authorized"))
-                    .catch(() => loadMenu("main"))
-                    .finally(() => redirectToPage("users"));
+locator.getServiceByClass(AuthorizationService)
+       .checkIsAuthorized()
+       .then((authorized) => authorized ? loadMenu("authorized") : loadMenu("main"))
+       .finally(() => locator.getServiceByName("login")
+                             .process());
 
