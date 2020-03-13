@@ -12,16 +12,19 @@ import java.util.Set;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.JobBuilder;
 import org.klaster.domain.dto.JobDTO;
+import org.klaster.domain.exception.ActionForbiddenForUserException;
 import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
 import org.klaster.domain.model.entity.FreelancerProfile;
+import org.klaster.domain.model.entity.JobMessage;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.DeletedJobState;
 import org.klaster.domain.model.state.job.FinishedJobState;
 import org.klaster.domain.model.state.job.StartedJobState;
 import org.klaster.domain.repository.FreelancerProfileRepository;
+import org.klaster.domain.repository.JobMessageRepository;
 import org.klaster.domain.repository.JobRepository;
 import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.util.MessageUtil;
@@ -50,6 +53,9 @@ public class DefaultJobService {
 
   @Autowired
   private FreelancerProfileRepository freelancerProfileRepository;
+
+  @Autowired
+  private JobMessageRepository jobMessageRepository;
 
   @Transactional
   public Job create(JobDTO jobDTO, User author) {
@@ -129,15 +135,37 @@ public class DefaultJobService {
                         .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(Job.class, jobId)));
   }
 
-  private void validateJobBelongsToUser(Job job, User user) {
-    EmployerProfile employerProfile = user.getCurrentState()
-                                          .getEmployerProfile();
-    if (!job.belongsToEmployer(employerProfile.getId())) {
-      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(User.class, user.getId()));
+  @Transactional
+  public JobMessage addMessageFromUser(long jobId, User author, String text) {
+    Job foundJob = findById(jobId);
+    validateJobDoesntBelongToUser(foundJob, author);
+    if (jobMessageRepository.existsByAuthorAndJob(author, foundJob)) {
+      throw new ActionForbiddenForUserException();
     }
+    JobMessage jobMessage = foundJob.getCurrentState()
+                                    .addMessage(author, text);
+    return jobMessageRepository.save(jobMessage);
   }
 
   public List<Job> findAll() {
     return jobRepository.findAll();
   }
+
+  private void validateJobDoesntBelongToUser(Job job, User user) {
+    EmployerProfile employerProfile = user.getCurrentState()
+                                          .getEmployerProfile();
+    if (null != employerProfile && job.belongsToEmployer(employerProfile.getId())) {
+      throw new ActionForbiddenForUserException();
+    }
+  }
+
+  private void validateJobBelongsToUser(Job job, User user) {
+    EmployerProfile employerProfile = user.getCurrentState()
+                                          .getEmployerProfile();
+    if (null == employerProfile || !job.belongsToEmployer(employerProfile.getId())) {
+      throw new EntityNotFoundException(MessageUtil.getEntityByParentIdNotFoundMessage(User.class, user.getId()));
+    }
+  }
+
+
 }

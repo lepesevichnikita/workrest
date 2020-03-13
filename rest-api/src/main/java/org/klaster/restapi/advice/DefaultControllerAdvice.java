@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
+import org.klaster.domain.exception.ActionForbiddenForUserException;
 import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -86,6 +87,11 @@ public class DefaultControllerAdvice {
   @ExceptionHandler(FileNotFoundException.class)
   public ResponseEntity<?> handle(FileNotFoundException exception) {
     return handleException(exception, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(ActionForbiddenForUserException.class)
+  public ResponseEntity<?> handle(ActionForbiddenForUserException exception) {
+    return handleException(exception, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

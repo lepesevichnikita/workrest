@@ -77,17 +77,17 @@ public class JobController {
                          .body(defaultJobService.finishById(id, currentUser));
   }
 
-  @PostMapping("/{id}/freelancer/${freelancerId}")
-  @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<Job> setFreelancer(@PathVariable long id, @PathVariable long freelancerId, @AuthenticationPrincipal User currentUser) {
-    return ResponseEntity.accepted()
-                         .body(defaultJobService.setFreelancerProfile(id, freelancerId));
-  }
-
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<Job> updateById(@PathVariable long id, @RequestBody JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
     return ResponseEntity.accepted()
                          .body(defaultJobService.updateById(id, jobDTO, currentUser));
+  }
+
+  @PostMapping("/{id}/freelancer/${freelancerId}")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<Job> setFreelancer(@PathVariable long id, @PathVariable long freelancerId, @AuthenticationPrincipal User currentUser) {
+    return ResponseEntity.accepted()
+                         .body(defaultJobService.setFreelancerProfile(id, freelancerId));
   }
 }

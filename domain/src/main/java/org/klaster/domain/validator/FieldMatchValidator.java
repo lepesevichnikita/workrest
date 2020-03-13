@@ -16,6 +16,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.klaster.domain.constraint.FieldMatch;
 
+/**
+ * Validator for fields, that should match each other
+ */
 public class FieldMatchValidator implements ConstraintValidator<FieldMatch, Object> {
 
   private Logger logger = Logger.getLogger(getClass().getName());

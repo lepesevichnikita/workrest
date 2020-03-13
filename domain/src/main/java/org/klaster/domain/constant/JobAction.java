@@ -14,6 +14,7 @@ public class JobAction {
 
   public static final String UPDATE = "Job update";
   public static final String SET_FREELANCER = "Set freelancer";
+  public static final String ADD_MESSAGE = "Add message";
 
   private JobAction() {
   }

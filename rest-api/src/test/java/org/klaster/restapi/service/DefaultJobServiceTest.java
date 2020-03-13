@@ -9,17 +9,23 @@ import static org.hamcrest.Matchers.instanceOf;
 
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.dto.EmployerProfileDTO;
+import org.klaster.domain.dto.FreelancerProfileDTO;
 import org.klaster.domain.dto.JobDTO;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
+import org.klaster.domain.exception.ActionForbiddenForUserException;
 import org.klaster.domain.exception.EmployerProfileNotFoundException;
 import org.klaster.domain.model.context.Job;
 import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.EmployerProfile;
+import org.klaster.domain.model.entity.FreelancerProfile;
+import org.klaster.domain.model.entity.JobMessage;
 import org.klaster.domain.model.entity.LoginInfo;
 import org.klaster.domain.model.state.job.DeletedJobState;
 import org.klaster.restapi.configuration.ApplicationContext;
 import org.klaster.restapi.factory.RandomEmployerProfileFactory;
+import org.klaster.restapi.factory.RandomFreelancerProfileFactory;
 import org.klaster.restapi.factory.RandomJobFactory;
+import org.klaster.restapi.factory.RandomJobMessageFactory;
 import org.klaster.restapi.factory.RandomLoginInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,11 +51,15 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
 
   private LoginInfo randomLoginInfo;
   private EmployerProfile randomEmployerProfile;
+  private FreelancerProfile randomFreelancerProfile;
   private Job randomJob;
+  private JobMessage randomJobMessage;
 
   private RandomLoginInfoFactory randomLoginInfoFactory;
   private RandomJobFactory randomJobFactory;
   private RandomEmployerProfileFactory randomEmployerProfileFactory;
+  private RandomFreelancerProfileFactory randomFreelancerProfileFactory;
+  private RandomJobMessageFactory randomJobMessageFactory;
 
   @Autowired
   private DefaultUserService defaultUserService;
@@ -62,6 +72,8 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
     randomLoginInfoFactory = RandomLoginInfoFactory.getInstance();
     randomJobFactory = RandomJobFactory.getInstance();
     randomEmployerProfileFactory = RandomEmployerProfileFactory.getInstance();
+    randomFreelancerProfileFactory = RandomFreelancerProfileFactory.getInstance();
+    randomJobMessageFactory = RandomJobMessageFactory.getInstance();
   }
 
   @BeforeMethod
@@ -69,6 +81,8 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
     randomLoginInfo = randomLoginInfoFactory.build();
     randomJob = randomJobFactory.build();
     randomEmployerProfile = randomEmployerProfileFactory.build();
+    randomFreelancerProfile = randomFreelancerProfileFactory.build();
+    randomJobMessage = randomJobMessageFactory.build();
   }
 
   @Test
@@ -284,8 +298,115 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
-  public void finishedStartedJob() {
-
+  public void createsMessageForPublishedJobFromUserWithFreelancerProfile() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    JobMessage createdJobMessage = defaultJobService.addMessageFromUser(createdJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+    assertThat(createdJobMessage, allOf(
+        hasProperty("text", equalTo(randomJobMessage.getText())),
+        hasProperty("author", hasProperty("id", equalTo(userWithFreelancerProfile.getId()))),
+        hasProperty("job", allOf(
+            hasProperty("id", equalTo(createdJob.getId())),
+            hasProperty("description", equalTo(createdJob.getDescription()))
+        ))
+    ));
   }
 
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByCurrentStateForStartedJob() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    Job startedJob = defaultJobService.startById(createdJob.getId(), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(startedJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByCurrentStateForStartedJobOnMessageCreate() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    Job startedJob = defaultJobService.startById(createdJob.getId(), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(startedJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByCurrentStateForFinishedJobOnMessageCreate() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    Job startedJob = defaultJobService.finishById(createdJob.getId(), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(startedJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenByStateException.class)
+  public void throwsActionForbiddenByCurrentStateForDeletedJobOnMessageCreate() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    Job startedJob = defaultJobService.deleteById(createdJob.getId(), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(startedJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenForUserException.class)
+  public void throwsActionForbiddenForUserExceptionForDeletedJobOnMessageCreateByJobOwner() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(createdJob.getId(), userWithEmployerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenForUserException.class)
+  public void throwsActionForbiddenForUserExceptionForTwiceMessageAdding() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(createdJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+    defaultJobService.addMessageFromUser(createdJob.getId(), userWithFreelancerProfile, randomJobMessage.getText());
+  }
+
+  @Test(expectedExceptions = ActionForbiddenForUserException.class)
+  public void throwsActionForbiddenForUserExceptionForUserWithoutFreelacnerProfile() {
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+    User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    defaultJobService.addMessageFromUser(createdJob.getId(), anotherVerifiedUser, randomJobMessage.getText());
+  }
 }

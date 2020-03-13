@@ -23,4 +23,5 @@ public class DeletedJobState extends AbstractJobState {
   public String getName() {
     return JobStateName.DELETED;
   }
+
 }

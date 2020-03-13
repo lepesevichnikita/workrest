@@ -7,7 +7,9 @@ import javax.persistence.Transient;
 import org.klaster.domain.constant.JobAction;
 import org.klaster.domain.exception.ActionForbiddenByStateException;
 import org.klaster.domain.model.context.Job;
+import org.klaster.domain.model.context.User;
 import org.klaster.domain.model.entity.FreelancerProfile;
+import org.klaster.domain.model.entity.JobMessage;
 import org.klaster.domain.model.state.general.AbstractState;
 
 /**
@@ -32,4 +34,9 @@ public abstract class AbstractJobState extends AbstractState<Job> {
   public void updateJob(Job job) {
     throw new ActionForbiddenByStateException(JobAction.UPDATE, this);
   }
+
+  public JobMessage addMessage(User author, String text) {
+    throw new ActionForbiddenByStateException(JobAction.ADD_MESSAGE, this);
+  }
+
 }
