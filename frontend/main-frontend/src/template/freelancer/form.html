@@ -1,0 +1,29 @@
+<form class="ui segment form" id="freelancerProfileForm">
+  <div class="field">
+    <label>Description</label>
+    {{if description}}
+    <textarea name="description">${description}</textarea>
+    {{/if}}
+    {{if !description}}
+    <textarea name="description"></textarea>
+    {{/if}}
+  </div>
+  <div class="field">
+    <div class="ui right labeled left icon input">
+      <i class="tags icon"></i>
+      <input name="skill" placeholder="Enter skill" type="text">
+      <a class="ui tag label" data-action="skillAdd">
+        Add skill
+      </a>
+    </div>
+  </div>
+  <div class="field" id="freelancerSkills">
+    {{if skills}}
+    {{each skills}}
+    <a class="ui label link" data-name="${$value}">${$value.name}</a>
+    {{/each}}
+    {{/if}}
+  </div>
+  <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+  <div class="ui error text"></div>
+</form>

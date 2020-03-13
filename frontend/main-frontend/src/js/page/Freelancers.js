@@ -5,7 +5,24 @@ import { Page } from "/frontend/src/js/domain/component/index.js";
 export class Freelancers extends Page {
   constructor(props) {
     super(props);
+    this._freelancers = [];
     this.addListener("div[data-action=show]", ["click", this._onShowClick.bind(this), false]);
+  }
+
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (authorized) {
+            this._loadData();
+          } else {
+            this.redirectToPage("login");
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this._renderPage();
+        });
   }
 
   _onShowClick(event) {
@@ -24,29 +41,18 @@ export class Freelancers extends Page {
     return this.locator.getServiceByClass(AuthorizationService);
   }
 
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then((authorized) => {
-          console.dir(authorized);
-          if (authorized) {
-            this._loadData();
-          } else {
-            this.redirectToPage("login");
-          }
-        })
-        .catch(console.error);
+  _renderPage() {
+    this.replacePage("freelancers", {freelancers: this._freelancers})
+        .finally(() => {
+          super.process();
+          this.hideDimmer();
+        });
   }
 
   _loadData() {
     this._freelancerService.getFreelancers()
-        .then(response => this.replacePage("freelancers", {
-          freelancers: response.body
-        })
-                              .finally(() => {
-                                super.process();
-                                this.hideDimmer();
-                              }));
+        .then(response => this._freelancers = response.body)
+        .finally(() => this._renderPage());
   }
 }
 

@@ -5,6 +5,7 @@ import { Page } from "/frontend/src/js/domain/component/index.js";
 export class Jobs extends Page {
   constructor(props) {
     super(props);
+    this._jobs = [];
     this.addListener("div[data-action=show]", ["click", this._onShowClick.bind(this), false]);
   }
 
@@ -27,10 +28,9 @@ export class Jobs extends Page {
   process() {
     this.showDimmer();
     this._jobService.getJobs()
-        .then(response => this.replacePage("jobs", {
-          jobs: response.body
-        })
-                              .finally(() => {
+        .then(response => this._jobs = response.body)
+        .finally(() => this.replacePage("jobs", {jobs: this._jobs})
+                           .finally(() => {
                                 super.process();
                                 this.hideDimmer();
                               }));

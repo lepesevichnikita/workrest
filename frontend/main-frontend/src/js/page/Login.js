@@ -7,6 +7,25 @@ export class Login extends Page {
     this.addListener(Login.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (authorized) {
+            this.redirectToPage("home");
+          } else {
+            this._renderPage();
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this._renderPage();
+        })
+        .finally(() => {
+          this.hideDimmer();
+        });
+  }
+
   _setValidationOnLoginForm() {
     const loginForm = $(Login.FORM_SELECTOR);
     loginForm.form({
@@ -24,7 +43,6 @@ export class Login extends Page {
   }
 
   _signIn(event, fields) {
-    event.preventDefault();
     this.showDimmer();
     this._authorizationService.signIn(fields)
         .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
@@ -39,23 +57,11 @@ export class Login extends Page {
     return this.locator.getServiceByClass(AuthorizationService);
   }
 
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then((authorized) => {
-          if (authorized) {
-            this.redirectToPage("home");
-          } else {
-            this.replacePage("login")
-                .then(() => {
-                  this._setValidationOnLoginForm();
-                  super.process();
-                });
-          }
-        })
-        .catch(console.dir)
-        .finally(() => {
-          this.hideDimmer();
+  _renderPage() {
+    this.replacePage("login")
+        .then(() => {
+          this._setValidationOnLoginForm();
+          super.process();
         });
   }
 }

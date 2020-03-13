@@ -21,8 +21,7 @@ export const endpoint = {
     all: "freelancers/all"
   },
   jobs: {
-    root: "jobs",
-    all: "jobs/all",
+    root: "jobs", all: "jobs/all", by_id: id => `jobs/${id}`,
     finish_by_id: id => `jobs/${id}/finish`,
     start_by_id: id => `jobs/${id}/start`
   },

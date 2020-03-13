@@ -78,6 +78,7 @@ locator.getServiceByClass(AuthorizationService)
 locator.getServiceByClass(AuthorizationService)
        .checkIsAuthorized()
        .then((authorized) => authorized ? loadMenu("authorized") : loadMenu("main"))
+       .catch(() => loadMenu("main"))
        .finally(() => locator.getServiceByName("home")
                              .process());
 

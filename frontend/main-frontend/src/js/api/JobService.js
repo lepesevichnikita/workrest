@@ -43,6 +43,11 @@ export class JobService {
     })
   }
 
+  async getJobById(jobId) {
+    return this._restClient.get(endpoint.jobs.by_id(jobId))
+               .secured(this._authorizationService.getToken().token);
+  }
+
   finishJob(id) {
     return new Promise((resolve, reject) => {
       this._restClient.post(endpoint.jobs.finish_by_id(id))

@@ -1,0 +1,13 @@
+<form class="ui segment form" id="employerProfileForm">
+  <div class="field">
+    <label>Description</label>
+    {{if description}}
+    <textarea name="description">${description}</textarea>
+    {{/if}}
+    {{if !description}}
+    <textarea name="description"></textarea>
+    {{/if}}
+  </div>
+  <input class="ui fluid large primary submit button" type="submit" value="Save"/>
+  <div class="ui error text"></div>
+</form>

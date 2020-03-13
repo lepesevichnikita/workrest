@@ -1,6 +1,7 @@
 import { JobService, UserService } from "/frontend/main-frontend/src/js/api/index.js";
-import { AuthorizationService } from "/frontend/src/js/domain/api/index.js";
+import { AuthorizationService, RestClient } from "/frontend/src/js/domain/api/index.js";
 import { Page } from "/frontend/src/js/domain/component/index.js";
+import { Renderer } from "/frontend/src/js/domain/service/index.js";
 
 export class User extends Page {
   constructor(props) {
@@ -14,9 +15,10 @@ export class User extends Page {
         .addListener(User.Selectors.EMPLOYER_FORM, ["submit", this._employerFormSubmit.bind(this), false])
         .addListener(User.Selectors.JOB_SKILL_ADD_BUTTON, ["click", this._jobSkillAddClick.bind(this), false])
         .addListener(User.Selectors.JOB_FORM, ["submit", this._jobFormSubmit.bind(this), false])
-        .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false])
-        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._showModal.bind(this), false])
-        .addListener(User.Selectors.JOB_CREATE_BUTTON, ["click", this._showModal.bind(this), false])
+        .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON, ["click", this._editEmployerProfileClick.bind(this), false])
+        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._editFreelancerProfileClick.bind(this), false])
+        .addListener(User.Selectors.JOB_UPDATE_BUTTON, ["click", this._updateJobClick.bind(this), false])
+        .addListener(User.Selectors.JOB_CREATE_BUTTON, ["click", this._createJobClick.bind(this), false])
         .addListener(User.Selectors.JOB_DELETE_BUTTON, ["click", this._deleteJob.bind(this), false])
         .addListener(User.Selectors.JOB_START_BUTTON, ["click", this._startJob.bind(this), false])
         .addListener(User.Selectors.JOB_FINISH_BUTTON, ["click", this._finishJob.bind(this), false]);
@@ -44,12 +46,24 @@ export class User extends Page {
     this._jobService.finishJob(id).then(() => this.process());
   }
 
-  _showModal(event) {
+  get _renderer() {
+    return this.locator.getServiceByClass(Renderer);
+  }
+
+  get _restClient() {
+    return this.locator.getServiceByClass(RestClient);
+  }
+
+  _editFreelancerProfileClick(event) {
     event.preventDefault();
-    const targetModalId = event.currentTarget.getAttribute("data-target");
-    $(`#${targetModalId}`)
-    .modal({detachable: false, dimmerSettings: {closable: true, useCss: false}})
-    .modal("show");
+    this._renderer.renderModal("freelancer/form", this._freelancerProfile)
+        .finally(() => super.process());
+  }
+
+  _editEmployerProfileClick(event) {
+    event.preventDefault();
+    this._renderer.renderModal("employer/form", this._employerProfile)
+        .finally(() => super.process());
   }
 
   _freelancerSkillAddClick(event) {
@@ -212,10 +226,27 @@ export class User extends Page {
         .catch(console.error);
   }
 
+  _createJobClick(event) {
+    event.preventDefault();
+    this._job = {};
+    this._renderer.renderModal("job/form", this._job)
+        .finally(() => super.process());
+  }
+
+  _updateJobClick(event) {
+    event.preventDefault();
+    this.showDimmer();
+    const jobId = event.currentTarget.getAttribute("data-id");
+    this._restClient.getJobById(jobId)
+        .then(response => this._job = response.body)
+        .then(() => this._renderer.renderModal("job/form", this._job)
+                        .finally(() => super.process()))
+        .finally(() => this.hideDimmer());
+  }
+
   _renderSkillsInContainer(containerSelector, skills) {
     const skillsContainer = $(containerSelector);
-    const builtTemplate = this.locator.getServiceByClass(Renderer)
-                              .buildTemplate("general/tags", {skills});
+    const builtTemplate = this._renderer.buildTemplate("general/tags", {skills});
     return builtTemplate.html(skillsContainer);
   }
 
@@ -253,8 +284,7 @@ User.Selectors = {
   JOB_DESCRIPTION_INPUT: "#jobForm textarea[name=description]",
   FREELANCER_FORM: "#freelancerProfileForm",
   EMPLOYER_FORM: "#employerProfileForm",
-  JOB_FORM: "#jobForm",
-  JOB_CREATE_BUTTON: "div[data-target=jobFormModal]",
+  JOB_FORM: "#jobForm", JOB_CREATE_BUTTON: "div[data-action=create][data-target=job]", JOB_UPDATE_BUTTON: "div[data-action=update][data-target=job]",
   JOB_DELETE_BUTTON: "div[data-action=delete]",
   JOB_START_BUTTON: "div[data-action=start]",
   JOB_FINISH_BUTTON: "div[data-action=finish]"
