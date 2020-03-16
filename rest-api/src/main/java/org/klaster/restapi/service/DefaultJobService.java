@@ -7,8 +7,10 @@ package org.klaster.restapi.service;
  *
  */
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.builder.general.JobBuilder;
 import org.klaster.domain.dto.JobDTO;
@@ -22,6 +24,7 @@ import org.klaster.domain.model.entity.JobMessage;
 import org.klaster.domain.model.entity.Skill;
 import org.klaster.domain.model.state.job.DeletedJobState;
 import org.klaster.domain.model.state.job.FinishedJobState;
+import org.klaster.domain.model.state.job.PublishedJobState;
 import org.klaster.domain.model.state.job.StartedJobState;
 import org.klaster.domain.repository.FreelancerProfileRepository;
 import org.klaster.domain.repository.JobMessageRepository;
@@ -93,7 +96,8 @@ public class DefaultJobService {
                                                                      .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(
                                                                          FreelancerProfile.class,
                                                                          freelancerId)));
-    foundJob.getCurrentState().setFreelancerProfile(freelancerProfile);
+    foundJob.getCurrentState()
+            .setFreelancerProfile(freelancerProfile);
     return jobRepository.saveAndFlush(foundJob);
   }
 
@@ -148,7 +152,11 @@ public class DefaultJobService {
   }
 
   public List<Job> findAll() {
-    return jobRepository.findAll();
+    return jobRepository.findAll()
+                        .stream()
+                        .filter(job -> job.getCurrentState() instanceof PublishedJobState)
+                        .sorted(Comparator.comparing(Job::getId))
+                        .collect(Collectors.toList());
   }
 
   private void validateJobDoesntBelongToUser(Job job, User user) {

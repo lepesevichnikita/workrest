@@ -7,6 +7,22 @@ export class SignUp extends Page {
     this.addListener(SignUp.FORM_SELECTOR, ["submit", this._onFormSubmit.bind(this), false]);
   }
 
+  process() {
+    this.showDimmer();
+    this._authorizationService.checkIsAuthorized()
+        .then((authorized) => {
+          if (!authorized) {
+            this.replacePage("signup")
+                .then(() => this._setValidationOnSignUpForm())
+                .finally(() => super.process())
+          } else {
+            this.redirectToPage("user");
+          }
+        })
+        .catch(console.error)
+        .finally(() => this.hideDimmer());
+  }
+
   get _authorizationService() {
     return this.locator.getServiceByClass(AuthorizationService);
   }
@@ -25,16 +41,6 @@ export class SignUp extends Page {
         .finally(() => {
           this.hideDimmer();
         });
-  }
-
-  process() {
-    this.showDimmer();
-    this._authorizationService.checkIsAuthorized()
-        .then(() => this.redirectToPage("home"))
-        .catch(() => this.replacePage("signup")
-                         .then(() => this._setValidationOnSignUpForm())
-                         .then(() => super.process()))
-        .finally(() => this.hideDimmer());
   }
 
   _setValidationOnSignUpForm() {

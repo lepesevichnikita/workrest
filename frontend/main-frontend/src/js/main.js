@@ -6,8 +6,10 @@ import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
 import { Locator, Renderer } from "/frontend/src/js/domain/service/index.js";
 
 const MENU_CONTAINER_ID = "#menu";
+AuthorizationService.TOKEN = 'm_token';
 
 const locator = new Locator();
+
 locator.registerServiceByClass(TemplateHelper, new TemplateHelper())
        .registerServiceByClass(RestClient, new RestClient())
        .registerServiceByClass(Renderer, new Renderer({locator}))

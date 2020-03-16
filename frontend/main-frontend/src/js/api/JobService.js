@@ -57,6 +57,16 @@ export class JobService {
     })
   }
 
+  sendMessage(id, message) {
+    return new Promise((resolve, reject) => {
+      this._restClient.post(endpoint.messages.by_job_id(id))
+          .secured(this._authorizationService.getToken().token)
+          .send(message)
+          .then(resolve)
+          .catch(reject);
+    })
+  }
+
   startJob(id) {
     return new Promise((resolve, reject) => {
       this._restClient.post(endpoint.jobs.start_by_id(id))

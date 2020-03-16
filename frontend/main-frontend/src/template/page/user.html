@@ -66,13 +66,14 @@
         <div class="ui four doubling stackable cards" id="job-cards">
           {{if employerProfile.jobs}}
           {{each employerProfile.jobs}}
-          <div class="ui link card">
+          <div class="ui card">
             <div class="content">
+              <div class="ui header">Job #${id}</div>
               <div class="meta">
                 ${$value.currentState.name}
               </div>
               <div class="description">
-                ${description}
+                ${$value.description}
               </div>
             </div>
            <div class="extra content">
@@ -80,10 +81,22 @@
               <span class="ui label">${$value.name}</span>
               {{/each}}
             </div>
+            <div class="ui list">
+              {{if $value.messages}}
+              {{each $value.messages}}
+              <div class="item">
+                <div class="content">
+                  <a class="header">${$value.author.personalData.firstName} ${$value.author.personalData.lastName}</a>
+                  <div class="description">${$value.text}</div>
+                </div>
+              </div>
+              {{/messages}}
+              {{/if}}
+            </div>
             {{if $value.currentState.name == 'Published'}}
             <div class="ui two top attached buttons">
               <div class="ui basic attached bottom green button" data-action="start" data-id="${$value.id}">Start</div>
-              <div class="ui basic attached bottom green button" data-action="update" data-id="${$value.id}" data-target="job">Start</div>
+              <div class="ui basic attached bottom secondary button" data-action="update" data-id="${$value.id}" data-target="job">Update</div>
             </div>
             {{/if}}
             {{if $value.currentState.name == 'Started'}}

@@ -1,17 +1,27 @@
-<div class="ui modal" id="job${id}">
-  <i class="close icon"></i>
-  <div class="header">
-    ${title}
+<div class="content">
+  <div class="ui header">
+    Job #${id}
   </div>
-  <div class="content">
-    <div class="description">
-      <div class="ui header">Description</div>
-      <p>${description}</p>
+  <div class="meta">End date: ${endDateTime}</div>
+  <div class="description">
+    <div class="ui header">Description</div>
+    <p>${description}</p>
+  </div>
+</div>
+<div class="extra content">
+  {{each skills}}
+  <span class="ui label">${$value.name}</span>
+  {{/each}}
+</div>
+<div class="ui list">
+  {{if messages}}
+  {{each messages}}
+  <div class="item">
+    <div class="content">
+      <a class="header">${$value.author.personalData.firstName} ${$value.author.personalData.lastName}</a>
+      <div class="description">${$value.text}</div>
     </div>
   </div>
-  <div class="extra content">
-    {{each skills}}
-    <span class="ui label">${$value.name}</span>
-    {{/each}}
-  </div>
+  {{/messages}}
+  {{/if}}
 </div>

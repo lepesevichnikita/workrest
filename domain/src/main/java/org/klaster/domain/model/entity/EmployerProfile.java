@@ -1,7 +1,10 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -25,7 +28,9 @@ public class EmployerProfile extends AbstractProfile {
 
 
   public Set<Job> getJobs() {
-    return jobs;
+    return jobs.stream()
+               .sorted(Comparator.comparing(Job::getId))
+               .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public void setJobs(Set<Job> jobs) {

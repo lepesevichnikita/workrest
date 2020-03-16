@@ -4,7 +4,7 @@ export class Page {
   constructor(props) {
     this._eventsListeners = {};
     this._locator = props.locator;
-    this.addListener(".ui.link", ["click", this._onLinkClick.bind(this), false]);
+    this.addListener(".ui.link[name]:not([name=''])", ["click", this._onLinkClick.bind(this), false]);
   }
 
   get locator() {

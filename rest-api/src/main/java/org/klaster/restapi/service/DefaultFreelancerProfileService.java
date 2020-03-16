@@ -13,6 +13,7 @@ package org.klaster.restapi.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.klaster.domain.dto.FreelancerProfileDTO;
+import org.klaster.domain.model.state.user.VerifiedUserState;
 import org.klaster.domain.repository.FreelancerProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class DefaultFreelancerProfileService {
   public List<FreelancerProfileDTO> findAll() {
     return freelancerProfileRepository.findAll()
                                       .stream()
+                                      .filter(freelancerProfile -> freelancerProfile.getOwner()
+                                                                                    .getCurrentState() instanceof VerifiedUserState)
                                       .map(FreelancerProfileDTO::fromFreelancerProfile)
                                       .collect(Collectors.toList());
   }

@@ -1,0 +1,28 @@
+<div class="content">
+  <div class="ui header">
+    Job #${id}
+  </div>
+  <div class="meta">End date: ${endDateTime}</div>
+  <div class="description">
+    <div class="ui header">Description</div>
+    <p>${description}</p>
+  </div>
+</div>
+<div class="extra content">
+  {{each skills}}
+  <span class="ui label">${$value.name}</span>
+  {{/each}}
+</div>
+<form class="ui segment form" data-action="send-message" data-id="${id}">
+  <div class="two fields">
+    <div class="ui fluid field">
+      <div class="ui left icon input">
+        <i class="paper plane icon"></i>
+        <input required type="text" name="text" placeholder="Leave your message">
+      </div>
+    </div>
+    <div class="ui field">
+      <input type="submit" class="ui button" value="Send message">
+    </div>
+  </div>
+</form>

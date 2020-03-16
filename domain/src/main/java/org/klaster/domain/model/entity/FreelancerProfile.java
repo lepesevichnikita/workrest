@@ -1,6 +1,9 @@
 package org.klaster.domain.model.entity;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,7 +31,9 @@ public class FreelancerProfile extends AbstractProfile {
   private Set<Job> jobs;
 
   public Set<Skill> getSkills() {
-    return skills;
+    return skills.stream()
+                 .sorted(Comparator.comparing(Skill::getName))
+                 .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public void setSkills(Set<Skill> skills) {

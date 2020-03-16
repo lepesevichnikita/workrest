@@ -6,6 +6,7 @@ import { AdministratorService } from "/frontend/system-administrator-frontend/sr
 import { Administrators, Login } from "/frontend/system-administrator-frontend/src/js/page/index.js";
 
 const MENU_CONTAINER_ID = "#menu";
+AuthorizationService.TOKEN = "sa_token";
 
 const locator = new Locator();
 locator.registerServiceByClass(TemplateHelper, new TemplateHelper())

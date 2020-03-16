@@ -11,6 +11,7 @@
       {{each jobs}}
       <div class="ui card">
         <div class="content">
+          <div class="ui header">Job #${id}</div>
           <div class="meta">${$value.endDateTime}</div>
           <div class="description">
             ${$value.description}
@@ -21,25 +22,11 @@
           <span class="ui label">${$value.name}</span>
           {{/each}}
         </div>
-        <div class="ui animated button basic bottom attached primary" data-action="show" data-target="job${$value.id}">
+        <div class="ui animated button basic bottom attached primary" data-action="show" data-id="${$value.id}">
           <div class="hidden content">See</div>
           <div class="visible content">
             <i class="eye icon"></i>
           </div>
-        </div>
-      </div>
-      <div class="ui modal" id="job${id}">
-        <i class="close icon"></i>
-        <div class="content">
-          <div class="description">
-            <div class="ui header">Description</div>
-            <p>${description}</p>
-          </div>
-        </div>
-        <div class="extra content">
-          {{each $value.skills}}
-          <span class="ui label">${$value.name}</span>
-          {{/each}}
         </div>
       </div>
       {{/each}}

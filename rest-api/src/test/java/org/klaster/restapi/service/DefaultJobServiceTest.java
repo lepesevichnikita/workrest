@@ -2,10 +2,12 @@ package org.klaster.restapi.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 
 import javax.persistence.EntityNotFoundException;
 import org.klaster.domain.dto.EmployerProfileDTO;
@@ -95,9 +97,7 @@ public class DefaultJobServiceTest extends AbstractTestNGSpringContextTests {
     assertThat(createdJob, allOf(
         hasProperty("description", equalTo(randomJob.getDescription())),
         hasProperty("endDateTime", equalTo(randomJob.getEndDateTime())),
-        hasProperty("skills",
-                    hasSize(randomJob.getSkills()
-                                     .size()))
+        hasProperty("skills", not(empty()))
     ));
   }
 

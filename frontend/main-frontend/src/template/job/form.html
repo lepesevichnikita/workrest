@@ -1,13 +1,22 @@
-<form class="ui segment form" id="jobForm">
+<form class="ui segment form" id="jobForm"
+      {{if id}}
+      data-id="${id}"
+      {{/if}}
+>
   <div class="ui header">
+    {{if id}}
+    Update job #${id}
+    {{/if}}
+    {{if !id}}
     Add job
+    {{/if}}
   </div>
   <input name="id" type="hidden" value="">
     <div class="field">
       <label>
         Description
         {{if description}}
-        <textarea name="description">{{description}}</textarea>
+        <textarea name="description">${description}</textarea>
         {{/if}}
         {{if !description}}
         <textarea name="description"></textarea>
@@ -27,16 +36,20 @@
     {{if skills}}
     {{each skills}}
     <a class="ui label link" data-name="${$value}">${$value}</a>
+    {{/each}}
     {{/if}}
   </div>
   <div class="inline field">
     <label>
       End date
     </label>
-    <input endDateTime}}
-           name="endDateTime" value=""
-           {{
-           {{if/if}}
+    <input name="endDateTime"
+           {{if endDateTime}}
+             value="${endDateTime}"
+           {{/if}}
+           {{if !endDateTime}}
+             value=""
+           {{/if}}
     type="datetime-local"/>
   </div>
   <input class="ui fluid large primary submit button" type="submit" value="Save"/>

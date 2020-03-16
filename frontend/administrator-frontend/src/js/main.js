@@ -1,10 +1,12 @@
 import { PersonalDataService, UserService } from "/frontend/administrator-frontend/src/js/api/index.js";
 import { Login, PersonalData, Users } from "/frontend/administrator-frontend/src/js/page/index.js";
 import { AuthorizationService, RestClient, TemplateProvider } from "/frontend/src/js/domain/api/index.js";
+import { Action } from "/frontend/src/js/domain/constant/index.js";
 import { TemplateHelper } from "/frontend/src/js/domain/helper/index.js";
 import { Locator, Renderer } from "/frontend/src/js/domain/service/index.js";
 
 const MENU_CONTAINER_ID = "#menu";
+AuthorizationService.TOKEN = "a_token";
 
 const locator = new Locator();
 locator.registerServiceByClass(TemplateHelper, new TemplateHelper())
@@ -44,8 +46,27 @@ const loadMenu = menuName => {
 };
 
 locator.getServiceByClass(AuthorizationService)
+       .subscribe(Action.SIGNED_IN, () => {
+         loadMenu("authorized");
+         redirectToPage("users");
+       })
+       .subscribe(Action.LOGGED_OUT, () => {
+         loadMenu("main");
+         redirectToPage("login");
+       })
+       .subscribe(Action.SIGNED_UP, () => redirectToPage("users"))
+       .subscribe(Action.TOKEN_CORRECT, () => {
+         loadMenu("authorized");
+       })
+       .subscribe(Action.TOKEN_INCORRECT, () => {
+         locator.getServiceByClass(AuthorizationService)
+                .signOut();
+       });
+
+locator.getServiceByClass(AuthorizationService)
        .checkIsAuthorized()
        .then((authorized) => authorized ? loadMenu("authorized") : loadMenu("main"))
+       .catch(() => loadMenu("main"))
        .finally(() => locator.getServiceByName("login")
                              .process());
 

@@ -86,6 +86,6 @@ export class AuthorizationService extends Subscribable {
   }
 }
 
-AuthorizationService.TOKEN = "admin_token";
+AuthorizationService.TOKEN = "token";
 
 export default AuthorizationService;
