@@ -67,9 +67,27 @@ export class JobService {
     })
   }
 
+  getAllMessagesById(id) {
+    return new Promise((resolve, reject) => {
+      this._restClient.get(endpoint.messages.by_job_id(id))
+          .secured(this._authorizationService.getToken().token)
+          .then(resolve)
+          .catch(reject);
+    })
+  }
+
   startJob(id) {
     return new Promise((resolve, reject) => {
       this._restClient.post(endpoint.jobs.start_by_id(id))
+          .secured(this._authorizationService.getToken().token)
+          .then(resolve)
+          .catch(reject);
+    })
+  }
+
+  setFreelancer(jobId, freelancerId) {
+    return new Promise((resolve, reject) => {
+      this._restClient.post(endpoint.jobs.freelancer_by_id(jobId, freelancerId))
           .secured(this._authorizationService.getToken().token)
           .then(resolve)
           .catch(reject);

@@ -12,16 +12,21 @@
   {{each skills}}
   <span class="ui label">${$value.name}</span>
   {{/each}}
-</div>
-<div class="ui list">
-  {{if messages}}
-  {{each messages}}
-  <div class="item">
-    <div class="content">
-      <a class="header">${$value.author.personalData.firstName} ${$value.author.personalData.lastName}</a>
-      <div class="description">${$value.text}</div>
+  <div class="ui segment">
+    <div class="ui icon header">
+      Replies
+    </div>
+    <div class="ui list">
+      {{each messages}}
+      <div class="item">
+        <div class="meta">
+          ${$value.author.personalData.firstName} ${$value.author.personalData.lastName}
+        </div>
+        <div class="content">
+          <div class="description">${$value.text}</div>
+        </div>
+      </div>
+      {{/each}}
     </div>
   </div>
-  {{/messages}}
-  {{/if}}
 </div>

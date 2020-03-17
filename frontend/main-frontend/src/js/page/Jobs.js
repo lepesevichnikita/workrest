@@ -33,23 +33,29 @@ export class Jobs extends Page {
     const jobId = event.currentTarget.getAttribute("data-id");
     const text = form.find("input[name=text]").val();
     this._jobService.sendMessage(jobId, {text: text}).finally(() => {
-      $(".ui.modals, .ui.modal").remove();
       this.hideDimmer();
-      this.process();
+      this._showJobByIdInModal(jobId);
     });
   }
 
   async _onShowClick(event) {
     event.preventDefault();
     const jobId = event.currentTarget.getAttribute("data-id");
+    this._showJobByIdInModal(jobId);
+  }
+
+  async _showJobByIdInModal(jobId) {
     const job = this._jobs.find(job => job.id == jobId);
+    job.messages = [];
     const currentUser = (await this._userService.getCurrentUser()).body;
     let jobPopUpName = "job/popup";
-    const isCurrentUserOwnerOfJob = currentUser.employerProfile && currentUser.employerProfile.jobs.find(
-        employerJob => employerJob.id == job.id);
-    const alreadyMessaged = job.messages && job.messages.find(job => job.author.id == currentUser.id);
-    if (!isCurrentUserOwnerOfJob && !alreadyMessaged && currentUser.freelancerProfile) {
-      jobPopUpName = "job/popup_with_message_input";
+    if (currentUser) {
+      job.messages = (await this._jobService.getAllMessagesById(jobId)).body;
+      const isCurrentUserOwnerOfJob = currentUser.employerProfile && currentUser.employerProfile.jobs.find(employerJob => employerJob.id == job.id);
+      const alreadyMessaged = job.messages && job.messages.find(message => message.author.id == currentUser.id);
+      if (!isCurrentUserOwnerOfJob && !alreadyMessaged && currentUser.freelancerProfile) {
+        jobPopUpName = "job/popup_with_message_input";
+      }
     }
     this._renderer.renderModal(jobPopUpName, job)
         .catch(error => {

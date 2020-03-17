@@ -23,7 +23,8 @@ export const endpoint = {
   jobs: {
     root: "jobs", all: "jobs/all", by_id: id => `jobs/${id}`,
     finish_by_id: id => `jobs/${id}/finish`,
-    start_by_id: id => `jobs/${id}/start`
+    start_by_id: id => `jobs/${id}/start`,
+    freelancer_by_id: (id, freelancerId) => `jobs/${id}/freelancer/${freelancerId}`
   },
   messages: {
     by_job_id: jobId => `${jobId}/messages`

@@ -48,6 +48,10 @@ export class Page {
         .process();
   }
 
+  removeModals() {
+    $('.ui.modal, .ui.modals').remove();
+  }
+
   async replacePage(pageName, pageData = {}) {
     const pageSelector = "#page";
     const pageTemplateName = `page/${pageName.toLowerCase()}`;

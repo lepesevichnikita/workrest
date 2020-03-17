@@ -12,6 +12,23 @@
   {{each skills}}
   <span class="ui label">${$value.name}</span>
   {{/each}}
+  <div class="ui segment">
+    <div class="ui icon header">
+      Replies
+    </div>
+    <div class="ui list">
+      {{each messages}}
+      <div class="item">
+        <div class="meta">
+          ${$value.author.personalData.firstName} ${$value.author.personalData.lastName}
+        </div>
+        <div class="content">
+          <div class="description">${$value.text}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
 </div>
 <form class="ui segment form" data-action="send-message" data-id="${id}">
   <div class="two fields">

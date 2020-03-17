@@ -1,6 +1,7 @@
 package org.klaster.domain.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,13 +39,11 @@ public class JobMessage {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
-  @JsonManagedReference
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @Fetch(value = FetchMode.SELECT)
   private User author;
 
-  @JsonManagedReference
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @Fetch(value = FetchMode.SELECT)
   private Job job;
 

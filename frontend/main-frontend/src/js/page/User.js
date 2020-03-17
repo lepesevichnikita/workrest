@@ -15,8 +15,10 @@ export class User extends Page {
         .addListener(User.Selectors.EMPLOYER_FORM, ["submit", this._employerFormSubmit.bind(this), false])
         .addListener(User.Selectors.JOB_SKILL_ADD_BUTTON, ["click", this._jobSkillAddClick.bind(this), false])
         .addListener(User.Selectors.JOB_FORM, ["submit", this._jobFormSubmit.bind(this), false])
-        .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON, ["click", this._editEmployerProfileClick.bind(this), false])
-        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON, ["click", this._editFreelancerProfileClick.bind(this), false])
+        .addListener(User.Selectors.EMPLOYER_PROFILE_UPDATE_BUTTON,
+                     ["click", this._editEmployerProfileClick.bind(this), false])
+        .addListener(User.Selectors.FREELANCER_PROFILE_UPDATE_BUTTON,
+                     ["click", this._editFreelancerProfileClick.bind(this), false])
         .addListener(User.Selectors.JOB_UPDATE_BUTTON, ["click", this._updateJobClick.bind(this), false])
         .addListener(User.Selectors.JOB_CREATE_BUTTON, ["click", this._createJobClick.bind(this), false])
         .addListener(User.Selectors.JOB_DELETE_BUTTON, ["click", this._deleteJob.bind(this), false])
@@ -94,7 +96,7 @@ export class User extends Page {
     this._freelancerProfile.skills = freelancerSkills;
     this._renderSkillsInFreelancerProfileForm()
         .then(() => {
-          $(User.Selectors.FREELANCER_SKILL_REMOVE_BUTTON )
+          $(User.Selectors.FREELANCER_SKILL_REMOVE_BUTTON)
           .click(this._removeSkillFromFreelancerProfileForm.bind(this));
         });
   }
@@ -178,7 +180,7 @@ export class User extends Page {
   _jobFormSubmit(event) {
     event.preventDefault();
     const jobForm = $(User.Selectors.JOB_FORM);
-    const jobId = jobForm.attr('data-id');
+    const jobId = jobForm.attr("data-id");
     this._job.description = jobForm.find("textarea")
                                    .val();
     this._job.endDateTime = jobForm.find("input[name=endDateTime]")
@@ -188,11 +190,11 @@ export class User extends Page {
         ? this._jobService.createJob(this._job)
         : this._jobService.updateJob(jobId, this._job);
     promise.then(() => this.process())
-        .finally(() => {
-          $(".ui.modals, .ui.modal").remove();
-          this.process();
-          this.hideDimmer();
-        });
+           .finally(() => {
+             $(".ui.modals, .ui.modal").remove();
+             this.process();
+             this.hideDimmer();
+           });
   }
 
   _splitInputAndPushUniqueToArray(array, input) {
@@ -288,7 +290,9 @@ User.Selectors = {
   JOB_START_BUTTON: "div[data-action=start]",
   JOB_FINISH_BUTTON: "div[data-action=finish]",
   FREELANCER_SKILL_REMOVE_BUTTON: "#freelancerSkills a",
-  JOB_SKILL_REMOVE_BUTTON: "#jobSkills a"
+  JOB_SKILL_REMOVE_BUTTON: "#jobSkills a",
+  JOB_SHOW_MESSAGES_BUTTON: "div[data-action=show-messages]",
+  JOB_SET_FREELANCE_BUTTON: "div[data-action=set-freelancer]"
 };
 
 User.EMPTY_FREELANCER_PROFILE = {description: null, skills: []};

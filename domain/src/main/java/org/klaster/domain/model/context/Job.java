@@ -48,8 +48,8 @@ public class Job extends AbstractContext<AbstractJobState> {
   @Fetch(FetchMode.SELECT)
   private FreelancerProfile freelancerProfile;
 
-  @JsonBackReference
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "job", orphanRemoval = true)
+  @JsonIgnore
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "job", orphanRemoval = true)
   @Fetch(FetchMode.SELECT)
   private Set<JobMessage> messages;
 

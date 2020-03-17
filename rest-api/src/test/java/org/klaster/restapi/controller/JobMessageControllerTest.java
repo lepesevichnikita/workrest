@@ -1,13 +1,16 @@
 package org.klaster.restapi.controller;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.IntStream;
 import org.klaster.domain.dto.EmployerProfileDTO;
 import org.klaster.domain.dto.FreelancerProfileDTO;
 import org.klaster.domain.dto.JobDTO;
@@ -120,7 +123,9 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser,
+                                                                                FreelancerProfileDTO.fromFreelancerProfile(
+                                                                                    randomFreelancerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, createdJob.getId(), CONTROLLER_NAME);
     final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(anotherRegisteredUser.getLoginInfo()
@@ -136,9 +141,7 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
            .andExpect(status().isCreated())
            .andExpect(jsonPath("$.id").value(notNullValue()))
            .andExpect(jsonPath("$.author.id").value(userWithFreelancerProfile.getId()))
-           .andExpect(jsonPath("$.text").value(randomJobMessage.getText()))
-           .andExpect(jsonPath("$.job.id").value(createdJob.getId()));
-
+           .andExpect(jsonPath("$.text").value(randomJobMessage.getText()));
   }
 
   @Test
@@ -149,7 +152,9 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser,
+                                                                                FreelancerProfileDTO.fromFreelancerProfile(
+                                                                                    randomFreelancerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.startById(createdJob.getId(), userWithEmployerProfile);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, createdJob.getId(), CONTROLLER_NAME);
@@ -174,7 +179,9 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser,
+                                                                                FreelancerProfileDTO.fromFreelancerProfile(
+                                                                                    randomFreelancerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.finishById(createdJob.getId(), userWithEmployerProfile);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, createdJob.getId(), CONTROLLER_NAME);
@@ -199,7 +206,9 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
                                                                             EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
     User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
     User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
-    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser, FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+    User userWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser,
+                                                                                FreelancerProfileDTO.fromFreelancerProfile(
+                                                                                    randomFreelancerProfile));
     Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
     defaultJobService.deleteById(createdJob.getId(), userWithEmployerProfile);
     final String uri = String.format(CONTROLLER_PATH_TEMPLATE, createdJob.getId(), CONTROLLER_NAME);
@@ -259,5 +268,38 @@ public class JobMessageControllerTest extends AbstractTestNGSpringContextTests {
                              .contentType(MediaType.APPLICATION_JSON)
                              .content(jobMessageDTOAsJson))
            .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void okWithAllMessages() throws Exception {
+    final int messagesCount = 10;
+    User registeredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfo);
+    User verifiedUser = defaultUserService.verifyById(registeredUser.getId());
+    User userWithEmployerProfile = defaultUserService.updateEmployerProfile(verifiedUser,
+                                                                            EmployerProfileDTO.fromEmployerProfile(randomEmployerProfile));
+    Job createdJob = defaultJobService.create(JobDTO.fromJob(randomJob), userWithEmployerProfile);
+    IntStream.range(0, messagesCount)
+             .forEach(jobMessageNumber -> {
+               User anotherRegisteredUser = defaultUserService.registerUserByLoginInfo(randomLoginInfoFactory.build());
+               User anotherVerifiedUser = defaultUserService.verifyById(anotherRegisteredUser.getId());
+               User anotherUserWithFreelancerProfile = defaultUserService.updateFreelancerProfile(anotherVerifiedUser,
+                                                          FreelancerProfileDTO.fromFreelancerProfile(randomFreelancerProfile));
+               defaultJobService.addMessageFromUser(createdJob.getId(),
+                                                    anotherUserWithFreelancerProfile,
+                                                    randomJobMessageFactory.build()
+                                                                           .getText());
+             });
+    final String expectedJobMessagesAsJson = objectMapper.writeValueAsString(defaultJobService.findAllMessagesByJobId(createdJob.getId()));
+    final String uri = String.format(CONTROLLER_PATH_TEMPLATE, createdJob.getId(), CONTROLLER_NAME);
+    final String validTokenValue = defaultTokenBasedUserDetailsService.createToken(registeredUser.getLoginInfo()
+                                                                                                 .getLogin(),
+                                                                                   registeredUser.getLoginInfo()
+                                                                                                 .getPassword())
+                                                                      .getValue();
+    mockMvc.perform(get(uri).header(HttpHeaders.AUTHORIZATION, validTokenValue)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(content().json(expectedJobMessagesAsJson));
   }
 }

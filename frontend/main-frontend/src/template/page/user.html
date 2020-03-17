@@ -33,10 +33,20 @@
         <span class="ui label">${$value}</span>
         {{/each}}
       </div>
-      <div class="ui basic attached bottom primary button" data-action="update" data-target="freelancerProfileFormModal">Update</div>
+      <div class="ui bottom attached primary vertical animated button" data-action="update" data-target="freelancerProfileFormModal">
+        <div class="hidden content">Update</div>
+        <div class="visible content">
+          <i class="edit icon"></i>
+        </div>
+      </div>
       {{/if}}
       {{if !freelancerProfile && currentState.name == 'Verified'}}
-      <div class="ui basic attached bottom green button" data-action="update" data-target="freelancerProfileFormModal">Create</div>
+      <div class="ui bottom attached green vertical animated button" data-action="update" data-target="freelancerProfileFormModal">
+        <div class="hidden content">Create</div>
+        <div class="visible content">
+          <i class="plus icon"></i>
+        </div>
+      </div>
       {{/if}}
     </div>
     <div class="ui fluid card" id="employerProfile">
@@ -49,10 +59,20 @@
         {{/if}}
       </div>
       {{if employerProfile}}
-      <div class="ui basic attached bottom primary button" data-action="update" data-target="employerProfileFormModal">Update</div>
+      <div class="ui bottom attached primary vertical animated button" data-action="update" data-target="employerProfileFormModal">
+        <div class="hidden content">Update</div>
+        <div class="visible content">
+          <i class="edit icon"></i>
+        </div>
+      </div>
       {{/if}}
       {{if !employerProfile && currentState.name == 'Verified'}}
-      <div class="ui basic attached bottom green button" data-action="update" data-target="employerProfileFormModal">Create</div>
+      <div class="ui bottom attached green vertical animated button" data-action="update" data-target="employerProfileFormModal">
+        <div class="hidden content">Create</div>
+        <div class="visible content">
+          <i class="plus icon"></i>
+        </div>
+      </div>
       {{/if}}
     </div>
     {{if employerProfile}}
@@ -69,8 +89,13 @@
           <div class="ui card">
             <div class="content">
               <div class="ui header">Job #${id}</div>
-              <div class="meta">
-                ${$value.currentState.name}
+              <div class="left floated meta">
+                <p>
+                  Current state: ${$value.currentState.name}
+                </p>
+                <p>
+                  End date: ${$value.endDateTime}
+                </p>
               </div>
               <div class="description">
                 ${$value.description}
@@ -81,36 +106,49 @@
               <span class="ui label">${$value.name}</span>
               {{/each}}
             </div>
-            <div class="ui list">
-              {{if $value.messages}}
-              {{each $value.messages}}
-              <div class="item">
-                <div class="content">
-                  <a class="header">${$value.author.personalData.firstName} ${$value.author.personalData.lastName}</a>
-                  <div class="description">${$value.text}</div>
+            {{if $value.currentState.name == 'Published'}}
+            <div class="ui two bottom attached buttons">
+              <div class="ui bottom attached green vertical animated button" data-action="start" data-id="${$value.id}">
+                <div class="hidden content">Start</div>
+                <div class="visible content">
+                  <i class="hourglass start icon"></i>
                 </div>
               </div>
-              {{/messages}}
-              {{/if}}
-            </div>
-            {{if $value.currentState.name == 'Published'}}
-            <div class="ui two top attached buttons">
-              <div class="ui basic attached bottom green button" data-action="start" data-id="${$value.id}">Start</div>
-              <div class="ui basic attached bottom secondary button" data-action="update" data-id="${$value.id}" data-target="job">Update</div>
+              <div class="ui bottom attached secondary vertical animated button" data-action="update" data-id="${$value.id}" data-target="job">
+                <div class="hidden content">Update</div>
+                <div class="visible content">
+                  <i class="edit icon"></i>
+                </div>
+              </div>
             </div>
             {{/if}}
             {{if $value.currentState.name == 'Started'}}
-            <div class="ui basic attached bottom primary button" data-action="finish" data-id="${$value.id}">Finish</div>
+            <div class="ui bottom attached primary vertical animated button" data-action="finish" data-id="${$value.id}">
+              <div class="hidden content">Finish</div>
+              <div class="visible content">
+                <i class="hourglass end icon"></i>
+              </div>
+            </div>
             {{/if}}
             {{if $value.currentState.name == 'Finished'}}
-            <div class="ui basic attached bottom red button" data-action="delete" data-id="${$value.id}">Delete</div>
+            <div class="ui bottom attached red vertical animated button" data-action="delete" data-id="${$value.id}">
+              <div class="hidden content">Delete</div>
+              <div class="visible content">
+                <i class="trash icon"></i>
+              </div>
+            </div>
             {{/if}}
           </div>
           {{/each}}
           {{/if}}
         </div>
       </div>
-      <div class="ui basic attached bottom green button" data-action="create" data-target="job">Create</div>
+      <div class="ui bottom attached green vertical animated button" data-action="create" data-target="job">
+        <div class="hidden content">Create</div>
+        <div class="visible content">
+          <i class="plus icon"></i>
+        </div>
+      </div>
     </div>
     {{/if}}
     <div class="ui modal">

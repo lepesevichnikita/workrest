@@ -7,6 +7,7 @@ package org.klaster.restapi.controller;
  *
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.klaster.domain.dto.JobDTO;
 import org.klaster.domain.model.context.Job;
@@ -46,7 +47,7 @@ public class JobController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<Job> create(@RequestBody JobDTO jobDTO, @AuthenticationPrincipal User currentUser) {
+  public ResponseEntity<Job> create(@RequestBody JobDTO jobDTO, @AuthenticationPrincipal User currentUser) throws JsonProcessingException {
     return new ResponseEntity<>(defaultJobService.create(jobDTO, currentUser), HttpStatus.CREATED);
   }
 
@@ -84,10 +85,12 @@ public class JobController {
                          .body(defaultJobService.updateById(id, jobDTO, currentUser));
   }
 
-  @PostMapping("/{id}/freelancer/${freelancerId}")
+  @PostMapping("/{id}/freelancer/${userId}")
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<Job> setFreelancer(@PathVariable long id, @PathVariable long freelancerId, @AuthenticationPrincipal User currentUser) {
+  public ResponseEntity<Job> setFreelancer(@PathVariable long id,
+                                           @PathVariable long userId,
+                                           @AuthenticationPrincipal User currentUser) {
     return ResponseEntity.accepted()
-                         .body(defaultJobService.setFreelancerProfile(id, freelancerId));
+                         .body(defaultJobService.setFreelancerProfile(id, userId));
   }
 }

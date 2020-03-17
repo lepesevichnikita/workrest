@@ -32,6 +32,7 @@ import org.klaster.domain.repository.JobRepository;
 import org.klaster.domain.repository.SkillRepository;
 import org.klaster.domain.util.MessageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +57,9 @@ public class DefaultJobService {
 
   @Autowired
   private FreelancerProfileRepository freelancerProfileRepository;
+
+  @Autowired
+  private DefaultUserService defaultUserService;
 
   @Autowired
   private JobMessageRepository jobMessageRepository;
@@ -90,14 +94,11 @@ public class DefaultJobService {
   }
 
   @Transactional
-  public Job setFreelancerProfile(long jobId, long freelancerId) {
+  public Job setFreelancerProfile(long jobId, long userId) {
     Job foundJob = findById(jobId);
-    FreelancerProfile freelancerProfile = freelancerProfileRepository.findById(freelancerId)
-                                                                     .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(
-                                                                         FreelancerProfile.class,
-                                                                         freelancerId)));
+    User foundUser = defaultUserService.findFirstById(userId);
     foundJob.getCurrentState()
-            .setFreelancerProfile(freelancerProfile);
+            .setFreelancerProfile(foundUser.getCurrentState().getFreelancerProfile());
     return jobRepository.saveAndFlush(foundJob);
   }
 
@@ -175,5 +176,12 @@ public class DefaultJobService {
     }
   }
 
-
+  @Transactional
+  public List<JobMessage> findAllMessagesByJobId(long jobId) {
+    Job foundJob = findById(jobId);
+    return foundJob.getMessages()
+                   .stream()
+                   .sorted(Comparator.comparing(JobMessage::getId))
+                   .collect(Collectors.toList());
+  }
 }
