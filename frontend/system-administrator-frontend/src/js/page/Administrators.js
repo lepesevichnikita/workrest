@@ -53,7 +53,10 @@ export class Administrators extends Page {
   _loadData() {
     this._administratorService.getAdministrators()
         .then(response => this.replacePage("administrators", {administrators: response.body})
-                              .finally(() => this.hideDimmer()));
+                              .finally(() => {
+                                super.process();
+                                this.hideDimmer();
+                              }));
   }
 
   _onDeleteClick(event) {

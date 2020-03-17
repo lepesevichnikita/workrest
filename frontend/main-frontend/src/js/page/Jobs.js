@@ -45,6 +45,7 @@ export class Jobs extends Page {
   }
 
   async _showJobByIdInModal(jobId) {
+    this.showDimmer();
     const job = this._jobs.find(job => job.id == jobId);
     job.messages = [];
     const currentUser = (await this._userService.getCurrentUser()).body;
@@ -57,6 +58,7 @@ export class Jobs extends Page {
         jobPopUpName = "job/popup_with_message_input";
       }
     }
+    this.hideDimmer();
     this._renderer.renderModal(jobPopUpName, job)
         .catch(error => {
           console.error(error);

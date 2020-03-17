@@ -35,14 +35,16 @@ export class Login extends Page {
             this.redirectToPage("administrators");
           } else {
             this.replacePage("login")
-                .then(() => this._setValidationOnLoginForm());
+                .then(() => this._setValidationOnLoginForm()).finally(() => {
+                  this.hideDimmer();
+                  super.process();
+            });
           }
         })
         .finally(() => super.process());
   }
 
   _signIn(event, fields) {
-    event.preventDefault();
     this._authorizationService.signIn(fields)
         .catch(error => this.addErrorsToForm(Login.FORM_SELECTOR, error.response.body))
   }
