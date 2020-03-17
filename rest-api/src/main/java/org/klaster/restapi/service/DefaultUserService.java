@@ -80,6 +80,11 @@ public class DefaultUserService {
   @Autowired
   private SkillRepository skillRepository;
 
+  /**
+   * Registers user's by passed login info
+   * @param loginInfo login and password of user
+   * @return registered user
+   */
   @Transactional
   public User registerUserByLoginInfo(LoginInfo loginInfo) {
     if (systemAdministratorProperties.getLogin()
@@ -94,6 +99,11 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(user);
   }
 
+  /**
+   * Changes user's current state to blocked
+   * @param id updated user id
+   * @return updated user
+   */
   @Transactional
   public User deleteById(long id) {
     User deletedUser = userRepository.findById(id)
@@ -103,6 +113,11 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(deletedUser);
   }
 
+  /**
+   * Changes user current state to blocked
+   * @param id updated user id
+   * @return updated user
+   */
   @Transactional
   public User blockById(long id) {
     User foundUser = userRepository.findById(id)
@@ -111,6 +126,12 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(foundUser);
   }
 
+  /**
+   * Unblocks current user if it is blocked.
+   * Reverts current user state to previous;
+   * @param id updated user id
+   * @return updated user
+   */
   @Transactional
   public User unblockById(long id) {
     User foundUser = userRepository.findById(id)
@@ -124,12 +145,24 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(foundUser);
   }
 
+  /**
+   * Finds first user by passed id
+   * @throws EntityNotFoundException if user with passed id doesnt exist
+   * @param id required user id
+   * @return found user
+   */
   @Transactional
-  public User findFirstById(long id) {
+  public User findFirstById(long id) throws EntityNotFoundException {
     return userRepository.findById(id)
                          .orElseThrow(() -> new EntityNotFoundException(MessageUtil.getEntityByIdNotFoundMessage(User.class, id)));
   }
 
+  /**
+   * Update user's employer profile
+   * @param user updated user
+   * @param employerProfileDTO employer profile DTO
+   * @return updated user
+   */
   @Transactional
   public User updateEmployerProfile(User user, EmployerProfileDTO employerProfileDTO) {
     EmployerProfile employerProfile = defaultEmployerProfileBuilder.setDescription(employerProfileDTO.getDescription())
@@ -139,6 +172,12 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(user);
   }
 
+  /**
+   * Updates user's freelancer profile
+   * @param user updated user
+   * @param freelancerProfileDTO freelancer profile DTO
+   * @return updated user
+   */
   @Transactional
   public User updateFreelancerProfile(User user, FreelancerProfileDTO freelancerProfileDTO) {
     Set<Skill> skills = skillRepository.findAllByNamesOrCreate(freelancerProfileDTO.getSkills());
@@ -151,6 +190,11 @@ public class DefaultUserService {
     return finalFreelancerProfile.getOwner();
   }
 
+  /**
+   * Changes current user's state to verified if it isn't verifed already
+   * @param id updated user id
+   * @return updated user
+   */
   @Transactional
   public User verifyById(long id) {
     User foundUser = userRepository.findById(id)
@@ -161,6 +205,10 @@ public class DefaultUserService {
     return userRepository.saveAndFlush(foundUser);
   }
 
+  /**
+   * Finds all users with base user authoritites
+   * @return found users
+   */
   public List<User> findAll() {
     return userRepository.findAllByAuthorities(getPlainUserAuthority());
   }
