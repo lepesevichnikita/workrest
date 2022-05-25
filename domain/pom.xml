@@ -17,7 +17,7 @@
 
   <properties>
     <sonar.projectKey>lepesevichnikita_${project.parent.artifactId}_${project.artifactId}</sonar.projectKey>
-    <spring.version>5.2.11.RELEASE</spring.version>
+    <spring.version>5.5.7</spring.version>
     <hibernate.version>5.4.12.Final</hibernate.version>
   </properties>
 
